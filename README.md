@@ -1,4 +1,4 @@
-# Learning Data Science on the Ethereum Blockchain with @omnianalytics
+# Learning Data Science on the Ethereum Blockchain with (https://twitter.com/OmniAnalytics)[@OmniAnalytics]
 
 Help us share our joy of data science with the Ethereum eco-system through an informative set of online courses and case studies that merge data analysis, blockchain analytics and statistical programming.
 
