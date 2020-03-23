@@ -21,7 +21,7 @@ Module 3 - Machine Learning and Clustering
 ## FAQ
 
 *Do you all have experience in this stuff?*  
-Why yes we do! Omni Analytics Group is a team of PhD level statistical consultants that have been teaching and solving difficult data science problems for nearly a decade. We are passionate about data science and blockchain technologies. Just check out our twitter.
+Why yes, we do! Omni Analytics Group is a team of PhD level statistical consultants that have been teaching and solving difficult data science problems for nearly a decade. We are passionate about data science and blockchain technologies. Just check out [our twitter](https://twitter.com/OmniAnalytics).
 
 *Do I need any prior experience before taking this course?*  
 Our intention is to start from the beginning and build up not only your data chops, but your statistical intuition and programming knowledge. At the end of these courses, you should be able to match a statistical technique to a blockchain data problem, write a basic script to analyze it and confidently search online for more advanced knowledge.
