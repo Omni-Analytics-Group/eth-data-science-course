@@ -14,6 +14,6 @@ Our ultimate vision is to spur and inspire the next generation of developer thro
 
 ## Tentative Course Outline
 
-Module 1 - Basic Data Structures and Munging
-Module 2 - Statistical Graphics and Visualization
-Module 3 - Machine Learning and Clustering
+* Module 1 - Basic Data Structures and Munging
+* Module 2 - Statistical Graphics and Visualization
+* Module 3 - Machine Learning and Clustering
