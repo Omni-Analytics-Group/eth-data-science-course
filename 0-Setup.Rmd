@@ -1,0 +1,55 @@
+---
+title: "Setup"
+output:
+  ioslides_presentation: 
+    smaller: true
+    css: css/styles.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Your Background
+
+What do you know already?
+
+- Excel, Numbers, Some sort of spreadsheet software
+- SAS, SPSS, Minitab
+- Any other programming language
+- R
+- A text editor
+
+## Installing R
+
+Hopefully this is done already. Otherwise for Windows or OSX:
+
+- Go to http://www.r-project.org/
+- From CRAN, pick a download site 
+- Choose link based on your Operation System (OS)
+- Choose the "base" subdirectory to install R.
+  - "contrib" is useful for installing packages on computers without internet access
+  - "Rtools" is needed for package development
+  
+
+## Interacting With R
+
+- RStudio
+- RGui [Windows/Mac] or Command line [Linux]
+- Notepad++ (NpptoR) [Windows only]
+- Emacs + ESS
+- Eclipse + StatET
+
+## Get Use to RStudio
+
+We will be using Rstudio for the duration of this course. However, you are free to use any IDE of your choice.
+
+
+<center><img src="Rstudio.png" width="600px"></center>
+
+
+
+
+
+
+
