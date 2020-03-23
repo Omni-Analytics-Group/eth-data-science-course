@@ -45,7 +45,7 @@ Hopefully this is done already. Otherwise for Windows or OSX:
 We will be using Rstudio for the duration of this course. However, you are free to use any IDE of your choice.
 
 
-<center><img src="Rstudio.png" width="600px"></center>
+<center><img src="images/Rstudio.png" width="600px"></center>
 
 
 
