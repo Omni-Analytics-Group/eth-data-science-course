@@ -1,0 +1,89 @@
+Link,Name,Text,Owner,Funded DAI,Goal DAI,Percentage Funded
+/grants/82/official-progpow-technical-audit-funding,Official ProgPow Technical Audit Funding,The Ethereum Cat Herders were tasked by the Ethereum Core Developers with reviewing and finding an independent party to perform an audit on th...,cpstl,"15,799.70","50,000.00",0.315994
+/grants/56/training-1000-ethereum-developers-for-free-in-2019,Training 1000 Ethereum developers for free in 2019,"B9lab have been running in-depth, extensively mentored and supported Ethereum developer courses since 2015. We believe that making quality edu...",8bitpal,0,"50,000.00",0
+/grants/54/progpow-full-stack-integration,Open Source ProgPoW miner full stack integration,"Project in one sentence
+Extend ethminer’s capabilities to implement ProgPoW by the means of EIP-1057 (https://github.com/ethereum/EIPs/blob/ma...",andrealanfranchi,"6,752.00","38,400.00",0.175833333
+/grants/95/tsskit-threshold-signature-scheme-toolkit,TSSKit: Threshold Signature Scheme Toolkit,TSSKit automatically selects the appropriate Threshold Signature Scheme based on a set of options required by the secret sharing needs of each...,tina1998612,"20,234.40","30,000.00",0.67448
+/grants/47/evm-evolution,EVM Evolution,"In the 21st century, on a blockchain holding billions USD in value, formal specification and verification are an essential tool. Yet the desig...",bmann,88,"30,000.00",0.002933333
+/grants/86/gitcoin-sustainability-fund,Gitcoin Sustainability Fund,This is our second in a series of Gitcoin Grant's posted by the internal Gitcoin team ( the other is https://gitcoin.co/grants/12/gitcoin-open...,owocki,294,"20,000.00",0.0147
+/grants/96/grinswap-cross-chain-atomic-swaps-with-grin,GrinSwap - cross chain atomic swaps with Grin,"GrinSwap makes it easy for anyone to trade in and out of Grin trustlessly and without the need for a third party. It makes OTC deals a breeze,...",jaspervdm,"3,510.48","10,000.00",0.351048
+/grants/97/knockturn-allee-grin-payment-processor,Knockturn Allee - Grin payment processor,Self-hosted Grin payment processor which allows merchants to accept grin payments (and donations in the future). It supports easy integration ...,hashmap,"2,565.28","7,000.00",0.366468571
+/grants/58/ironbelly,Ironbelly - Grin mobile wallet,Ironbelly is a mobile wallet for Grin/Mimblewimble blockchain. It's first of a kind. The goal is to provide an easy and simple way to hold and...,i1skn,"5,911.77","7,000.00",0.844538571
+/grants/25/lighthouse-ethereum-20-client,Lighthouse: Ethereum 2.0 Client,"Sigma Prime is developing a fully open-source Serenity (Ethereum 2.0 / ETH 2.0) client called Lighthouse, using the Rust programming language....",paulhauner,"3,221.54","6,300.00",0.511355556
+/grants/89/hopr-decentralized-privacy-preserving-messaging-2,HOPR - decentralized privacy-preserving messaging protocol,HOPR is a privacy-preserving messaging protocol that incentivizes users to participate in the network. It provides privacy by relaying message...,scbuergel,"6,824.38","6,000.00",1.137396667
+/grants/17/implement-support-for-asyncio-using-web3py-2,Implement support for asyncio using Web3.py,The Web3.py library provides a wide array of high level APIs for interacting with the Ethereum blockchain.  Python3 introduced core support fo...,pipermerriam,"1,472.00","5,500.00",0.267636364
+/grants/15/whiteblock-testing-2,Whiteblock Testing,"Whiteblock is a blockchain research and testing team. Some of our notable work includes our audit and analysis of the EOS blockchain, sharding...",zscole,142.25,"5,000.00",0.02845
+/grants/90/eggforce,Eggforce,"POA Network would like to introduce to the community its latest initiative, the POA Games Fund. This initiative is a $50,000 Dai fund which wi...",siddigzeidan,0,"5,000.00",0
+/grants/87/kitsune-wallet,Kitsune-Wallet,"Kitsune wallet is the new name of Universally Upgradable Identity Proxy, which was initiated during EthParis 2019. Similarly to the nine-taile...",amxx,"5,000.00","5,000.00",1
+/grants/66/leapdao-building-a-home-for-dapps-on-layer-2,LeapDAO - building a home for dApps on layer-2 ❤,"Ethereum, being the first world computer, has spurred a cambrian explosion of dApps. Yet its capacity is limited — when gas prices surge, high...",johannbarbie,"5,011.00","5,000.00",1.0022
+/grants/65/urllib3,urllib3 - Python HTTP Library,"urllib3 is a powerful, sanity-friendly HTTP client for Python.
+
+Much of the Python ecosystem already uses urllib3 and you should too. PyPI see...",shazow,180,"5,000.00",0.036
+/grants/43/fission-codes,FISSION Codes,"The FISSION Codes project aims to bring standardized messaging to blockchain smart contract systems. Similar to HTTP Status Codes, FISSION Cod...",bmann,253.03,"5,000.00",0.050606
+/grants/35/blockscout-blockchain-explorer-for-inspecting-and,BlockScout: Blockchain Explorer for Inspecting and Analyz...,"BlockScout is the only fully-featured, open-source EVM block explorer available today. Because it is open source and freely available, BlockSc...",siddigzeidan,57,"5,000.00",0.0114
+/grants/24/prysm-by-prysmatic-labs,Prysm by Prysmatic Labs,"We are developing an open source ETH 2.0 client in Go. On top of that, we are developing a series of utilities in Go to interact with beacon c...",terenc3t,"10,708.58","5,000.00",2.141716
+/grants/22/fuzz-geth-and-parity-for-evm-consensus-bugs-2,fuzz geth and Parity for EVM consensus bugs,Work with the Ethereum Foundation security team on consensus testing using a multi-client EVM fuzzer. The grantee will help update our coverag...,cdetrio,"14,800.00","4,500.00",3.288888889
+/grants/79/lodestar-eth20-client,Lodestar (ETH2.0 client),"NOTICE :: New Grant 
+
+Old grant url :: https://gitcoin.co/grants/21/lodestar-eth20-client-2
+
+We would like to thank everyone who made donation...",gregthegreek,"1,707.00","3,500.00",0.487714286
+/grants/36/molochdao,MolochDAO,"2019 is the year of DAO.
+
+Moloch is a minimum viable decentralized autonomous organization.
+
+Moloch aims to solve coordination problems fa...",austintgriffith,"6,165.00","3,500.00",1.761428571
+/grants/16/cryptoeconomicsstudy-free-open-source-blockchain-2,"Cryptoeconomics.study - Free, Open-Source Blockchain Course","Cryptoeconomics.study is a free, open-source course on Blockchain protocols and Cryptoeconomics. Our goal is to bring developers to the point ...",k-ho,"5,458.00","3,000.00",1.819333333
+/grants/13/ethersjs-complete-simple-and-tiny-2,"ethers.js - Complete, Simple and Tiny","The ethers.js library is a complete, simple and tiny library for writing Ethereum applications, wallets and utilities.
+
+Funding helps contin...",ricmoo,"3,903.73","3,000.00",1.301243333
+/grants/62/general-contributions-to-python-ecosystem-of-eth-3,General Contributions to Python Ecosystem of Ethereum,General solving of Issues which are specific to the python repositories of Ethereum.,bhargavasomu,55,"3,000.00",0.018333333
+/grants/55/plasma-by-kyokan-secure-low-fee-instant-payments,"Plasma by Kyokan - Secure, Low-Fee, Instant Payments","This is a Golang Plasma implementation designed to do one thing well: let people make payments securely, trustlessly, instantly, and for almos...",mslipper,0,"3,000.00",0
+/grants/37/connext-network,Connext Network,"Connext is free, open source, p2p micropayment infrastructure, built using payment channels on the Ethereum blockchain. Payment channels are a...",hthillman,"3,552.09","3,000.00",1.18403
+/grants/32/vipnode,Vipnode,"Vipnode is building an open source implementation and protocol for creating an economic incentive to run full nodes.
+
+You can use vipnode to...",shazow,191,"3,000.00",0.063666667
+/grants/20/burner-wallet,Burner Wallet,"One mobile phone can send DAI to another in 5 seconds with a simple QR code scan without any wallet download, this works on mobile web browser...",austintgriffith,"5,465.00","3,000.00",1.821666667
+/grants/85/tennagraph-minimum-bias-ethereum-signal-aggregat-2,Tennagraph - Minimum bias ethereum signal aggregator,Tennagraph represents consensus among stakeholders on EIPs and community issues through the collection of on-chain and off-chain signals. Our ...,madeoftin,"1,340.79","2,800.00",0.478853571
+/grants/80/walletconnect,WalletConnect,WalletConnect is an open protocol for connecting desktop Dapps to mobile Wallets using end-to-end encryption by scanning a QR code. Opening up...,pedrouid,"2,092.00","2,500.00",0.8368
+/grants/48/uniswap,Uniswap,Designed with simplicity in mind the Uniswap protocol provides an interface for seamless exchange of ERC20 tokens on Ethereum. By eliminating ...,haydenadams,"4,975.69","2,500.00",1.990276
+/grants/29/zokrates,ZoKrates,"ZoKrates is a toolbox to enable developers to use zkSNARKs and verify them on a blockchain.
+
+Zero-knowledge proofs (ZKP) are an exciting mec...",schaeff,"3,004.00","2,500.00",1.2016
+/grants/63/radicalxchange,RadicalxChange,"RadicalxChange convenes a community of activists, artists, entrepreneurs and scholars committed to using dramatically expanded competitive, fr...",cloudydata,2,"2,000.00",0.001
+/grants/39/plasma-group,Plasma Group,An open source community-driven scalability plasma implementation and research project.,jinglan,"3,192.67","1,500.00",2.128446667
+/grants/75/ethereum-dev-fund-working-group,Ethereum Dev Fund Working Group,"This Gitcoin Grant is in support of the Ethereum Dev Fund Working Group.
+
+Our charter is to figure out how to solve the long term systemic i...",owocki,0,"1,000.00",0
+/grants/41/yeeth,Yeeth,"We are working on an ETH 2.0 implementation in swift, this includes the BeaconChain along with various other components required such as Simpl...",decanus,245.1,"1,000.00",0.2451
+/grants/40/ethhub,EthHub - Ethereum Information Hub,"EthHub is a fundamentals-focused, open source, UI-driven, community-driven Ethereum research and resources hub that aims to solve the issue of...",sassal,"3,769.29","1,000.00",3.76929
+/grants/31/grantops,GrantOps,"GrantOps mission is to support blockchain projects to apply for available grants. 
+
+After working on grant proposals for Giveth initiatives ...",parkwil89,41,"1,000.00",0.041
+/grants/26/peepeth-social-network-for-a-better-world,Peepeth: social network for a better world,"Peepeth is a social network promoting mindful engagement.
+
+-Features encourage thoughtful content while discouraging reactive and hateful po...",bbarton,13,"1,000.00",0.013
+/grants/99/buidler-2,Buidler,"Buidler is the first task runner for Ethereum smart contract developers. It unlocks productivity through flexibility, interoperability, and st...",fzeoli,69.26,500,0.13852
+/grants/83/poa-network-community-management-grant-for-adj-2,POA Network Community Management Grant for Adj,"This grant is for community member Adj who will be helping out with the community management issues:
+
+* Suggest new directions and ideas for t...",siddigzeidan,250,500,0.5
+/grants/49/blockchain-education-network,Blockchain Education Network,"🙌 Thanks to Coindesk, we are raffling off TWO tickets to #Consensus2019! Donate to BEN by 4/19!
+
+Rules
+10 DAI = 1 Entry
+50 DAI = 5 Entries
+100...",erickpinos,120,500,0.24
+/grants/81/decentralize-data-now-cat-herding,Decentralize Data NOW! Cat Herding,Decentralize Data NOW! is a community with a telegram group that holds an open call coordinating the creation of tools for extracting data out...,griffgreen,225,400,0.5625
+/grants/38/zero-knowledge-podcast,Zero Knowledge Podcast,Zero Knowledge is a podcast which goes deep into the tech that will power the emerging Web3 and the community that is building it. The podcast...,arrose,694.72,300,2.315733333
+/grants/44/chainid-network,ChainID Network,"**ChainID Network** is a project to maintain information about all of the EVM / Ethereum client networks.
+
+The Chain ID and Network ID in part...",bmann,0.1,250,0.0004
+/grants/30/ethereum-all-core-devs-community-project-managem-2,Ethereum All Core Devs community project management,"This grant is intended to fund ongoing project management work for Ethereum All Core Devs such as taking, editing, and organizing notes and ot...",lrettig,"1,031.23",250,4.12492
+/grants/76/inflation-funding-working-group,Block Rewards Funding Working Group,"This is the working group that is focused on Inflation Funding for the Ethereum Blockchain.
+
+You can read about our project at https://githu...",owocki,6,200,0.03
+/grants/74/ethmagicians-business-model-ring,ETHMagicians Business Model Ring,The ETHMagicians Business Models Ring's charter is to create a map of all of the possible business models in the emergent intersection of bloc...,owocki,6,200,0.03
+/grants/23/eth20-implementers-call-meeting-notes,ETH2.0 Implementers Call Notes,In depth meeting notes of the bi-weekly ETH 2.0 Implementers Calls. Always making improvements to the notes. Any amount is greatly appreciated...,pggallagher,429.19,200,2.14595
+/grants/12/gitcoin-open-source-support-fund,The Gitcoin Open Source Support Fund,"Funds in this grant will be deployed, at Gitcoin's discretion, to support various Ethereum projects in the space.
+
+We will post an update each...",owocki,"2,257.35",100,22.5735

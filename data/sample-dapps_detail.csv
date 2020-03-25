@@ -1,0 +1,423 @@
+"Status","Name","Link","About","Tags","Founder(s)"," Created"," Last Updated","Software License"," Mainnet contract address"," Ropsten contract address"
+" Live","EtherScan","http://etherscan.io/","Blockchain explorer","blockchain, explorer, analytics, api, contract","Matt Tan","2015-08-14","2017-06-23",NA,NA,NA
+" Working Prototype","WeiFund","http://weifund.io/","Crowdfunding Platform","crowdfunding, platform, bugs, campaigns, bounty","Nick Dodson","2015-08-15","2017-06-23","MIT",NA,NA
+" Working Prototype","Cosmo","http://cosmo.to/","Meteor dapp for building and vetting solidity contracts","development, compiling, browser, ide, deploy","Nick Dodson","2015-08-15","2017-06-23","MIT",NA,NA
+" Concept","Etherparty","http://etherparty.io/","Smart Contracts deploying the Cloud","development, contract, agreement, transactions, programming","Lisa Cheng, Whit Jack","2015-08-15","2017-06-23",NA,NA,NA
+" Working Prototype","Macroverse","https://macroverse.io/","A shared procedural universe for blockchain games","world, procedural, virtual, middleware, game, real estate","Adam Novak","2017-06-23","2017-06-23",NA,NA,NA
+" Live","WagETH","https://www.wageth.com/","High stakes, high return king of the hill","wageth, wager, king, pot, win, game","josheth","2017-06-22","2017-06-22","Public Domain","0x782d2CE967F31eA8D8888B5A223cee1558B62f3C",NA
+" Concept","TokenFunder","http://www.tokenfunder.io/","Blockchain crowd funding","crowd, funding, money, investment",NA,"2017-06-22","2017-06-22",NA,NA,NA
+" Work In Progress","Inflekt","https://inflekt.us/","Open source community network and events platform","community, network, events, event, platform, open source","Consensys","2017-06-22","2017-06-22",NA,NA,NA
+" Concept","Curation Markets","https://docs.google.com/document/d/1VNkBjjGhcZUV9CyC0ccWYbqeOoVKT2maqX0rK3yXB20/mobilebasic","Coordinate around shared goals and benefit from the value they collectively create","market, objectives",NA,"2017-06-22","2017-06-22",NA,NA,NA
+" Live","NotarEth","http://notareth.herokuapp.com/","Ethereum based notary service","notary, registry, proof, transfer, documents","Maran Hidskes","2015-08-13","2017-06-21","MIT",NA,NA
+" Live","Ether.Camp","https://live.ether.camp/","Blockchain explorer","blockchain, explorer, hackaton, contract, development","Roman Mandeleil","2015-08-13","2017-06-21",NA,NA,NA
+" Work In Progress","FundRequest","https://fundrequest.io/","Funding contributions to the open source community","open source, github, funding","Karel Striegel","2017-06-21","2017-06-21",NA,NA,NA
+" Work In Progress","NVO","http://nvo.io","Decentralized Exchange","exchange","Yanni Braggui","2017-06-21","2017-06-21",NA,NA,NA
+" Concept","ClimateCoin","https://climatecolab.org/contests/2015/shifting-attitudes--behavior/c/proposal/1313601","Coins for those who offset carbon","subcurrency, climate, carbon, global, social","Dennis Peterson","2015-06-11","2017-06-20","MIT",NA,NA
+" Work In Progress","TrustlessPrivacy","http://www.trustlessprivacy.com","Interoperable electronic health records","contract, videogames, pop, p2p, marketing","sam@trustlessprivacy.com","2015-06-23","2017-06-20",NA,NA,NA
+" Working Prototype","Truffle","http://truffleframework.com/","Development framework for Ethereum","development, framework, management, deployment","Tim Coulter","2015-07-07","2017-06-20","MIT",NA,NA
+" Work in Progress","WeiLend",NA,"P2P Lending","lending, finance, borrow, crowdfunding, p2p","Massi Terzi","2015-07-08","2017-06-20","Apache",NA,NA
+" Concept","cyberâ¢Fund","https://cyber.fund/","Make digital investments comprehensible, accessible, easy and safe","investment, digital, property, assets, crowdsales","Dima Starodubcev","2015-07-20","2017-06-20",NA,NA,NA
+" Work In Progress","PowerBall",NA,"""Powerball""-style lottery","game, lottery, serpent, funding, payouts","Peter Borah","2015-07-20","2017-06-20","MIT",NA,NA
+" Concept","Vevue","http://www.vevue.com/","Bringing Google Street View to life","transportation, earning, community, bitcoin, users","Thomas Olson","2015-08-10","2017-06-20",NA,NA,NA
+" Demo","HitFin","https://www.hitfin.com/","OTC Derivatives Settlement","trading, financial, investment, settlement, derivative","Patrick Salami","2015-07-09","2017-06-20",NA,NA,NA
+" Working Prototype","Seglos","http://www.seglos.com/","Spend your Ethereum without losing out on the future grow","trading, stablecoin, stable coin, ethereum, decentrilized, autonomous, dao, exchange, trade, finance","Maytham Naei","2017-06-08","2017-06-20","Ask",NA,"0x8f03ad84b390f1e6d2cd11960afda6bb5c1e696b"
+" Live","TimeBank","https://timebank.tech/","Store Ether enforceably with a time lock","deposit, time, lock","Isaac Ibiapina","2017-06-20","2017-06-20","MIT","0x459f90b6e8dc23bbf1ff4c2f22aa2149b4bd4cff","0xcf9f3f8f8b5bf5ed72bd3fdb66c29e36675c9d2b"
+" Live","Token Creation Service (ERC20)","http://tokenservice.minereum.com/","Create your own Ethereum Token with just a Minereum Transaction","minereum, token, ethereum tokens, erc20, erc23, ethereum","Minereum Team","2017-06-20","2017-06-20","Free","0x41fafb65b1514ce1177287a567002f8978d98205",NA
+" Demo","FunFair","https://funfair.io/","FunFair is a decentralised gaming platform powered by Ethereum smart contracts.","game, fun, casino, gambling","Jez San","2017-06-23","2017-06-20","proprietary",NA,NA
+" Work In Progress","Swarm",NA,"Distributed File Storage","storage, catalog, p2p, content, distribution","Daniel Nagy","2015-04-28","2017-06-19","LGPL",NA,NA
+" Concept","Guarante eMarket","https://communities.cyclos.org/garanteemarket","Peer-to-peer marketplace for guarantees","market, p2p, finance, loans, auctions","Bruno Ricardo Ferreira","2015-04-29","2017-06-19",NA,NA,NA
+" Live","DigixGlobal","https://www.dgx.io/","Gold storage","subcurrency, token, gold, distributed ledger","Antony Eufemio & Chris Hitchcott","2015-04-29","2017-06-19",NA,NA,NA
+" Work in Progress","BoardRoom","http://boardroom.to/","Board election and voting","governance, contract, voting, collaborative, management","Nick Dodson","2015-05-27","2017-06-19","MIT",NA,NA
+" Working Prototype","Ether.Fund","http://ether.fund","Ethereum Resources","blockchain, explorer, platform, wallet, crowdsale","J.R. BÃ©dard","2015-06-01","2017-06-19","MIT",NA,NA
+" Work in Progress","MetaMask","https://metamask.io/","MetaMask brings Ethereum to your web browser","catalog, browser, chrome, web, bridge","Aaron Davis & Dan Finlay","2015-12-09","2017-06-19","MIT",NA,NA
+" Concept","Cofound.it","https://cofound.it/en/","A distributed VC ecosystem for the distributed future","vc, venture capital, consultancy, business, money, invest, investment","Jan Isakovic / Daniel Zakrisson","2017-06-19","2017-06-19",NA,NA,NA
+" Concept","Resilience",NA,"Link the global financial network of daily transactions together on the web/blockchain","swarm","Anonymous","2017-06-19","2017-06-19",NA,NA,NA
+" Concept","FOAM","http://www.foam.space/","New stockmarket for real estate ","real estate, house, estate agent, property, ownership, invest, trade, investment",NA,"2017-06-19","2017-06-19",NA,NA,NA
+" Work In Progress","Stabl","http://stabl.money/","Exchange offering onchain leveraged future positions","finance, exchange, leveraged, future positions, positions","Consensys","2017-06-19","2017-06-19",NA,NA,NA
+" Work In Progress","Upstairs","http://upstairs.me","A Decentralized Reputation based on the Ethereum Blockchain","rating, reputation, identity","Etherdesign","2017-06-19","2017-06-19","MIT",NA,NA
+" Live","Lost Ethereum","http://www.lostethereum.com/","Recovery of provably Lost Ethereum as LOST tokens","proof-of-burn, typo, misspelled, lost, recovery","Matt Branton","2017-06-19","2017-06-19","GPL3","0x0A938f219c673381EAB8F99eb720D899dAC8F0AB",NA
+" Working Prototype","Proof of Existence 2.0 (Poet)","http://www.po.et","B2B tool to catalog, trade, and license creative assets.","proof, existence, ownership, attribution, creative, media, publishing","BTC Labs","2017-06-19","2017-06-19","MIT",NA,NA
+" Concept","Indorse","http://indorse.io","Decentralized Professional Network running on Ethereum","skills, social, network","David Moskowitz, Gaurang Torvekar","2017-06-18","2017-06-18",NA,NA,NA
+" Working Prototype","Angular2 + Truffle Starter Dapp",NA,"Write, compile & deploy smart contracts with Angular2 frontend","blockchain, truffle, angular2, javascript, smartcontracts, ","Nikhil Bhaskar","2017-06-17","2017-06-17","MIT",NA,NA
+" Live","CryptoFees","http://cryptofees.net","A simple site to compare ETH and BTC transaction fees","transaction, fees","Oleksandr Popov","2017-06-17","2017-06-17","MIT",NA,NA
+" Live","EthLend","http://ethlend.io","Decentralized Lending Platform","lending, loan, decentralized, token, collateral, pledge, borrow, finance","Stani Kulechov","2017-05-24","2017-06-16","Proprietar",NA,NA
+" Demo","Whisper Chat Client",NA,"Group chat","communication, social, invitations, messages, users","Fabian Vogelsteller","2015-04-22","2017-06-15","MIT",NA,NA
+" Demo","Wallet Dapp",NA,"Ethereum Wallet","wallet","Fabian Vogelsteller, Alex van de Sande","2015-04-22","2017-06-15","MIT",NA,NA
+" Concept","Z-Lab Denim Authentication",NA,"Provenance Authenticator for Z-Lab Denim","provenance","Zorie Barber","2016-07-08","2017-06-15",NA,NA,NA
+" Working Prototype","Guts","https://guts.tickets/","Fighting ticket fraud and secondary price inflation","ticket, fraud, ticket fraud","GUTS BV","2017-06-15","2017-06-15",NA,NA,NA
+" Concept","PEPERIUM","http://peperium.life/","Rare Pepe and Meme Trading on the Ethereum blockchain","pepe, meme, market","MyRarePepeNation","2017-06-15","2017-06-15",NA,NA,NA
+" Working Prototype","ANRYZE Distributed Network","https://www.ico.anryze.com/","Distributed Computer Power Network for Speech Recognition","speech recognition, neural network, artificial intelligence, decentralized network, distributed computer power, ","Anryze","2017-06-15","2017-06-15",NA,NA,NA
+" Demo","TrustDavis",NA,"Reputation system","reputation","Joris Bontje & Jarrad Hope","2015-04-22","2017-06-14","MIT",NA,NA
+" Live","Universal ÃApp",NA,"A Universal Interface for contracts on the Ethereum blockchain","ui, tool, dapp","d11e9","2015-09-03","2017-06-14","MIT",NA,NA
+" Working Prototype","Trustery",NA,"Public Key Infrastructure and identity management system","prototype, identity","Mustafa Al-Bassam","2016-05-19","2017-06-14",NA,NA,NA
+" Working Prototype","Transaction Relay",NA,"Enables transactions fees to be paid in any EIP20 token","transactions, deployment, tokens","iuri matias","2016-09-04","2017-06-14","apache",NA,NA
+" Live","ETH Gas Station","http://ethgasstation.info/","Stats on ethereum gas","gas, gas station, stats, infomation, info","latetot","2017-06-14","2017-06-14",NA,NA,NA
+" Working Prototype","Quickblocks","http://quickblocks.io/","Monitoring and summarization of data for any Ethereum address","data, monitor, address, info, infomation, stats, statistics","Great Hill Corporation","2017-06-14","2017-06-14",NA,NA,NA
+" Live","Etherchain","https://etherchain.org/","Ethereum stats and chain explorer","chain, explore, explorer, stats, infomation, balance, info","Etherchain","2017-06-14","2017-06-14",NA,NA,NA
+" Working Prototype","Weipoint","https://www.weipoint.com/","Search the decentralized web","search, explore","Antonio Juliano","2017-06-14","2017-06-14",NA,NA,NA
+" Work in Progress","TokenEscrow",NA,"Contract for running an escrow service for Ethereum token-contracts","escrow, token, finance","Alex Beregszaszi","2015-11-16","2017-06-13","MIT",NA,NA
+" Working Prototype","TinyOracle",NA,"Simple data provider toolkit for Ethereum","oracle, datafeed","Alex Beregszaszi","2015-11-25","2017-06-13","MIT",NA,NA
+" Demo","ToDoList",NA,"Sample dapp - Create a simple to-do list","todo, list, demo, sample","Beaudru Manuel","2017-06-12","2017-06-13",NA,NA,NA
+" Work In Progress","CurationMarkets",NA,"Trade popularity of Memes & Informations","curation, markets, tokens, smart contracts, active supply, curators, curation, communal deposit, circulation, monetizing","Simon De La Rouviere, GonÃ§alo SÃ ","2017-06-13","2017-06-13","MIT",NA,NA
+" Work in Progress","mememarkets",NA,"Coupon-based continuous token model","meme markets, meme, markets, token, decentralized, protocol, monitezation, information, network, trade","Simon De La Rouviere","2017-06-13","2017-06-13","MIT",NA,NA
+" Live","GotCHa","http://www.gotcha.fun","A simple and fair game to win Ethereum","gamble, fun, game","Blockchain Manic","2017-06-13","2017-06-13","private","0x158d49800dc50a933fB6303973A084d298667917","0xE8063338Ba6984f6639896bAC2e9E194F930a81f"
+" Demo","studbook",NA,"Tinder for horses","game","Andres Junge","2015-08-17","2017-06-12","MIT",NA,NA
+" Work in Progress","Taxeme",NA,"A component of the Resilience taxation system","tax, token","Johan Ngyren","2015-11-20","2017-06-12","MIT",NA,NA
+" Concept","tax spendings",NA,"tax collection & detail usage, maintaining public ledger","finance, tax","siddharth patel","2016-07-25","2017-06-12",NA,NA,NA
+" Work In Progress","district0x Network","https://district0x.io/","A collective of decentralized marketplaces and communities","market, community, finance","district0x Project","2017-06-12","2017-06-12","GPL 3.0",NA,NA
+" Live","Punch Clock",NA,"A simple smart contract to keep track of in and out time.","clock, time sheet","Dat Nguyen","2017-06-12","2017-06-12","Apache License 2.0","0x12f8c63034AAC487396b70db04aBA5c84dEd1886",NA
+" Live","The Ether billboard","http://etherbillboard.com/","An Advertisement Billboard backed in Ethereum","billboard, advertisment, buy, sell, marketplace","michelsonmorley","2017-06-12","2017-06-12","MIT","0xc150bf564a4f58d72e05544fd253894a0e86c83e",NA
+" Working Prototype","eth.social","https://eth.social","An Ethereum dApp for posting social events.","meetup, social, events","Miguel Mota","2017-06-11","2017-06-11","MIT",NA,NA
+" Work In Progress","Ether Riche",NA,"Position yourself as one of the ether riche!","ranking","Stephen Holstein","2017-06-11","2017-06-11","GPL3",NA,NA
+" Working Prototype","Sleth",NA,"Slot Machine","game, coins, slot, machine, spins","Joris Bontje","2015-04-22","2017-06-11","MIT",NA,NA
+" Concept","Raikoth",NA,"Governance experiment","crowdfunding, politics","moridinamael","2015-08-26","2017-06-09",NA,NA,NA
+" Demo","VariabL","http://variabl.io/","Derivatives Exchange Built on Ethereum","exchange, derivative, on-chain, stable tokens, market, finance","VariabL Team","2017-06-09","2017-06-09","ARR",NA,NA
+" Working Prototype","NEVERDIE","https://neverdie.com","Gamified job creator and virtual world infrastructure ","amevrica, rocktropia, neverdie, virtual world, api, virtual reality, game, video games, mmorpg","Jon NEVERDIE Jacobs","2017-06-09","2017-06-09",NA,"0xA54ddC7B3CcE7FC8b1E3Fa0256D0DB80D2c10970",NA
+" Concept","Spankchain","https://docs.google.com/presentation/d/13FoNfeBG-ppW3Tkpm2znBdno91_JCpy2qz9coaR-684/edit#slide=id.g1e48b299c1_0_0","An adult cam platform","nsfw, cam, porn","Spanktoshi Nakabooty","2017-06-23","2017-06-09",NA,NA,NA
+" Working Prototype","Project Basil",NA,"Decentralised Vulnerability feed management","security, vulnerability feed, cert","Harsh Patel","2015-09-15","2017-06-08","MIT",NA,NA
+" Work In Progress","OpenRep",NA,"A feedback based reputation system using ethereum smart contracts and BtcRelay.","reputation","James Sangalli","2016-08-24","2017-06-08","MIT",NA,NA
+" Work In Progress","BRAID","https://www.braidthemovie.com/","Psycho thriller movie funded via the blockchain","movie, thriller","Mitzi Peirone","2017-06-08","2017-06-08",NA,NA,NA
+" Live","Share&Charge","https://shareandcharge.com/en/","A platform for sharing electric car refuleing stations","electric, car, electric car, fuel, charge, charging station, refuel",NA,"2017-06-08","2017-06-08",NA,NA,NA
+" Concept","OmegaOne","https://omega.one/","A cheaper and safer way to trade cryptocurrencies and tokens","decentralized exchange, market liquidity, trust intermediation",NA,"2017-06-23","2017-06-08",NA,NA,NA
+" Demo","Benefactory","http://www.benefactory.cc/","Create groups for crowd philanthropy","philanthropy, charity, money, community",NA,"2017-06-07","2017-06-07",NA,NA,NA
+" Work In Progress","Hypergive","http://www.hypergive.com/","Fund secure digital food wallets for the homeless and hungry","charity, homeless, food, food wallet",NA,"2017-06-07","2017-06-07",NA,NA,NA
+" Demo","Amply","http://amply.tech/","Digital identity for children allowing them access to further benefits","identity, charity, digital identity, children, kids",NA,"2017-06-07","2017-06-07",NA,NA,NA
+" Working Prototype","meteor-embark",NA,"Streamlined Ethereum Integration for Meteor","development","Chris Hitchcott","2015-09-30","2017-06-06","MIT",NA,NA
+" Work In Progress","LoanBolio",NA,"Platform to lend and borrow, a bank without deposits","lend, borrow, loan","Akash Sarda","2017-06-05","2017-06-06","MIT",NA,NA
+" Live","EthereumPot","http://ethereumpot.com/","Ethereum gambling site","gambling","EthereumPot","2017-06-06","2017-06-06",NA,"0xCa50d78B6B01f66496Bf9Ec61248C51647975Ab4",NA
+" Working Prototype","LightWallet",NA,"Lightweight JS Wallet for Node and the browser","wallet","ConsenSys / Chris Lundkvist","2015-10-07","2017-06-05","MIT",NA,NA
+" Live","Icebox",NA,"A cold storage solution for Ether","wallet, cold storage","Christian Lundkvist","2016-02-10","2017-06-05","MIT",NA,NA
+" Working Prototype","KPCS Ethereum",NA,"The Kimberley Process certificate issuing process","diamonds, certificate, raw materials","Eric Schulte","2016-05-17","2017-06-05",NA,NA,NA
+" Demo","Beyond The Void","https://beyond-the-void.net/","Moba game with ethereum linked items","game, moba, moba game, fun",NA,"2017-06-05","2017-06-05",NA,NA,NA
+" Work In Progress","Virtue Poker","https://virtue.poker/","Poker on the Blockchain","poker, game, gambeling, card game","Jim Berry","2017-06-05","2017-06-05",NA,NA,NA
+" Demo","Blockphase","https://www.blockphase.com/","Digital content distribution and management platform for virtual reality","vr, virtual reality, digital content, content",NA,"2017-06-05","2017-06-05",NA,NA,NA
+" Working Prototype","Frozeth",NA,"Ethereum tools for the offline machine","wallet","Kobi Gurkan","2015-08-17","2017-06-04","MIT",NA,NA
+" Concept","Gate in","http://www.gate-in.com.ar","DAPP for tracking of international shipments. ","tracking, shipping, maritime, comex","GATE-IN Pedro Urdapilleta ","2017-06-04","2017-06-04",NA,NA,NA
+" Live","hodlethereum","https://hodlethereum.com","The world's first proof-of-HODL.","hodl, lock","localethereum","2017-06-03","2017-06-03","Public domain","0x1bb28e79f2482df6bf60efc7a33365703bcf1536",NA
+" Working Prototype","Ethos",NA,"An Ethereum Browser","browser, gui, wallet","d11e9","2015-08-26","2017-06-02","MIT",NA,NA
+" Concept","ethID",NA,"Decentralised Password Vault","password, storage, safe, vault","Argyris Xafis","2015-12-17","2017-06-02","proprietary",NA,NA
+" Live","EthHypeDns",NA,"Resolve Hyperboria/CJDNS ipv6 addresses via etherid.org contact","dns, domain, lookup","slothbag","2016-01-05","2017-06-02","proprietary",NA,NA
+" Working Prototype","EthEmbedded","http://ethembedded.com/","Ethereum computer built on embedded devices","device, devices, embedded","John Gerryts","2017-06-02","2017-06-02",NA,NA,NA
+" Work In Progress","REIDAO","http://www.reidao.io/","Real Estate on the Blockchain","real estate, house, estate agent, property","Kok Beng / Darvin Kurniawan / David Chandra / Hendrik Tanjaya / TAN Wee Liang, Prof","2017-06-02","2017-06-02",NA,NA,NA
+" Concept","Agrum","https://agrum.io/","Vineyard ownership on the ethereum blockchain","vinyard, agriculture, wine","Daniel Novy","2017-06-02","2017-06-02",NA,NA,NA
+" Live","EtherSim",NA,"Ethereum simulator for testing and development purposes","tools, frameworks, simulators, test, tdd, bdd","Iuri Matias","2016-05-25","2017-06-01","MIT",NA,NA
+" Work In Progress","EtherMarket",NA,"Decentralized Marketplace","market, trade, economics, finance","Iuri Matias / Ryan Casey","2015-04-28","2017-05-31",NA,NA,NA
+" Demo","EtherCrawler",NA,"A dungeon crawler and challenge market based on Ethereum","game","Peter Borah","2015-08-17","2017-05-31","MIT",NA,NA
+" Working Prototype","ethereum-datetime",NA,"Ethereum Date and Time tools","date, time","Piper Merriam","2015-10-07","2017-05-31","MIT",NA,NA
+" Working Prototype","LoftVR","http://www.loftvr.io/","Virtual Reality Arcades powered by Ethereum","virtual reality, vr, playspaces, games, game, gaming",NA,"2017-05-31","2017-05-31",NA,"0x5088C2985210925d15Ea470a160fC08b352818d0",NA
+" Concept","Sikoba","http://www.sikoba.com/","Decentralised money platform based on peer-to-peer IOUs","iou economy, iou, money platform, money, credit, payment, repayment, finance, bank","Aleksander Kampa / Jean Lasar / Bok Khoo / Craig Sailor / Roland Kofler / Lisa Tan","2017-05-31","2017-05-31",NA,NA,NA
+" Demo","Token Factory","https://tokenfactory.surge.sh/","Issue & Interact with Standard Token Contracts on Ethereum","interact, token contract, create contract","Simon de la Rouviere","2017-05-31","2017-05-31","MIT License",NA,NA
+" Working Prototype","Acebusters","http://www.acebusters.com","Decentralized Poker App using payment channels","poker, payment channels, gaming","Johann Barbie, Helge Wieding","2017-05-31","2017-05-31","MIT",NA,NA
+" Work In Progress","Peoples Culture","http://peoplesculture.co","Decentralized human performance audit to increase productivity ","employee, audit","Laura VenVas","2017-05-31","2017-05-31",NA,NA,NA
+" Concept","Election Commission",NA,"Decentralize monitoring of election data","decentralize, governance, politics, election","Rohit Pawar","2016-03-20","2017-05-30",NA,NA,NA
+" Live","HomeParte","https://www.homeparte.com","Real Estate Crowdfunding ","crowdfunding real estate colombia latinoamerica","HomeParte","2017-05-30","2017-05-30",NA,"0xc277ee8e7226841df552852f5b2c664c6d0f536f",NA
+" Live","DTE",NA,"Decentralized Token Exchange","decentralized exchange, token exchange, exchange, decentralized token exhange","Yampi","2016-09-08","2017-05-29","GPL",NA,NA
+" Concept","Smart Contract and Settlement","http://dapp.openshift.com","A framework to build smart contract and settlement","settlement","Dan Tse","2017-05-29","2017-05-29","GPL",NA,NA
+" Working Prototype","Decentralized Twitter",NA,"Microblogging on the Ethereum blockchain","twitter, solidity","Jahn Bertsch","2015-12-17","2017-05-28","GPLv3",NA,NA
+" Concept","4SiteOnline","http://4siteonline.net/","Hardware independant security sytems","security, alarm, home automation","4SiteOnline","2017-05-28","2017-05-28",NA,NA,NA
+" Working Prototype","BasicAttentionToken","https://basicattentiontoken.org/","Blockchain based digital advertising","bat, advertising, advert, marketing, pr, promotion, browser","Brendan Eich / Brian Bondy","2017-05-26","2017-05-26",NA,NA,"0x8e99d0B58E1E87a9065a3e918f4cE4f26Cfb0d42"
+" Live","Smartex","https://smartex.io/","Smartex.io provides the tools necessary to easily integrate Ethereum powered payments into almost every e-commerce solutions available, while shielding merchants against market volatility risks","payment, ecommerce","Christopher Moore","2017-06-23","2017-05-26",NA,NA,NA
+" Working Prototype","Rocket Pool","http://www.rocketpool.net","Next generation decentralised Ethereum proof of stake (POS) pool","pos, casper, proof of stake, pos, pool, decentralized, rocket pool","David Rugendyke","2017-05-25","2017-05-25","Apache-2.0",NA,NA
+" Working Prototype","dapp pricefeed",NA,"(Gold) price feed","datafeed, deployement, operating, monetary, currency","Nick Dodson","2015-04-22","2017-05-24","MIT",NA,NA
+" Demo","Dapp Catalog",NA,"Dapp Catalog","appstore, catalog, selection, browse, search","Fabian Vogelsteller, Alex van de Sande","2015-04-22","2017-05-24","MIT",NA,NA
+" Demo","cryptocoinwatch",NA,"Crypto currency datafeed","datafeed, currencies, monetary, tracking, address","Joris Bontje","2015-04-22","2017-05-24","MIT",NA,NA
+" Concept","DAERS",NA,"Decentralize autonomous emergency reporting system","emergency, notification","mizutaka","2016-03-27","2017-05-24","MIT",NA,NA
+" Live","Storj","https://storj.io/","Decentralized cloud storage","decentralized cloud storage, cloud storage, storage, files, cloud","Alexander Leitner / Gordon Hall / Tome Boshevski / Braydon Fuller / Bryan White / James Prestwich","2017-05-24","2017-05-24",NA,NA,NA
+" Concept","Voise","https://voise.it/","A decentralized music platform that aims to monetize independent artists","music, music platform, artist, artists","Ivan Rossetti / Isaac RodrÃ­guez / Ying Hao Chen","2017-05-24","2017-05-24",NA,"0x68D44a267AA3c66242ADF021d2d4658B6D60Dd2C",NA
+" Concept","ArtChain","http://artchain.org/","Establishing the authenticity of art assets easily","art, painting, sculpture, assets, marketplace, provenance, artists, registry, ownership","Laurenzo Mefsut","2017-05-24","2017-05-24",NA,NA,NA
+" Demo","CoinDash","https://www.coindash.io/","A Crypto Based Social Trading Platform","social, trading, platform, social trading platform, crypto portfolio, portfolio, market, trade, traders, investments, marketplace, finance","Alon Muroch / Bar Yariv / Niv Muroch","2017-05-24","2017-05-24","MIT License",NA,NA
+" Live","Token Browser","https://www.tokenbrowser.com/","Browser that provides universal access to financial services.","browser",NA,"2017-05-24","2017-05-24","GNU General Public License v3.0",NA,NA
+" Work in Progress","content",NA,"p2p community content platform","reddit, community","d11e9","2015-08-26","2017-05-23","MIT",NA,NA
+" Demo","PRISM","https://prism.exchange/","Trustless Asset Portfolio Platform","token, asset, portfolio, exchange, finance, market","ShapeShift","2017-05-23","2017-05-23",NA,NA,NA
+" Work In Progress","atomic-swap",NA,"Atomic cross-chain trading","trading, exchange, cryptocurrency, centralized, transaction","Zack Hess","2015-04-22","2017-05-22",NA,NA,NA
+" Work In Progress","Ascend",NA,"A decentralized encrypted payload delivery system","storage","Louis-Pierre Morin","2015-06-18","2017-05-22","Opensource",NA,NA
+" Concept","BatCountry",NA,"Scrape local weather stations, Visualise the current meteorologic","weather stations, globalisation, gaia, status, world health, aggregation","James William Kerr","2016-05-20","2017-05-22","MIT",NA,NA
+" Live","Bancor","https://www.bancor.network/","Built-in price discovery and a liquidity mechanism for tokens","generator, token generator, token, ","Jonathan Endersby","2017-05-22","2017-05-22","Apache License 2.0",NA,NA
+" Live","Infura","https://infura.io/","secure, stable, fault tolerant and scalable Ethereum and IPFS nodes.","node, ipfs","E.G. Galano / Herman Junge / Maurycy Pietrzak / Michael Wuehler","2017-05-22","2017-05-22",NA,NA,NA
+" Live","IPFS","https://ipfs.io/","A peer-to-peer hypermedia protocol","ipfs, hypermedia","Juan Benet","2017-05-22","2017-05-22","MIT License",NA,NA
+" Work In Progress","Livepeer","https://livepeer.org/","An Open Platform For Decentralized Live Video Broadcasting","video, broadcasting, youtube, media, stream, streaming","Doug Petkanics / Eric Tang","2017-05-22","2017-05-22","GNU Lesser General Public License v3.0",NA,NA
+" Live","MyEtherWallet","https://www.myetherwallet.com/","Ethereum wallet - client-side tool for interacting with the Ethereum network","wallet, ens",NA,"2017-05-22","2017-05-22","MIT License",NA,NA
+" Demo","Project Oaken","https://www.projectoaken.com/","Autonomous blockchain-based IOT hardware & software","iot, hardware, acorns, toll road, water meter","Hudson Jameson","2017-05-22","2017-05-22","Apache-2.0",NA,NA
+" Demo","Project Groundhog","https://www.youtube.com/watch?v=WFeJYv3PSaI","Social Network","communication, social, network, reputation, feed","Conrad Barski","2015-04-22","2017-05-21",NA,NA,NA
+" Concept","Provenance","https://www.provenance.org/","Product Origin Tracking","manufacturing, products, supply, chain, platform","Jessi Baker & Jutta Steiner","2015-04-22","2017-05-21",NA,NA,NA
+" Demo","Adept","https://www.youtube.com/watch?v=U1XOPIqyP7A","IBM/Samsung IoT Project","iot, samsung, ibm, pep, messaging","John Cohn","2015-04-23","2017-05-21",NA,NA,NA
+" Working Prototype","Populus","https://populus.readthedocs.org/","Ethereum Contract Development Framework","development","Piper Merriam","2015-10-07","2017-05-21","MIT",NA,NA
+" Live","Oraclize","https://www.oraclize.it/","Provable honest oracle service","datafeed, oracle","Thomas Bertani","2015-11-10","2017-05-21","proprietary",NA,NA
+" Live","KingOfTheEtherThrone","https://www.kingoftheether.com/","Makes you a King, might grant you riches, will immortalize you.","ponzi, game","Kieran Elby","2016-07-31","2017-05-21","MIT",NA,NA
+" Working Prototype","LÎTH","https://www.inzhoop.com/","LÎTH is the first hybrid mobile app to manage an Ethereum wallet","mobile, wallet","Inzhoop","2016-02-25","2017-05-21","GPL",NA,NA
+" Working Prototype","Arcade City","https://arcade.city/","Brandforked to Swarm City","uber, rideshare","Bernd Lapp","2016-03-12","2017-05-21",NA,NA,NA
+" Work in Progress","PatrolX","https://www.patrolx.com/","Threat intelligence and breach alerts with no false positives.","cybersecurity, intelligence","Adam Sculthorpe","2016-03-17","2017-05-21",NA,NA,NA
+" Working Prototype","EtherLi Multi-Sig Wallet","https://www.ether.li/","Multi-Sig Wallet with 2FA and mist support","wallet, multi-sig, contract wallet, multisig, 2fa, bitgo","Ben Chan / Mason Borda","2016-03-24","2017-05-21",NA,NA,NA
+" Working Prototype","ThanksCoin","https://www.thankscoin.org/","Reputation Ranking and monetary reward of Internet users","reputation, social network, micropayments","ThanksCoin","2016-03-31","2017-05-21","MIT",NA,NA
+" Live","Proof of Phone","https://www.proofofphone.com/","KYC oracle validates and links your phone number and eth address","kyc, oracle, proof of phone, proof, identity","Igor Barinov","2016-05-16","2017-05-21","MIT",NA,NA
+" Working Prototype","Zonafide","https://www.zonafide.net/","Work together to stop fraud: beta DApp on Google Play","confirmation","Paul Worrall","2016-05-17","2017-05-21",NA,NA,NA
+" Live","Otonomos","https://www.otonomos.com/","Blockchain-Chartered Companies","governance","Han Verstraete","2016-05-29","2017-05-21","GPL",NA,NA
+" Concept","BitHouse","https://www.bithouse.io/","DAO house rental contract and equity distrubution.","housing, property, equity","Will","2016-06-09","2017-05-21","MIT",NA,NA
+" Working Prototype","Smart Identity","https://www.deloitte.co.uk/smartid/","Next generation digital identity for the new digital economy","smart identity, smartid, digital identity","Deloitte","2017-02-26","2017-05-21","Apache 2",NA,NA
+" Live","PredictionToken","https://predictiontoken.github.io/","PredictionToken mints prediction market tokens","trade, trading, prediction, market, token, bet, wager","Etherboost","2016-08-24","2017-05-21","None",NA,NA
+" Live","Crystal Mines","https://yampi1.github.io/CrystalMines/","Win Ether by upgrading and working in your mine.","game, crystal, mines, mine","Yampi","2016-09-04","2017-05-21","GPL",NA,NA
+" Live","GrÃ¼nStromJeton","https://stromstunde.de/","Green Energy Consumption Token issued to power consumers","energy, market, consumer, trading, energy transition, gemany","Thorsten Zoerner","2016-09-18","2017-05-21","MIT",NA,NA
+" Working Prototype","Swarm City","https://swarm.city","Swarm City is the first truly decentralized peer to peer economy","ipfs, whisper, peer to peer, sharing economy, ridesharing, uber, airbnb, lyft, p2p","Bernd Lapp","2017-01-31","2017-05-21","TBD",NA,NA
+" Working Prototype","Lending Circles","https://rosca-test.wetrust.io","Rotating Savings and Credit on the Blockchain","lending, finance","WeTrust","2017-02-06","2017-05-21","open",NA,NA
+" Working Prototype","APPII","https://www.appii.io","CV verification - Maximising the potential of everyone","cv, recruitment, resume, career management, employment, employability","APPII","2017-04-07","2017-05-21","Private",NA,NA
+" Live","Simple Shop","https://www.simple-shop.si","Universal invoice Point of Sale software","pos, point of sale, invoice, software","RED ZION d.o.o.","2017-04-10","2017-05-21","FREE",NA,NA
+" Concept","Probiquery","https://rebrand.ly/probiquery","Personalized Education","quiz","Amiya Behera","2017-04-12","2017-05-21","MIT4",NA,NA
+" Live","imToken","https://token.im/","Light-weight smart digital wallet","wallet","Consenlabs","2017-04-14","2017-05-21","n/a",NA,NA
+" Live","xcontract","https://xcontract.herokuapp.com/","An easy to use web application that allows you to run dapps onsite","abi","James Sangalli","2017-04-22","2017-05-21","MIT",NA,NA
+" Concept","0x","https://www.0xproject.com/","The Protocol for Trading Tokens","decentralized exchange, digital assets","0xProject","2017-05-09","2017-05-21",NA,NA,NA
+" Concept","Edgeless","https://www.edgeless.io/","Decentralised Edgeless CASINO","casino, black jack","Edgeless Team","2017-05-09","2017-05-21",NA,NA,NA
+" Working Prototype","ICONOMI","https://www.iconomi.net/","Your connection to the distributed economy","digital assets, investment, ico, finance","ICONOMI Inc.","2017-05-09","2017-05-21",NA,NA,NA
+" Concept","SingularDTV","https://singulardtv.com/","A Blockchain Entertainment Studio, Smart Contract Rights Management Platform and Video On-Demand Portal","studio, movie, drm, tv, film, videos, ico","SingularDTV","2017-05-09","2017-05-21",NA,NA,NA
+" Work In Progress","Starbase","https://starbase.co","Crowdfund your rocket idea using the power of Blockchain by issuing global tokens.","crowdfunding, crowdsourcing, investing","Starbase PTE Ltd","2017-05-09","2017-05-21",NA,NA,NA
+" Live","minereum","https://www.minereum.com","The First Self Mining Smart Contract","minereum, self mining, smart contract","minereum","2017-05-16","2017-05-21","Free","0x1a95b271b0535d15fa49932daba31ba612b52946",NA
+" Live","Coinbooks","https://www.coinbooks.io","Personal Ethereum Transaction and Token Manager","accounting","Coinbooks","2017-05-16","2017-05-21","N/A",NA,NA
+" Live","tipeth","https://tipeth.com","Give money with just a url","tip, donate","Ryan Ghods","2017-05-18","2017-05-21","MIT",NA,NA
+" Live","Eth Hodler","https://www.ethhodler.org/","A simple DApp & ERC20 token","dao, erc20, lock","Currency Tycoon","2017-05-08","2017-05-21","MIT","0x47F383f5aCBacc18a3d9ff6F7AF8B49Bfed27C61","0x5D538965D0c5f2c21aaBF16a24367fb37692CaE3"
+" Work In Progress","adChain","https://www.adchain.com/","Resolving the coordination and incentive problems at the root of ad fraud","advert, advertising, marketing, publicity, pr","Jonathan Richard Ong / Miguel Mota","2017-05-20","2017-05-21",NA,NA,NA
+" Live","Ambisafe","https://www.ambisafe.co/","Issue assets on the blockchain and add it to cryptocurrency exchanges","asset, listing, token",NA,"2017-05-20","2017-05-21",NA,NA,NA
+" Concept","Blocksure","https://www.blocksure.com/","Blockchain powered insurance solutions","insurance","Ranvir Saggu / Joseph Goulden","2017-05-20","2017-05-21","GNU General Public License v3.0",NA,NA
+" Live","VDice","https://www.vdice.io/","On-Chain Ethereum Betting Game","blockchain, betting, gambling, dice game, oraclize","vDice.io Dev. Team","2016-06-10","2017-05-21",NA,NA,NA
+" Live","Embark","https://iurimatias.github.io/embark-framework/","Framework for Ethereum DApps","development","Iuri Matias","2015-08-15","2017-05-20","MIT",NA,NA
+" Concept","Watchdog","https://patrykkalinowski.com/blog/2016/03/26/blockchain-as-a-decentralized-watchdog.html","Framework for decentralized watchdog","watchdog, storage, trust","zyzioziom","2016-03-27","2017-05-20",NA,NA,NA
+" Work In Progress","Maker / Dai","https://makerdao.com/","Stable Cryptocurrency","subcurrency, stablecoin","MakerDAO / Nexus Dev","2016-04-07","2017-05-20","MIT",NA,NA
+" Live","kissBTC","https://kissbtc.io/","Bitcoin on the Ethereum blockchain","bitcoin, token","vnovak","2016-06-03","2017-05-20",NA,NA,NA
+" Live","OutcomeCoin","https://outcomecoin.github.io/","OutcomeCoin mints prediction market tokens","prediction, exchange, trade, trading, market, outcome, token","Etherboost","2016-08-07","2017-05-20","None",NA,NA
+" Work In Progress","Melonport","https://melonport.com/","A portal to decentralised asset management","portfolio, fund, asset management, asset, funds, hedge fund","Reto Trinkler, Mona El Isa","2016-09-02","2017-05-20","MIT",NA,NA
+" Live","Maker Market","https://mkr.market","User interface for Maker Market contracts","maker, market, exchange, mkr, erc20, status-im","MakerDAO","2017-02-08","2017-05-20",NA,"0xa1b5eedc73a978d181d1ea322ba20f0474bb2a25","0x0bc603c1e35e0a7c16623230b2c10ca1668cb0c8"
+" Work In Progress","Lunyr","https://lunyr.com","Decentralized crowdsourced encyclopedia with reward system","infomation, encyclopedia, wiki","Lunyr","2017-03-07","2017-05-20","open",NA,NA
+" Concept","Digon","https://plan-a-health.net/Digon_Project/","Provider/Patient Contract Currency","healthcare, contract, provider, patient, currency","Plan A Health Consulting Ltd","2017-04-16","2017-05-20","n/a",NA,NA
+" Concept","Lendroid","https://lendroid.com","Decentralized digital asset lending platform","digital assets, lending, borrow, finance","Vignesh Sundaresan","2017-05-09","2017-05-20",NA,NA,NA
+" Work In Progress","Mysterium","https://mysterium.network","Decentralized VPN","vpn, privacy, ico","Mysterium Network","2017-05-09","2017-05-20","GPL",NA,NA
+" Concept","Omise GO","https://omg.omise.co","ewallet platform for payments, cross-border remittances, rewards points, and much more","wallet, remittance","Omise","2017-05-09","2017-05-20",NA,NA,NA
+" Work In Progress","Plutus","https://plutus.it","Tap & Pay using Bitcoin and Ether at NFC-enabled terminals worldwide and earn a rebate on the Blockchain","nfc, merchant, payment, ico","Plutus.it","2017-05-09","2017-05-20",NA,NA,NA
+" Working Prototype","OpenZeppelin","https://openzeppelin.org/","Build Secure Smart Contracts in Solidity","security","Smart Contracts Solutions","2017-05-09","2017-05-20","MIT",NA,NA
+" Live","PonzICO","https://ponzico.win/","Let's Just Cut to the Chase","ponzi, ico","Josh Cincinnati","2017-05-16","2017-05-20","CC-SA","0x1ce7986760ade2bf0f322f5ef39ce0de3bd0c82b",NA
+" Concept","Contingency","https://contingency.tech/","Decentralized trustless gambling network","trustless, gambeling, betting, game",NA,"2017-05-20","2017-05-20",NA,NA,NA
+" Live","CryptoFace","http://face.crypto.camp/","Blockchain Avatars","avatar, face, identity",NA,"2017-05-20","2017-05-20",NA,"5e49ec3fbd55e7b86a5a5b1a32c73aa44b42b4af",NA
+" Live","Decentraland","https://decentraland.org/","A blockchain-based virtual reality world","vr, virtual reality, world, land","Esteban Ordano / Dario Sneidermanis / Manuel ArÃ¡oz / Yemel Jardi","2017-05-20","2017-05-20","MIT License",NA,NA
+" Working Prototype","Lemon Email DApp","http://dapp.lemon.email","Decentralized messaging service","messaging, email","Devana Labs","2017-05-19","2017-05-19","GNU",NA,NA
+" Live","GlobalMiles","http://www.globalmiles.com/en","Frequent Flyer Program","loyalty, frequent, flyer, airline, token, currency, miles, aviation, points, airways, milage, frequent flyer, frequent flyer program","GlobalMiles Tech.","2017-05-18","2017-05-18","EULA","0x8ba49452E12449240425DE9895b1aA51f5F3b90D",NA
+" Working Prototype","Network Democracy DAO","http://liquid.qhoss.com/pages/intro.html","Stake-weighted liquid democracy implemementation","liquid democracy, dao","Swarm Fund","2017-05-18","2017-05-18","MIT",NA,NA
+" Concept","Etherisc Social Insurance","https://govhack.etherisc.com","Social insurance based on group p2p assessment","insurance, social, p2p, peer assessment, uae govhack, etherisc, mutual","Etherisc GmbH","2017-02-20","2017-05-17","t.b.d.",NA,NA
+" Work In Progress","Golem","https://golem.network/","Distributed computation","grid, computing, datacenters, program, network","Piotr ZielinÌski","2015-04-23","2017-05-16",NA,NA,NA
+" Live","eth-iban-validator","https://github.com/mickaelvalmier","Smart contract for IBAN validation with check digits","iban, check, validation","Mickael Valmier","2017-03-19","2017-05-16","MIT",NA,NA
+" Work In Progress","MedicalServices-Patient","https://github.com/russelcoolbit/MedicalServices-Patient","Share medical information between parties with Smart contract.","healthcare","CoolBitX Technology","2017-05-03","2017-05-16","MIT",NA,NA
+" Work In Progress","Virtualgodown","http://www.virtualgodown.com","Singular system for mapping supply and demand.","digital pipeline for material flow, digital inventory, digital asset in material flow","Virtualgodown Technologies ","2017-05-16","2017-05-16","NA",NA,NA
+" Concept","EthPassport","https://github.com/mdcuesta/EthPassport","Decentralized Traveler","travel, passport","Michael Dela Cuesta","2017-02-26","2017-05-15","MIT",NA,NA
+" Live","One Million Words","http://onemillionwords.world/","Writing eternal message on blockchain for free","game, writing, blockchain","Blockchain Maniac","2017-05-15","2017-05-15","Private","0x559deca5865c6919637b776c28d7f04588883d98",NA
+" Working Prototype","EthBadge","https://github.com/js0p/EthBadge","Identity verification using Ethereum Name Service (ENS)","identity, ens","JoseMPM Productions","2017-03-25","2017-05-10","Apache",NA,NA
+" Concept","Babel","http://joinbabel.com","The First Decentralized E-Commerce Platform Made By The People, ","e-commerce","Bill","2017-05-10","2017-05-10","GPLv3",NA,NA
+" Live","Grove","https://ethereum-grove.readthedocs.org/","Fast, efficient, queryable storage for ethereum contracts","tree, api","Piper Merriam","2015-10-07","2017-05-09","MIT",NA,NA
+" Live","Etherdice","https://etherdice.io/","Provably fair and escrowed gambling","dice, gambling","vnovak","2015-11-15","2017-05-09","proprietary",NA,NA
+" Live","Everex Transfer","https://everex.one/","Cryptocash platform for remittance, payments, trading, lending","wallet, remmitance, trading, crowdfund, transfer, payments, lending, p2p, android, mobile, web, finance, market","Everex","2016-05-24","2017-05-09",NA,NA,NA
+" Live","Ethplorer","https://ethplorer.io/","Ethereum token viewer. Tokens for investors, Widgets and API","token, viewer, cryptocurrency, explorer, eip20, erc20, smart contract, transactions, asset, ","Everex","2017-03-01","2017-05-09","Apache 2.0",NA,NA
+" Live","RockPaperScissors","https://github.com/HashFairGames/RockPaperScissors","fair Rock Paper Scissors game with helpful interface","hash based game, lottery, win, dapp, rock, paper, scissors, fair, decentralized, games, fun","HashFairGames","2016-09-30","2017-05-09"," ","0x1d77340D3819007BbfD7fdD37C22BD3b5c311350",NA
+" Live","TheEthereumLottery","https://github.com/HashFairGames/TheEthereumLottery","Lottery Dapp which solves problem of random numbers in blockchan","theethereumlottery, lottery, million, win, 5 mln eth, random, number, problem, on, in, blockchain, hashfairgames","HashFairGames","2016-12-29","2017-05-09"," ",NA,NA
+" Working Prototype","Time Clock","https://github.com/dmozzy/TimeClock","Service Delivery / Labor hire contract","solidity","Daniel Moscufo","2016-11-13","2017-05-09","MIT",NA,NA
+" Working Prototype","Flight Delay Insurance","https://fdd.etherisc.com","Get instant payout in case your flight is late.","insurance, decentralized, mutual, flight delay, etherisc, risk, sharing, p2p","Etherisc GmbH","2017-02-08","2017-05-09","t.b.d",NA,"0x0963b57f213f00b651c2b31ead3167e5fed23e92"
+" Working Prototype","Gold Auction","https://gcteth.codetract.io","Daily settled auction for easy exchange of tokens","auction, finance","CodeTract","2017-03-04","2017-05-09","MIT",NA,NA
+" Working Prototype","Lotto","https://github.com/DeviateFish/Lotto","Simple, provably-fair, secure lottery","lottery, gambling","DeviateFish","2017-03-07","2017-05-09","ISC","0x58B79dFe37D3eD6b44582fb0C6591680C3d51DB8",NA
+" Work In Progress","Powermatcher Blockchain","https://foxfirelouvre.com/","Distributed energy auction for balancing supply and demand","energy, auction","Foxfire","2017-03-16","2017-05-09",NA,NA,NA
+" Work In Progress","Univereum","https://github.com/frostiq/univereum","ÃAPP for electronic voting in universities","universities, voting","Alex Bazhanau","2017-03-26","2017-05-09","MIT",NA,NA
+" Work In Progress","BlockTix","https://blocktix.io","Counterfeit-resistant solution for the management of event tickets or passes","tickets, events, advertising","Blocktix","2017-05-09","2017-05-09","GPL",NA,NA
+" Concept","ChronoBank","https://chronobank.io/","Blockchain revolution in the recruitment industry","reputation, recruitment, hours","Edway Group Pty. Ltd","2017-05-09","2017-05-09","GPL",NA,NA
+" Concept","Civil","http://joincivil.com","Radically Open Journalism","news, journalism","Matthew Iles","2017-05-09","2017-05-09",NA,NA,NA
+" Demo","CypherPoker","http://www.cypherpoker.org/","Decentralized, rake-free, open-source, cryptographic Texas hold'em","game, poker, texas holdem","Patrick Bay","2017-05-09","2017-05-09","MIT",NA,NA
+" Concept","DAO Casino","https://dao.casino","Blockchain protocol for fair gambling","fair gambling, casino, gaming","DAO.Casino","2017-05-09","2017-05-09",NA,NA,NA
+" Concept","iEx.ec","http://iex.ec/","Distributed Cloud Computing","cloud computing, ico","iEx.ec","2017-05-09","2017-05-09",NA,NA,NA
+" Concept","Matchpool","http://matchpool.co","Matchpool is a platform that creates human connections","dating, matchmaking, ico, recruitment","Matchpool","2017-05-09","2017-05-09","GPL",NA,NA
+" Working Prototype","MediaChain","http://www.mediachain.io/","Building a more connected world for creators and audiences","media, publishing, images, music","Mediachain","2017-05-09","2017-05-09","MIT",NA,NA
+" Concept","Neufund","http://www.neufund.org","Bridging the worlds of blockchain and venture capital","investment, venture capital, finance","Neufund","2017-05-09","2017-05-09",NA,NA,NA
+" Work In Progress","Santiment","http://www.santiment.net","Crypto market intelligence platform","trading, sentiment","Shantiment PTE LTD","2017-05-09","2017-05-09","unknown",NA,NA
+" Live","Ethereum Lottery .io","https://ethereumlottery.io/","Lottery fueled by Bitcoin blocks","lottery, lotto, gambling, bitcoin, btcrelay","Viktor Novak","2016-07-12","2017-05-09",NA,NA,NA
+" Live","Ethereum Lottery .net","https://ethereumlottery.net","Ethereum Lottery","lottery, jackpot, lotto, weekly, fast, faucet","iFA","2016-08-12","2017-05-09","none",NA,NA
+" Live","EtherDelta","https://etherdelta.github.io/","Decentralized exchange","exchange, trade, trading, token, dao, etherex, etherdelta","Etherboost","2016-07-13","2017-05-06","None",NA,NA
+" Work In Progress","VÎON","http://veondao.info","Decentralized software auditing marketplace","smart contracts, code, market, audit","VÎON INÃUSTRIES","2017-05-06","2017-05-06","MIT",NA,NA
+" Live","Giveth","http://giveth.io","Decentralizing Charitable Donations and Actions","charity, dao, dco, unicorns, donations, giving, communities, vault, minime","Griff Green","2017-05-05","2017-05-05","GPL","0xf19c536ab792f173b7ee62d9ccc51f4ed6180773",NA
+" Live","Etherandom","https://etherandom.com/","Off-chain secured, on-chain verifiable random number generation","random, numbers, generation, gambling, betting, dice","Etherandom","2016-08-11","2017-05-04","BSD",NA,NA
+" Working Prototype","Aragon","https://aragon.one","Create and manage DAOs","dao, company, organization, governance","Luis Cuende","2017-05-04","2017-05-04","AGPLv3",NA,NA
+" Live","CCCoin","http://cccoin.mediachain.io","Image creation, curation, and sharing incentivization network.","images, curation","Mediachain Labs","2017-05-04","2017-05-04","CC-BY-SA",NA,NA
+" Working Prototype","Qchain","http://qchain.co/","Online advertising and analytics platform on the Ethereum blockchain","advertising, marketing","Team Mastodon","2017-05-03","2017-05-03","Apache 2.0",NA,NA
+" Working Prototype","AnonymousVoting","https://eprint.iacr.org/2017/110.pdf","Decentralised e-voting with maximum voter privacy. ","voting, anonymous","Patrick McCorry","2017-02-27","2017-05-02","Open Source",NA,NA
+" Work In Progress","Epocum","https://epocum.io","Next generation search engine with connectivity based economy","certificate authority, analitycs services, earn with sharing, website ownership certification","Epocum Team","2017-04-27","2017-05-01","MIT",NA,NA
+" Concept","demon","http://www.emolition.com","DEcentralized EMOtive data MONitoring Platform","affective computing, social, emotive data","Emolition","2017-05-01","2017-05-01","MIT",NA,NA
+" Live","Ethereum x 1.8","https://double-ethe.rhcloud.com/","Multiplier ethereum 1.8x Payouts","ponzi","Diana","2016-03-16","2017-04-27","proprietary",NA,NA
+" Live","Decentralized Ether Mixer","https://dmixer.github.io/","Decentralized Ether Mixer","mixer","Yaron Velner","2016-10-21","2017-04-22","MIT",NA,NA
+" Demo","Userfeeds","http://userfeeds.io/","The Content Ranking System for Blockchain Communities","reputation, twitter, facebook, liquid democracy, google pagerank, ranking","Maciej Olpinski","2017-04-22","2017-04-22","n/a",NA,NA
+" Concept","Bbiller","http://bbiller.com","Purchase Orders and Invoice Settlement","billing, order, invoice","Bbiller","2017-04-19","2017-04-19","GPL",NA,NA
+" Live","dappsys","https://dappsys.readthedocs.io/","Solidity Contract System Framework","development","Nexus Dev","2016-01-02","2017-04-16","MIT",NA,NA
+" Live","Dapple","https://dapple.readthedocs.io/","smart contract package manager and build tool","development","Nexus Dev","2016-01-02","2017-04-14","MIT",NA,NA
+" Demo","Smart Market Protocol","http://smprotocol.net/","Decentralized marketing and trade functions are offerd","marketing","Kaula Inc.","2017-04-10","2017-04-10","MIT",NA,NA
+" Live","CryptoDerivatives.Market","https://cryptoderivatives.market/","Decentralised trustless ether/token exchange contract market","decentralised, erc20, token, exchange","Bok Consulting Pty Ltd","2017-03-26","2017-04-09","MIT","0xa9f801f160fe6a866dd3404599350abbcaa95274",NA
+" Work In Progress","Charitychain","https://charitychain.io/","Inspire your friends by doing an outstanding action.","charity","Charitychain.io","2017-04-09","2017-04-09","MIT",NA,NA
+" Live","Myblockchaincorner","http://myblockchaincorner.com/","Buy your own html tile in the blockchain, It's yours forever!","html, blockchain, persistance","raycar5","2017-04-08","2017-04-08"," ",NA,NA
+" Working Prototype","Crop Insurance","https://crop.etherisc.com","Get instant payout in case bad weather damages your crop harvest","insurance, decentralized, mutual, crop, weather, etherisc, risk, sharing, p2p","Etherisc GmbH","2017-02-20","2017-04-07","t.b.d.",NA,NA
+" Live","Costring","https://costring.co","Upload Images to the blockchain forever","images, blockchain, upload, free, datastorage","Manuel","2016-11-02","2017-04-04","closed",NA,NA
+" Working Prototype","web3console","http://web3c.etherworld.co","Web3 API in browser terminal","web3, browser","etherworld.co","2017-04-04","2017-04-04","MIT",NA,NA
+" Working Prototype","Chasm","https://alexgr.in/chasm","Secure multi-party cloud backup solution based on Shamir's Secre","cloud, storage","Alex Grinman","2017-04-04","2017-04-04","MIT",NA,NA
+" Working Prototype","Commit ETH","https://commiteth.com","Github bounty bot","github, bounty, programing, development","Status Holdings Pte Ltd","2017-03-21","2017-04-03","GNU AGPL",NA,NA
+" Work In Progress","PAPI","http://www.leanscience.com","AI assistant to collect and organize great ideas across teams ","productivity, team, ai","Lean Science","2017-04-03","2017-04-03",NA,NA,NA
+" Live","Eth World Chain","http://ethwordchain.com","Word Building game on Blockchain","fun, game","transcendlabs.in","2017-04-03","2017-04-03","MIT",NA,NA
+" Work In Progress","Easy Pay Remit ","http://freewebforall.com","An easy and decentralized gateway for remittance and payments ","finance, remittance","SGSoft Solutions","2017-04-02","2017-04-02","Private",NA,NA
+" Live","Chainy.Link","https://chainy.link/","Create Irreplaceable short URLs, Messages, Links to File","proof of existence, blockchain, broadcast, message, file, storage, link, image, proof","Everex","2016-11-24","2017-03-25","Apache",NA,NA
+" Working Prototype","Trustlines Network","http://trustlines.network/","Permissionless mobile payments based on people powered money","finance, mobile","brainbot technologies","2017-03-25","2017-03-25","MIT",NA,NA
+" Live","Call4Contest","https://call4contest.com","Call4Contest is a contest creation/participation/voting platform","foto, video, lyrics, audio, contest","Julia Altenried, Stefan Hoeller","2017-01-25","2017-03-23","unlicensed",NA,NA
+" Live","Dentacoin","http://dentacoin.com","Health Care Industry should be in the hands of the people.","erc20 token, health care, insurance","Dentacoin Foundation","2017-03-22","2017-03-22","MPL v2","0x08d32b0da63e2C3bcF8019c9c5d849d7a9d791e6","0x571280B600bBc3e2484F8AC80303F033b762048f"
+" Work In Progress","First Blood","https://app.firstblood.io/","A decentralized eSports reward platform.","status-im","Joe & Zack","2017-02-08","2017-03-16","GPL",NA,NA
+" Live","DAO IPCI","http://ipci.io","Blockchain technology for carbon markets","climate","IPCI","2017-03-14","2017-03-14","BSD 3",NA,NA
+" Concept","xapout","http://xapout.com/","simplifying work","simplify work simple","Michael Kwaaitaal","2016-06-19","2017-03-11","Open",NA,NA
+" Working Prototype","TokenNinja","http://tokenninja.com","ERC20 token management system ","managment, token","TokenNinja","2017-03-11","2017-03-11",NA,NA,NA
+" Work In Progress","Zero Waste Advocacy","http://www.zerowasteadvocacy.com/","Community Resource Management","regenerative community development, zerowaste, wasteuber, reuse, dao","Adbongo Group LLC","2016-06-10","2017-03-10",NA,NA,NA
+" Work In Progress","ProjectLIVE","http://projectlive.mundopm.com.br","Collaborative Problem-solving Issue","project management, collaboration teamwork, share expert, cloud service","MundoPM","2017-03-10","2017-03-10","CC4.0",NA,NA
+" Concept","voteholder","http://www.voteholder.org/","reinvention of global governance","government, human, equal, social, direct, democracy","Michael","2016-05-26","2017-03-07",NA,NA,NA
+" Work In Progress","Verity","http://www.verity.site","Credible, Decentralized Reputation and Governance","reputation, governance, crowdsourcing, tokens","Matt Goldenberg","2016-11-26","2017-03-03","GPL",NA,NA
+" Live","TrekMiles","http://www.trekmiles.com","Fitness Motivation App + Currency + Community","fitness, community","David","2017-03-03","2017-03-03","prop","0xb20bb2780a6ae9e399e805ce4f60321245f7a0db",NA
+" Working Prototype","EthereanMind","http://ethereanmind.com","A voting Dapp to capture the sentiments/concerns of ethereans","voting, stake, sentiment, social","Conrad Barski","2017-03-03","2017-03-03","GNUv3",NA,"0xa46DD00C96e57B7c4DEBc0Ab27D8dFc34c0fAf1D"
+" Live","Decypher TV","http://decypher.tv/series/ethereum-development","Ethereum Screencasts for Developers","tutorials, screencasts","Decypher Media","2017-03-01","2017-03-01","WTFPL",NA,NA
+" Live","The-Pitts-Circus-Family-Movie","http://www.the-pitts-circus.com/Ethereum","solid-contract ETH investment contract","movie, investment, roi, ","Ken Evil","2016-07-30","2017-02-27",NA,NA,NA
+" Live","Pray4Prey","http://pray4prey.com/","The one and only blockchain aquarium","oraclize, game, ethereumgame","Julia Altenried, Stefan HÃ¶ller","2017-02-27","2017-02-27","MIT","0xc5c49c5f57d9f1635dde956c6858146717879600",NA
+" Working Prototype","StackExchange Bounty DApp","http://dapps.oraclize.it/stackexchange-v2/#/stackexchange-v2/","Bounties for StackExchange questions","oraclize, stackexchange, bounty, education","Oraclize","2017-02-27","2017-02-27","MIT",NA,NA
+" Working Prototype","Proof of Identity","http://dapps.oraclize.it/proof-of-identity/","Onchain identity verification via your Estonina Digi-ID","oraclize, identity, e-residency","Oraclize","2017-02-27","2017-02-27","MIT",NA,NA
+" Demo","Youtube contract","http://dapps.oraclize.it/youtube-escrow/","Automated escrow for youtubers and their sponsors","oraclize, youtube, escrow, youtuber","Oraclize","2017-02-27","2017-02-27","MIT",NA,NA
+" Work In Progress","DNN","http://dnn.media/","Decentralized News Network","news, politics, neutrality, press","Samit and Dondrey","2017-02-27","2017-02-27","TBD",NA,NA
+" Live","The Rouleth","http://www.rouleth.com/","Full European Roulette - Play or Invest in the D.A.Casino","gambling, bet, game, roulette, casino, play, invest","WhySoS3rious","2016-06-12","2017-02-26","MIT",NA,NA
+" Work In Progress","BlockCapsule","http://blockcapsule.com","Time Capsule on Blockchain","cache, history, capsule","BlockCapsule Developers","2017-02-22","2017-02-22","Closed",NA,NA
+" Demo","Rex","http://www.rexmls.com/","A Decentralized Global Multiple Listing Service","real estate","Stephen King & Russell McLernon","2016-08-04","2017-02-21","None",NA,NA
+" Live","Pass DAO","http://forum.passdao.org/","A DAO for decentralized services","dao, proposal, vote","Frederic","2017-02-21","2017-02-21","GPL","0xad2D970EDFF30d8f166989470aaF4BE3Ff6375aE",NA
+" Concept","Pokereum","http://www.pokereum.io/","Decentralized Poker","game, p2p, player, token, evm","Oladapo Ajayi / Patrick Mazzota / Juan Pastas","2015-04-22","2017-02-20",NA,NA,NA
+" Work in Progress","PROFÎTH","http://www.profeth.org/","A smart contracts ecosystem for a resource-based digital economy","resource based economy, predictive market, dao, contract ecosystem, zeitgeist movement, the venus project, digital economy","Roberto Valenti","2016-02-22","2017-02-20","MIT",NA,NA
+" Live","IDEX","http://idex.market/","Distributed Ethereum exchange made of smart contracts","exchange, trade, market, finance","Decentralized Capital","2017-02-20","2017-02-20","MIT","0xfbf8ECb34aCbC2C4D2d4Cdc645c9a76EFcbE2cFf",NA
+" Concept","PointNurse","http://www.pointnurse.com/","Decentralized Healthcare","healthcare, team-based, community, patients, diagnosis","Cyrus Maaghul","2015-04-23","2017-02-14",NA,NA,NA
+" Live","BLOCKLOG.xyz","http://blocklog.xyz","DECENTRALIZED BLOGGING PLATFORM","blog, social, cloud, template, market","monkeyscage","2017-02-14","2017-02-14","Open",NA,NA
+" Live","THOT","http://thot.blocklog.xyz","Decentralized Blog Generator","generator, blog, publishing, content, autonomous, blocklog","monkeyscage","2017-02-14","2017-02-14","OPEN",NA,NA
+" Concept","NervemeterDAO","http://www.nervemeter.co.uk/","100% transparent charitable org","charity, dao, homelessness","Ian Allison & Kieron Livingstone","2016-03-10","2017-02-10",NA,NA,NA
+" Working Prototype","AuctionHouse","http://auctionhouse.dappbench.com","Auction platform for non-fungible on-chain assets.","auctions, status-im","Doug Petkanics, Eric Tang","2017-02-10","2017-02-10","MIT",NA,"0x7ac337474ca82e0f324fbbe8493f175e0f681188"
+" Working Prototype","MintChalk","http://www.mintchalk.com/","In-browser smart contract building / publishing","development, smart contract, edition, computer, network","James Alexander Levy","2015-04-23","2017-02-08",NA,NA,NA
+" Work in Progress","myHealthIRL","http://www.myhealthirl.com/","Decentralized Healthcare","health, healthcare, ","Ivan Jasenovic","2016-04-26","2017-02-08",NA,NA,NA
+" Working Prototype","Microtick","http://www.microtick.com/","Decentralized data streams for Ethereum","data, stats","Mark Jackson","2016-07-21","2017-02-08","Undecided",NA,NA
+" Live","Blockjack","http://blockjack.io","The first Blackjack Gambling Game on the Blockchain","gambling, game, fun, casino, ","Voltaireth + WhySoS3rious","2017-02-08","2017-02-08","GPL",NA,NA
+" Live","Matching Ethers","http://www.matching-ethers.com/","Strategy and luck game. Round of 2 teams, Bet upside or flipped","game, luck, strategy, gambling, information, economics","WhySoS3rious","2016-05-06","2017-02-05","MIT",NA,NA
+" Live","Ethlance","http://ethlance.com/","Decentralized Job Market Platform","job, freelance","Matus Lestan","2017-01-28","2017-01-28","GPL",NA,NA
+" Concept","LAVA","http://www.lavamovement.com/","Preventing ticket fraud","tickets, festivals, music, events","LAVA team","2016-06-14","2017-01-26","retained",NA,NA
+" Live","Gnosis","http://gnosis.pm","Prediction market platform","gnosis, prediction market, status-im","Gnosis Team","2017-01-26","2017-01-26","NA","0x5aae5c59d642e5fd45b427df6ed478b49d55fefd","0xae506b8af761ea320df139a8d2407ce13b9f8ecc"
+" Working Prototype","Musicoin","http://musicoin.org","Blockchain solution to musicians to license their works","music, smart contract","Berry Labs","2017-01-24","2017-01-24","MIT",NA,NA
+" Working Prototype","Ethmail.tech","http://ethmail.tech","Secure Blockchain Mail","mail, pgp, encryption, e-mail, email, communication, send, message, encrypt","Steven Ireland","2017-01-23","2017-01-23","GNU AGPL",NA,NA
+" Working Prototype","Drago","http://rigoblock.com/","Decentralized Hedge Fund & Social Trading","hedge, fund, asset, management, trading, exchange, rigoblock, gabcoin, trade, market, finance","Gabriele Rigo","2017-01-21","2017-01-21","Apache 2.0",NA,NA
+" Demo","Hedgy","http://www.hedgy.co/","Demo of an ISDA Master Agreement","derivative, agreement, isda","Matt Slater","2016-03-28","2017-01-18",NA,NA,NA
+" Work In Progress","SmartPool","http://smartpool.io/","Decentralized Mining Pool","mining, pool","Loi Luu","2017-01-18","2017-01-18","MIT",NA,NA
+" Working Prototype","Alice","http://www.alice.si","Philanthropy platform","philanthropy, charity, donations","Alice SI","2017-01-13","2017-01-13"," ",NA,NA
+" Live","Etherplay","http://etherplay.io/","Skill Games : Play games on Ethereum","game, skill, portal, games, reward, play","wighawag","2017-01-03","2017-01-03","none",NA,NA
+" Live","godzillion","http://www.godzillion.io/","the world's first smart contract market place based on ethereum ","the world's first smart contract market place based on ethereum blockchain","Rodrigo Sainz ","2016-10-22","2017-01-03","N/A ",NA,NA
+" Demo","Vega Fund","http://vega.fund","Decentralized managed fund.","fund, hedge, ico, finance","GKVH & WPR","2016-12-22","2016-12-22","GNU",NA,NA
+" Concept","FreeMyVunk","http://www.freemyvunk.com/","Monitize your video game junk","gaming, token, market","R. Tyler Smith","2015-11-19","2016-12-20",NA,NA,NA
+" Live","The Million Ether Homepage","http://bit.ly/2hP14VX","Advertising platform. Income is shared between referrals.","advertising, earn ether, referrals, mlm, 6handshakes, earn money, ads, million dollar homepage, income","Peter Porobov","2016-12-20","2016-12-20","GNU GPL","0x15dbdB25f870f21eaf9105e68e249E0426DaE916",NA
+" Working Prototype","DealMate","http://dealmate.io","Escrow smart contract between two parties with, an intermediary","escrow, smart contract, deal, oracle, intermediary, deposit, contract, mate, finance","Gleb Nazarkin","2016-12-16","2016-12-16","WIP",NA,NA
+" Live","EthSlurp","http://www.ethslurp.com/","Blockchain Data Scraper","blockchain data","Great Hill Corporation","2016-05-31","2016-12-07","MIT",NA,NA
+" Live","One Million Ether Page","http://onemillionetherpage.com","Trading Pixels in the Blockchain","hompage, advertising, marketing","Alfons Machata","2016-12-07","2016-12-07","GPL",NA,NA
+" Work In Progress","EtherGit","http://ethergit.io/","Incentivized open source software development","git, open source, development","Miles Albert","2016-12-01","2016-12-01","GPL",NA,NA
+" Work in Progress","Ethereum Early Adopters Registry","http://www.ethrilleum.com/","Put your name on the first official list of early adopters","registry","Great Hill Corporation","2016-04-24","2016-12-01","MIT",NA,NA
+" Live","etherslots.win","http://www.etherslots.win/","Ethereum-Based Slot Machine","slot, machine, game, casino, play, lottery, dice","Ignas Mangevicius and DEV. team","2016-10-30","2016-11-26",NA,NA,NA
+" Live","EtherListen","http://www.etherlisten.com/","Realtime Ethereum transaction visualizer.","blockchain, explorer","Kobi Gurkan","2015-08-24","2016-11-24","MIT",NA,NA
+" Live","etherfaces","http://www.etherfaces.com/","Front Page for ETH ecosystem - users, developers, investors, etc","happenings, developers","Sridhar","2016-08-09","2016-11-17","MIT",NA,NA
+" Live","PixelMap","http://pixelmap.io","The Million Dollar Homepage, on the Blockchain!","pixelmap, milliondollarhomepage","Ken Erwin","2016-11-17","2016-11-17","MIT Licens",NA,NA
+" Working Prototype","Ethereum Computation Market","http://www.ethereum-computation-market.com/","Verifiable off-chain computation for ethereum contracts.","market, computation","Piper Merriam","2016-02-14","2016-11-13","MIT",NA,NA
+" Live","Ethereum Alarm Clock","http://www.ethereum-alarm-clock.com/","Schedule contract calls","development, scheduling","Piper Merriam","2015-09-24","2016-11-08","MIT",NA,NA
+" Work In Progress","Project Entropy","http://project-entropy.com","The World's DAO Controlled fleet of sailing hackspaces","sailing, governance, hackspace, maker, events","Joran Kikke","2016-11-08","2016-11-08","BSD",NA,NA
+" Concept","Smart-Lease",NA,"Store apartment leases. Pay rent and verify working appliances.","mariesleaf@gmail.com","Marie","2016-11-02","2016-11-02","MIT",NA,NA
+" Work In Progress","Dynamis","http://www.dynamisapp.com/","Insurance Dapp","insurance","Joshua Davis","2015-09-24","2016-10-31",NA,NA,NA
+" Working Prototype","Decibel.LIVE","http://www.decibel.live","Noise monitoring and compensation settlement based on Ethereum","noise, monitoring, iot, internet of things, compensation","Decibel.LIVE","2016-04-18","2016-10-31","Commercial",NA,NA
+" Live","ETH Notifier","http://ethnotifier.com","Sends SMS and Email notifications from Ethereum blockchain","xipfs, ipfs, sms, email, notification, push, microservice","U-Zyn Chua","2016-10-31","2016-10-31","MIT",NA,NA
+" Working Prototype","Decentralized Capital","http://www.decentralizedcapital.com/#/home","Government currency assets on the Ethereum blockchain","finance, fiat, money","Alex Wearn","2016-08-08","2016-10-30","none",NA,NA
+" Work In Progress","COAKT","http://www.coakt.com/","Raise more than money","crowdfund, finance","Nick Barba, Kevin Kriss","2016-09-01","2016-10-12",NA,NA,NA
+" Live","BlockCDN","http://www.blockcdn.org","A blockchain-powered CDN trading platform","content delivery network, blockchain, p2p","Tony Long","2016-10-12","2016-10-12","MIT Licens",NA,NA
+" Live","Etherization","http://www.bspend.com/etherization","Strategy Game","strategy, civilization, game, turn","Vedran Kajic","2016-06-24","2016-10-11","None yet",NA,NA
+" Working Prototype","PriceGeth",NA,"Price API for Smart Contracts (Oracle)","oracles, price, ethbtc, ","Shayan Eskandari","2016-10-11","2016-10-11","MIT",NA,NA
+" Live","HydraChain","http://www.brainbot.com/projects#hydrachain","Permissioned Distributed Ledger based on Ethereum","kyc, aml, pbft, permissioning, private chain, consortium chain, permissioned distributed ledgers","brainbot technologies","2016-08-04","2016-10-09","MIT",NA,NA
+" Live","EtherLovers","http://etherlovers.com/","Eternal blockchain-based lovers list","love, lovers","Lukas","2016-10-09","2016-10-09"," ",NA,NA
+" Working Prototype","TokenCard","http://tokencard.io/","Smart contract powered Visa debit card. ERC20 compliant","visa, erc20, card, token","Monolith Studio","2016-10-06","2016-10-06","None",NA,NA
+" Live","Bitualcard","http://www.bitualcard.com","Ethereum Ferex Option","option, forex, ethereumforx","John Lee","2016-10-01","2016-10-01","NA",NA,NA
+" Concept","Blockchain Backpack","http://www.blockchainbackpack.org/","Valve Item Economy on Ethereum ","gaming, assets, market","Dr. Blue","2015-11-23","2016-09-30","Apache",NA,NA
+" Work In Progress","Donamin","http://donamin.com","Donamin is a conscious dealmarket with online marketing tools.","marketing, donation, dealmarket, market, advertising","ZoltÃ¡n TÃ¡pi","2016-09-30","2016-09-30","MIT",NA,NA
+" Live","emojillionaire","http://emojillionaire.com/","Ethereum based lottery with emoji theme","lottery, emoji, win, bet","Matus Lestan","2016-09-29","2016-09-29","MIT",NA,NA
+" Demo","Pangea","http://www.bitnation.co/","A Blockchain Jurisdiction","identity, citizenship","BITNATION","2016-03-11","2016-09-25","MIT",NA,NA
+" Demo","Interdimensional Jukebox",NA,"A video Jukebox living on the ethereum blockchain","music, video, jukebox, robot chicken","controtie","2016-09-25","2016-09-25","MIT",NA,NA
+" Working Prototype","Augur","http://www.augur.net/","Decentralized Prediction Market","prediction market","Jack Peterson, Joey Krug, etc","2015-08-15","2016-09-20","GPL",NA,NA
+" Work in Progress","Kato","http://www.askkato.com.au/","Decentralized digital concierge for tasks and services","concierge, services, assistant, online tasks, offline tasks","Donovan Walter-Girout","2016-04-04","2016-09-18",NA,NA,NA
+" Concept","Ampliative Art","http://www.ampliativeart.org","A decentralized, cooperative and empowering art community","art, exchange, coop","Adrian Onco","2015-11-13","2016-09-11",NA,NA,NA
+" Work In Progress","Free Ftopia","http://freeftopia.org/","Building a framework for converting SaaS businesses to DCOs","startup, business","Phil","2016-09-11","2016-09-11",NA,NA,NA
+" Work in Progress","SlackCoin","http://www.amalgamatedhumanity.com/","Blockchain payments for Slack teams","slackcoin, currency, slack, blockchain, eris","Bryan Young","2016-06-04","2016-09-08","MIT",NA,NA
+" Work In Progress","Flight Assure","http://www.ai-london.com/","Ultra Short Term Life Assurance","insurance","Ai-London","2016-09-02","2016-09-04","Commercial",NA,NA
+" Concept","4G Capital Smart Contracts","http://www.4g-capital.com/","Donors can use the application to fund small businesses in Kenya using digital currency. The money lent is converted and disbursed to the businesses using 4G Capital's transactional system.","kenya","Erick Murimi","2015-12-22","2016-09-02","GPL",NA,NA
+" Working Prototype","War On Ether","http://waronether.com/","Programmable bots fighting for land","game, fun","Kobi Gurkan","2016-08-31","2016-08-31","MIT",NA,NA
+" Demo","Cetas","http://cetas.systems","Adaptive data intelligence ( Digital Identity Management | KYC & AML | Financial Scoring )","kyc, credit rating","Algorythmix","2016-08-13","2016-08-13","proprietary",NA,NA
+" Working Prototype","Ujo Music","http://ujomusic.com/","Rebuilding the music industry on the blockchain","music, ujo","ConsenSys","2016-03-08","2016-08-08","proprietary",NA,NA
+" Work in Progress","uPort","http://uport.me/","The next-generation identity system","identity, kyc, aml","ConsenSys","2016-03-21","2016-08-08","MIT",NA,NA
+" Work In Progress","ARK","http://ark.monkeyscage.org/","Open Global Coins Database","coins","MonkeysCage","2016-08-08","2016-08-08",NA,NA,NA
+" Working Prototype","Raiden Network","http://raiden.network/","High Speed Asset Transfers for Ethereum (aka Lightning)","tokens, lightning, scalability, state channels","brainbot technologies","2016-08-04","2016-08-04","MIT",NA,NA
+" Demo","Transactive Grid","http://transactivegrid.net/","Peer to peer home produced energy trading","energy, grid","Martin Lundfall / ConsenSys","2016-03-10","2016-08-02","proprietary",NA,NA
+" Work In Progress","Sustainy","http://sustainy.org/","Platform for sustainable/fair p2p economy, alt currency, gamifid","sustainability, enviroment","Jonathan Bean","2016-08-02","2016-08-02","CC BY-NC-S",NA,NA
+" Live","otlw-forum","http://otlw.co/forum/","A decentralized forum based on smart-contract documents.","forum, social, documents","otlw","2016-08-02","2016-08-02","MIT",NA,NA
+" Live","Ticking Bomb","http://tickingbomb.ether-contract.org/","Who's Gonna Explode First ? Come help your team !","dapps, game, ticking, bomb","MilkyWayz","2016-05-25","2016-07-30",NA,NA,NA
+" Live","Sell ETC Safely","http://selletcsafely.tech/","Safely split ETH and ETC","etc, classic, split, splitter, trading","Viktor Novak","2016-07-30","2016-07-30",NA,NA,NA
+" Work In Progress","Etherplan","http://etherplan.com/","Smart Investment Plans on Ethereum!","investment, finance","Donald McIntyre ","2016-07-26","2016-07-26",NA,NA,NA
+" Concept","String","http://string.technology/","Autonomous & open financial cloud for financial assets","asset, exchange, finance, trade, market","Dominic Williams","2015-11-14","2016-07-08",NA,NA,NA
+" Working Prototype","blockchain2email","http://blockchain2email.com/","A smart contract API to send emails from Ethereum","email, api, interface, contact, notification","NS","2016-07-07","2016-07-07","Copyright",NA,NA
+" Working Prototype","Status","http://status.im/","open source mobile ethereum client ","mobile, client, wallet","Jarrad Hope","2016-02-22","2016-07-07","MPL2",NA,NA
+" Working Prototype","Spore","http://spore.memhub.io/","Simple package manager for dApp development based on ethereum and IPFS","development, packaging, ipfs","Denis Erfurt","2015-10-29","2016-06-27","MIT",NA,NA
+" Work In Progress","Mountain of Money","http://momey.org/","Collective deposit used by participants for interest-free loans","banking, leverage pooling, credit, tontine, anti-capitalism","Austin Gross and Jan Ritsema","2016-06-27","2016-06-27","MIT",NA,NA
+" Working Prototype","Solether","http://solether.mkvd.net/","Autonomous Electrical Energy Entities - Prototype +EntityConcept","solether, nodejs, arduino, solar, charger, energy, autonomous, entity, intel, edison","Francesco 'makevoid' + KristinaB","2016-02-16","2016-06-24","Unlicense",NA,NA
+" Live","Proof of Github","http://proofofgithub.herokuapp.com","KYC oracle validates and links your GitHub and eth address","kyc, oracle, proof, identity","Igor Barinov","2016-06-24","2016-06-24","MIT",NA,NA
+" Working Prototype","CT Contract Management","http://chainthat.com/legal/","Legal contract management solution","legal, contracts","ChainThat","2016-06-24","2016-06-24","proprietary",NA,NA
+" Working Prototype","Slock It","http://slock.it/","If you can lock it, we will let you rent, sell or share it.","internet of things","Christoph Jentzsch","2015-10-02","2016-06-17","GPL",NA,NA
+" Work in Progress","dns2","http://sinking-point.github.io/dns2/","Potential improvement on the DNS in the form of a smart contract","dns, dns2, domain, name, system","Sinking Point","2016-03-04","2016-06-14","GPLv3",NA,NA
+" Working Prototype","Ethernote","http://ethernote.herokuapp.com/","Promissory Note.Legal binding of esign contract & smart contract","ethernote, smart contract template, promissory note, iou","Igor Barinov","2016-06-14","2016-06-14","MIT",NA,NA
+" Working Prototype","SafeMarket","http://safemarket.github.io/","P2P Marketplace","market, trade, finance","Aakil Fernandes","2015-11-09","2016-06-13","MIT",NA,NA
+" Working Prototype","CT Risk Placing","http://chainthat.com/insurance/","Commercial & Speciality Re(Insurance) placing platform","insurance, reinsurance, risks","ChainThat","2016-06-11","2016-06-11","proprietary",NA,NA
+" Demo","otlw-assess","http://otlw.co/","A decentralized framework for assessment in education","education, assessment, schelling","otlw","2016-06-11","2016-06-11",NA,NA,NA
+" Live","Rubix","http://rubixbydeloitte.com/","Enterprise Blockchain Platform","c++, enterprise","Rubix by Deloitte / Jinius Tu","2016-03-28","2016-06-10",NA,NA,NA
+" Live","Regis","http://regis.nu/","Create, deploy and interact with registries on Ethereum.","regis, registry, record, solidity","ConsenSys / Daniel Novy","2016-03-16","2016-06-09","proprietary",NA,NA
+" Live","ReGa","http://rega.site/","Ethereum p2p insurance platform","insurance, p2p, scoring, instech, mobileapp, android","Sergei Sevriugin","2016-06-07","2016-06-07","MIT",NA,NA
+" Live","EuroBet","http://eurocupbet.ether-contract.org/","Let's bet on the Euro Cup 2016 Winner!","eurocup, bet, euro","MilkyWayz","2016-06-06","2016-06-06","MIT",NA,NA
+" Work in Progress","RANDAO","http://randao.org","A DAO working as RNG of Ethereum","entropy, dao","Youcai","2015-11-23","2016-06-04","MIT",NA,NA
+" Work in Progress","Ethereum Lotto 50/50 draw","http://ethereum-lotto.com/","Ethereum Lotto 50/50 draw. Win half and support a charity!","lotto draw, ethereum lotto","Rob","2016-06-04","2016-06-04",NA,NA,NA
+" Working Prototype","AuditDog","http://quiark.github.io/AuditDog/","SW audit repository","security, auditing","Roman PlÃ¡Å¡il","2015-09-08","2016-05-31","MIT",NA,NA
+" Working Prototype","PublicVotes","http://publicvotes.org/","A publicly verifiable Voting System, powered by Smart Contracts","voting","Dominik Schiener","2015-11-12","2016-05-26","MIT",NA,NA
+" Live","Noosadigital","http://noosadigital.com/","Dream Agency","marketing","Michael","2016-05-26","2016-05-26",NA,NA,NA
+" Work in Progress","proof-of-individuality","http://proofofindividuality.tk","anti-sybil token","sybil, token","d11e9","2015-11-20","2016-05-25","MIT",NA,NA
+" Live","Protect The Castle","http://protect-the-castle.ether-contract.org/","Ponzi Game: Protect The Castle - x2 + Jackpot","ponzi, pyramid, castle, game, citizen, ponzi game","MilkyWayz","2016-03-21","2016-05-25",NA,NA,NA
+" Working Prototype","AKASHA","http://akasha.world/","Next-Generation Social Media Network","social network, social media network, social blogging network","AKASHA International","2016-05-25","2016-05-25",NA,NA,NA
+" Live","Etheramid","http://etheramid.cloudapp.net/","Social invitation game with reward","social, game, etheramid, invitation","Etheramid","2016-05-18","2016-05-18","MIT",NA,NA
+" Working Prototype","PirateChest","http://piratechest.github.io/","p2p magnet discovery","p2p, search","d11e9","2015-08-26","2016-05-17","MIT",NA,NA
+" Live","EtherDesign","http://etherdesign.io/","A.I. Design Dapp","design, interface, graphic, ai","Ed","2016-05-17","2016-05-17",NA,NA,NA
+" Live","ETH Digger","http://ethdigger.com/","Investment in Ethereum cloud mining using smart contract","investment, cloud, mining, smart, contract, anonymous, eth, digger","ETH Digger","2016-05-16","2016-05-16","MIT",NA,NA
+" Live","elcoin","http://7elephant.org/","Multifunctional platform based on elCoin - ethereum token","","Pavel Usenkov & Sergey Primachik","2016-05-14","2016-05-14",NA,NA,NA
+" Live","Ethereum games","http://ethereumgames.net/","Site for luck based ethereum games","games","Ethereum games","2016-05-09","2016-05-09",NA,NA,NA
+" Live","btcrelay","http://btcrelay.org/","A bridge between the Bitcoin blockchain & Ethereum smart contracts","exchange, spv","Joseph Chow","2016-05-03","2016-05-03","MIT",NA,NA
+" Live","Last is me!","http://lastis.me/","Trustless, time based lottery","lottery, trustless, jackpot","Riccardo Casatta","2016-05-03","2016-05-03","MIT",NA,NA
+" Concept","Melange","http://melnge.github.io/Melange/","Marriage of internet protocols to internet policy","ip, ","Algorythmix","2016-03-15","2016-04-10","CC BY-SA",NA,NA
+" Work in Progress","etherforum","http://matiasinsaurralde.github.io/etherforum/","An experimental / proof of concept / distributed forum built on top of Ethereum","communication","Matias Insaurralde","2015-12-21","2016-04-07","Public Domain",NA,NA
+" Concept","CubeSpawn","http://main.cubespawn.com/","Modular Manufacturing","manufacturing, modular, system, flexible, open source","James Jones","2015-04-22","2016-04-04",NA,NA,NA
+" Work in Progress","Daemon Market","http://daemonuxldeitsvu.onion/","Decentralized Smart Darknet Market","darknet, market, dao","Daemon","2016-04-03","2016-04-03",NA,NA,NA
+" Live","ESports Bets","http://eth.csgobets.org/","Decentralized ESports betting platform","esport, bets, betting, csgo","Masaca","2016-04-03","2016-04-03",NA,NA,NA
+" Live","Etheropt","http://etheropt.github.io","Decentralized Ethereum options exchange","options, finance, exchanges, transactions","Etherboost","2016-03-23","2016-03-23",NA,NA,NA
+" Working Prototype","iudex","http://iudex.github.io","smart contract based reputation system","reputation, oraclize","Alex Beregszaszi, Thomas Bertani","2015-12-10","2016-03-21","MIT",NA,NA
+" Work In Progress","Balanc3","http://balanc3.net/","Triple Entry Accounting","accounting, blockchain","Consensys / Jeff Ward & Christian Lundkvist","2016-03-21","2016-03-21","proprietary",NA,NA
+" Working Prototype","insurETH","http://insureth.mkvd.net/","P2P flight insurance","insurance, flight, oracle","Thomas Bertani, Kristina Butkute, Francesco Canessa","2016-01-21","2016-03-16","Apache",NA,NA
+" Live","BlockApps","http://blockapps.net/","Scalable Enterprise Blockchain Platform","development","Consensys / Kieren James-Lubin","2016-03-16","2016-03-16",NA,NA,NA
+" Concept","Grid Singularity","http://gridsingularity.com/","Decentralized energy data exchange platform","energy","Ewald Hesse","2016-03-12","2016-03-12","proprietary",NA,NA
+" Live","GovernMental","http://governmental.github.io/GovernMental/","Educational Ponzi Schema","ponzi","g0vernmental","2016-03-10","2016-03-11","proprietary",NA,NA
+" Live","Etheroll","http://etheroll.com/","Ether dice game casino / gamble ether","dice, gamble, casino, ether, gambling, game, luck, chance, etheroll","James","2016-03-01","2016-03-01","proprietary","0xece701c76bd00d1c3f96410a0c69ea8dfcf5f34e",NA
+" Live","EtherWall","http://etherwall.com","GUI desktop wallet for Ethereum","wallet","AleÅ¡ Katona","2016-02-18","2016-02-18","GPLv3",NA,NA
+" Working Prototype","EtherAPIs","http://etherapis.io/","Micropayment platform for generic API calls","micropayment, api, payment channel","PÃ©ter SzilÃ¡gyi & Jeffrey Wilcke","2016-02-16","2016-02-16","GPL",NA,NA
+" Working Prototype","EyePi","http://eyepi.com/","Crowdsourced medicine","healthcare, medical, devices, pharmaceutical, crowdsourcing","Bryan Hill","2015-06-10","2016-02-11",NA,NA,NA
+" Live","EtherID","http://etherid.org/","Ethereum Name Registrar","registry","Alexandre Naverniouk","2015-11-30","2015-11-30","Apache",NA,NA
+" Live","Browser-Solidity","http://ethereum.github.io/browser-solidity/","Browser based solidity contract compiler & runtime","solidity, compiler, development","chriseth & d11e9","2015-11-20","2015-11-20","MIT",NA,NA
+" Working Prototype","EtherPot","http://etherpot.github.io/","Provably Fair Lottery","game, lottery","Aakil Fernandes","2015-08-27","2015-11-19","MIT",NA,NA
+" Working Prototype","Shapeshift Bot","http://axic.github.io/shapeshiftbot/","Simple Ethereum contract to transfer Ether to Bitcoin","api, exchange, bitcoin","Alex Beregszaszi","2015-11-12","2015-11-12","MIT",NA,NA
+" Working Prototype","Etheria","http://etheria.world/","The first-ever decentralized virtual world","sandbox, world","fivedogit","2015-11-07","2015-11-07","GPL",NA,NA
+" Working Prototype","Colony","http://colony.io/","Companies for the 21st Century","governance","AttaAtta","2015-09-29","2015-09-29","proprietary",NA,NA
+" Working Prototype","Avatar","http://d11e9.github.io/avatar/","distributed profile registry","registry, profiles","d11e9","2015-08-28","2015-08-28","MIT",NA,NA
+" Working Prototype","Occams Run","http://d11e9.github.io/Occams-Run/","All things being equal (50/50) only The Brave will win","game, chance","d11e9","2015-08-26","2015-08-26","MIT",NA,NA
+" Working Prototype","Smart-Exchange","http://debris.gitbooks.io/ethchange/content/","Exchange service","exchange","Marek Kotewicz","2015-08-15","2015-08-15","MIT",NA,NA
+" Concept","Blocknet","http://blocknet.co","Inter-blockchain application platform","development, platform, cryptographic, p2p, nodes","Dan Metcalf & Arlyn Culwick","2015-06-03","2015-06-03",NA,NA,NA
+" Demo","Ethereum Prediction Market","http://atomrigs.blogspot.com","Prediction market","prediction, markets, probability, statistics, outcomes","Atomrigs","2015-04-22","2015-04-22","prediction, market, results, probability, statistics",NA,NA
