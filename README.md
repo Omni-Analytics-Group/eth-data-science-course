@@ -14,10 +14,35 @@ Our ultimate vision is to spur and inspire the next generation of developers thr
 
 ## Tentative Course Outline
 
-Module 1 - Basic Data Structures and Munging  
-Module 2 - Statistical Graphics and Visualization  
-Module 3 - Machine Learning and Clustering  
-Module 4 - Case Studies  
+Module 1 - Basic Data Structures and Munging
+* Setting up your R environment
+* Basics of syntax
+* Importing data
+* Data structures
+* Reshaping with dplyr
+
+Data Sources: *Gitcoin Grants, State of the DApps*
+
+Module 2 - Statistical Graphics and Visualization
+* Why graph?
+* Thinking in layers
+* Basic graph types
+* Advanced statistical graphics
+
+Data Sources: *Etherscan*
+
+Module 3 - Supervised and Unsupervised Machine Learning
+* The ML workflow
+* Supervised learning for classification
+* Unsupervised learning for grouping
+* Forecasting what's next
+* Deep learning for sequences
+
+Data Sources: *Numerai Tournament Data, UniSwap*
+
+Module 4 - Case Studies
+* Text mining Gitcoin Grants
+* Exploring and explaining Ethereum gas prices
 
 ## FAQ
 
