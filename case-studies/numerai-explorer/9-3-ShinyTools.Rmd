@@ -1,0 +1,48 @@
+---
+title: "Tools for Shiny Apps"
+output:
+  ioslides_presentation: 
+    smaller: true
+---
+
+## Help Documents
+
+[Shiny Input Widgets](http://shiny.rstudio.com/tutorial/lesson3/)
+
+[Shiny Outputs](http://shiny.rstudio.com/tutorial/lesson4/)
+
+
+## Shiny Inputs
+
+Shiny has many different input options:
+
+- `actionButton()` - creates a clickable button
+- `checkboxInput()` and `checkboxGroupInput()`
+- `dateInput()` - calendar to select a date
+- `dateRangeInput()` - select a range of dates
+- `fileInput()` - upload a file
+- `numericInput()` - input a numeric value
+- `radioButtons()` - select one or more items
+- `sliderInput()` - slide along a range of values
+- `textInput()` - input a string
+
+## Shiny Outputs
+
+Shiny also has many output options:
+
+- `renderDataTable()` - outputs an interactive, sortable data table
+- `htmlOutput()` - output html elements
+- `renderPlot()` - output an R plot
+- `renderPrint()` - output text from print() in R
+- `renderTable()` - output an HTML table
+- `renderText()` - output text from R
+- `renderUI()` - output a custom part of the user interface
+- `renderImage()` - print an image to the page
+
+## Other User Interface Options
+
+- `tabsetPanel()` - make multiple different output views (i.e. a plot in one tab, a data table in another)
+- `helpText()` - create additional text to help users navigate your applet
+- `submitButton()` - only update outputs when this button is clicked
+- `conditionalPanel()` - only show certain UI options when conditions are met (i.e. if a certain tab is open, or a certain input is selected)
+

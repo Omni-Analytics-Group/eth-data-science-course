@@ -1,0 +1,242 @@
+---
+title: "Structure of a Shiny Applet"
+output:
+  ioslides_presentation: 
+    smaller: true
+---
+
+
+## Two Components
+
+There are two primary components to a Shiny app:
+
+1. The User Interface (UI) definition
+    a. Defines the **appearance** of the application
+    b. Lists each input and output, and where they will appear
+    c. Typically does not contain R analysis code
+2. The Server definition
+    a. Defines the **functionality** of the application
+    b. For each input and output defined in the UI, the server will describe how to produce the necessary results
+    c. Typically contains most of the code from your R analysis script
+  
+
+## UI
+
+```{r, eval=FALSE}
+# A simple/common user interface template
+ui <- fluidPage(
+
+  # Application title
+  titlePanel("Title"),
+  
+  sidebarPanel(
+    # Define some inputs here
+  ),
+  
+  mainPanel(
+    # output (from the server) go here
+  )
+
+)
+```
+
+## UI
+- Defines the `ui` function, which contains elements that describe the HTML page
+
+- Typical applets are constructed using the `pageWithSidebar()` function, which creates a side bar generally used for input and a main panel used for output
+
+- Elements are hierarchical functions:
+components in the sidebar go into the `sidebarPanel()` function, separated by commas
+
+- Input variables are named in ui and then referenced in the server
+
+## User Interface Example 
+
+User interface code for creating Example_01.r:
+```{r,eval = F}
+#import data
+summary <- read.csv("data/summary_features.csv", header=T)
+ui <- fluidPage(
+    # Application title
+    titlePanel("Summary Statistics"),
+    # Sidebar panel
+    sidebarLayout(
+        sidebarPanel(
+            #variable input selection using the column names of summary
+            varSelectInput("sum_stat", 
+                           "Summary Statistics:", summary[5:11])
+        ),
+        # Main panel
+        mainPanel(
+            plotOutput("summaryplot"),
+        )
+    ),
+    dataTableOutput("summary")
+)
+```
+
+
+## server
+
+```{r, eval=FALSE}
+# Server side logic 
+server <- function(input, output) {
+  # do something
+}
+```
+
+## server
+- Defines the `server`, which is a function with input and output variables.
+- Contains all of the R code to generate any output
+- (Later) can also be used to modify inputs
+- Generally much longer than ui - all the interesting stuff happens in the server
+
+## Server Example 
+
+Server code for creating Example_01.r:
+
+```{r}
+server <- function(input, output) {
+    
+    #render table of summary
+    output$summary <- renderDataTable({
+        datatable(summary, style = 'bootstrap', 
+                  class = 'table-bordered',
+                  options = list(scrollX = TRUE))
+    })    
+
+    #render plot
+    output$summaryplot <- renderPlot({
+    ggplot(summary, aes_string(x=input$sum_stat)) + 
+        geom_histogram(fill = "#EA5600", color="grey")
+    })
+}
+
+```
+
+
+## Your Turn
+
+Using Example_01.R:
+
+1. Change the default variable input to 'numeric.p25' in <b> varSelectInput() </b>.
+2. Modify output$summary such that it renders only the first 5 rows of the table.
+
+## Answers
+
+### 1.
+```{r,eval = F}
+# In user interface
+varSelectInput("sum_stat", 
+               "Summary Statistics:", 
+               summary[5:11], selected = "numeric.p25")
+```
+
+##
+
+### 2.
+
+```{r, eval = F}
+# In Server
+output$summary <- renderDataTable({
+        datatable(head(summary,5), style = 'bootstrap',
+                  class = 'table-bordered',options = list(scrollX = TRUE))
+    })  
+```
+
+## Shiny Interactivity for Example_01.R
+
+Input
+
+  - Choose variable
+  
+Output
+
+  - Table
+  - Plot
+
+\includegraphics{shinyexample2.PNG}
+
+There are many additional ways for users to interact with shiny!
+
+
+## Reactivity
+
+Shiny applets work because of **reactive expressions**, which automatically update outputs when input values change.
+
+```
+input values => R code => output values
+```
+
+**Reactive expressions** keep track of what values they read and what values they change. If those values become "out of date", they know their return value is out of date and will automatically recalculate.
+
+## Reactivity
+
+We can create a reactive expression by passing a normal expression into reactive.
+
+```{r, eval=FALSE}
+# In server
+plottitle <- reactive(paste0("Distribution of ", input$sum_stat))
+```
+
+This statement stores the title into the variable <b> plottitle </b> which we can then call later in our server code.
+
+## Reactivity
+
+Reactive values can be turned into output objects that are passed to the shinyServer function.
+
+This output depends on the selected variable.
+
+```{r,eval =F}
+# In server
+output$summaryplot <- renderPlot({
+    ggplot(summary, aes_string(x=input$sum_stat)) + 
+        geom_histogram(fill = "#EA5600", color="grey")+
+        labs(title=plottitle(),x=input$sum_stat, y = "Frequency")
+    })
+```
+
+Whenever the selected variable changes, this function will be re-executed and the output will change.
+
+Note that reactive function is not needed to achieve the same result.
+
+## Your Turn
+
+Explore the code for the Example_01.r applet.
+
+1. Rewrite the code so reactive function is not needed to display the title according to the variable selected.
+2. Replace the table Output with a textOuput that tell us the size of the summary table.
+
+
+## Answers
+
+### 1.
+dataframe
+```{r,eval = F}
+# In server
+output$summaryplot <- renderPlot({
+    ggplot(summary, aes_string(x=input$sum_stat)) + 
+        geom_histogram(fill = "#EA5600", color="grey")+
+        labs(title=paste0("Distribution of ", 
+                          input$sum_stat),x=input$sum_stat, y = "Frequency")
+    })
+```
+
+##
+
+### 2.
+
+```{r,eval = F}
+# In user interface
+  textOutput("tableinfo")
+
+# In server
+  output$tableinfo <- renderText({
+        paste0("The summary table has ", 
+               dim(summary)[1], " rows and ", 
+               dim(summary)[2], " columns.")
+  })
+
+```
+
+

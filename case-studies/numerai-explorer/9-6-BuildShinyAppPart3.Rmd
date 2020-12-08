@@ -1,0 +1,100 @@
+---
+title: "Build Shiny App Part 3"
+output:
+  ioslides_presentation: 
+    smaller: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+## The target_mean_by_era data
+
+Let's load the data and use the R shiny template provided in 9-2-ShinyStructure
+
+```{r}
+target_mean_by_era <- read.csv("dataforshiny/target_mean_by_era.csv", header=T)
+
+ui <- fluidPage(
+
+  # Application title
+  titlePanel("Title"),
+  
+  sidebarPanel(
+    # Define some inputs here
+  ),
+  
+  mainPanel(
+    # output (from the server) go here
+  )
+
+)
+
+server <- function(input, output) {
+  # do something
+}
+```
+
+
+## Your turn
+
+1. Change the title to "Target across Era".
+2. In the sidebarPanel, create a <b> slideInput </b> so the user can pick an Era ranging from 1 to 120.
+3. Under the slider, display a text that tells us the target mean of the era chosen by the user.
+4. In the mainPanel, display a line plot x is the first column and y is the second column using <b> ggplot2 </b>. 
+
+
+##
+
+### 1. 
+```{r}
+titlePanel("Target across Era")
+```
+
+### 2.
+
+```{r}
+sliderInput("era1", "Era:", min = 1, max = 120, step=1, value = 1)
+```
+
+##
+
+### 3.
+```{r}
+#in UI
+textOutput("erainfo2")
+
+#in Server
+  output$erainfo2 <- renderText({
+        paste0("The mean of the target in era", input$era2, "is ",
+      target_mean_by_era$Mean[target_mean_by_era$era==input$era2], ".")
+  }) 
+```
+
+### 4.
+```{r}
+#in UI
+plotOutput("targetmean")
+
+#in Server
+  output$targetmean <- renderPlot({
+    ggplot(data=target_mean_by_era, aes(x=era, y=Mean))+
+      geom_line()+
+      scale_x_continuous(breaks = seq(0, 120, by = 10))+
+      labs(title = "Mean of target across eras", x="era")
+  })
+```
+
+
+## Third app done!
+You can download the code part3.R and make sure it is in the same directory of the folder dataforshiny. 
+
+<center><img src="images/part3.PNG" width=600px height=500px></center>
+
+
+
+
+
+
+
