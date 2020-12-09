@@ -41,9 +41,9 @@ Module 3 - Supervised and Unsupervised Machine Learning
 Data Sources: *Numerai Tournament Data, UniSwap*
 
 Module 4 - Case Studies
-* Clustering and segmenting Ethereum validator performance
-* Visualizing slashings in the Ethereum Medalla testnet
-* Using R Shiny to explore Numerai tournament data
+* [Clustering and segmenting Ethereum validator performance](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/)
+* [Visualizing slashings in the Ethereum Medalla testnet](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/slashers/)
+* [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/)
 * Text mining Gitcoin Grants
 * Exploring and explaining Ethereum gas prices
 
@@ -51,7 +51,7 @@ Data Sources: *Beaconscan, Numerai Tournament Data*
 
 ## Updates
 
-Gitcoin Grant Round 8
+*Gitcoin Grant Round 8*
 
 Like everything else in the world, 2020 flipped our course development plans upside down.  Instead of building the course from the bottom up, we chose to repurpose and refactor our Medalla research into motivating case studies on how to perform data analysis on Ethereum 2.0 blockchain data.  The case studies walk through, in detail, how we performed the analysis that ultimately netted us a Bronze prize. We also included a tutorial on on how to use R Shiny as an exploration tool for understanding the Numer.ai dApp's tournament data.
 
