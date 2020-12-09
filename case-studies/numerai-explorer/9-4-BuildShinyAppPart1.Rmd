@@ -1,0 +1,116 @@
+---
+title: "Build Shiny App Part 1"
+output:
+  ioslides_presentation: 
+    smaller: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+## Let's build a Shiny App!
+
+First, download the dataforshiny folder containing 5 csv.files. These data are obtained from the Numerai Tournament training data. 
+
+### The plan
+
+####
+We will build an app that lets user to explore the Numerai Tournament training data in various different ways. 
+
+We will first build an app for each dataset in the folder. In other words, we will build 5 small apps. 
+
+After that, we will combine these apps into one!
+
+
+## The summary data 
+
+We have seen and used this dataset in the previous section. Let's start with the existing code in Example_01.R and add another functionality on there. 
+
+First, we can change the names of the columns so that it is more readable as follows.
+
+```{r}
+#change column names of summary statistcs
+names(summary)[5:11] <- c("Mean", 
+                          "Standard Deviation", 
+                          "Minimum", 
+                          "First Quartile", 
+                          "Median", 
+                          "Third Quartile", 
+                          "Maximum")
+```
+
+##
+
+Next, let's add a column named category. 
+
+```{r}
+#create category in summary table
+summary$category<-ifelse(startsWith(summary$skim_variable, 
+              'feature_intelligence') ,'Intelligence',
+              ifelse(startsWith(summary$skim_variable,
+              'feature_charisma'),'Charisma', 
+              ifelse(startsWith(summary$skim_variable, 
+              'feature_strength'), 'Strength', 
+              ifelse(startsWith(summary$skim_variable, 
+              'feature_dexterity'), 'Dexterity', 
+              ifelse(startsWith(summary$skim_variable,
+              'feature_constitution'),'Constitution', 'Wisdom')))))
+```
+
+
+Thus, we can now plot a similar histogram across different categories by simply adding <b> +facet(~category) </b>. 
+
+##
+
+Let's create a <b> checkboxInput </b> to let the user pick between two plots. 
+
+```{r}
+#in UI 
+checkboxInput("category", "Category:", FALSE)
+
+#in server
+  output$summaryplot <- renderPlot({
+    if (input$category){
+      ggplot(summary, aes_string(x=input$sum_stat, fill = "category")) +
+        geom_histogram(color="grey60")+
+        labs(title=paste0("Distribution of ", input$sum_stat),
+             x=input$sum_stat, y = "Frequency") +
+        facet_wrap(~category) +
+        theme(axis.text.x = element_text(angle = 45, 
+                                         vjust = 1, size = 9, hjust = 1))
+      
+    } else {
+      ggplot(summary, aes_string(x=input$sum_stat)) + 
+        geom_histogram(fill = "#EA5600", color="grey")+
+        labs(title=paste0("Distribution of ", input$sum_stat),
+             x=input$sum_stat, y = "Frequency")        
+    }
+  })
+
+```
+
+## First app done!
+
+You can download the code part1.R and make sure it is in the same directory of the folder dataforshiny. 
+
+<center><img src="images/part1.PNG" height=500px></center>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
