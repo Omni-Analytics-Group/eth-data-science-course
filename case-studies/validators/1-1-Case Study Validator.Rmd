@@ -619,6 +619,7 @@ Now that we have a general idea, let's code!
 
 ```{r}
 valid_ranks <- valid_stats %>%
+    mutate(-index) %>%
     mutate(across(c(currentBalance, executions, skips, slashed, active, active_time), rank)) %>%
     mutate(active_time = active_time / 4) %>%
     gather(key = Variable, value = Rank, 2:ncol(.)) %>%
