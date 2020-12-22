@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Interacting with and Analyzing Numerai Network Growth</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <meta name="date" content="2020-12-22" />
+    <script src="libs/header-attrs-2.5/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Interacting with and Analyzing Numerai Network Growth
+## <br/>with GraphQL and <code>ggplot2</code>
+### Omni Analytics Group
+### 2020-12-22
+
+---
+
+
+## Background
+
+Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit models. These models are then used by the AI-based Numerai backend to perform trades. Numerai has seen explosive growth in recent years... can we use R-based tools to analyze this growth?
+
+---
+
+## GraphQL
+
+Numerai's API uses GraphQL as a backend, which is a structured query language much like SQL itself. There are two primary methods of accessing the data
+
+- Directly, using the `ghql` R package
+- Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R
+
+We will use `ghql` to keep the steps reproducible.
+
+---
+
+## `ghql`
+
+Let's begin by installing `ghql`:
+
+
+```r
+install.packages("ghql")
+```
+
+Next, we connect to the Numerai API:
+
+
+```r
+library(ghql)
+
+con &lt;- GraphqlClient$new(
+  url = "https://api-tournament.numer.ai/"
+)
+```
+
+---
+
+## Making a Query
+
+We can perform a query with the following:
+
+
+```r
+qry &lt;- Query$new()
+
+qry$query('leaderboard', '{
+  v2Leaderboard {
+    username
+    corrRep
+    mmcRep
+    return_52Weeks
+    return_13Weeks
+  }
+}')
+
+result &lt;- con$exec(qry$queries$leaderboard)
+```
+
+---
+
+## Viewing the Results
+
+
+
+
+```r
+parsed &lt;- fromJSON(result)[[1]]$v2Leaderboard
+head(parsed) %&gt;%
+  kable()
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; corrRep &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mmcRep &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; return_13Weeks &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; return_52Weeks &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; username &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0402891 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0209802 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 119.53684 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 335.1833 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; era__mix__2000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0401076 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0166502 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; tb &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0400921 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0168063 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.45799 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 435.2859 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; themiconmanweb &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0392682 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0177738 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87.74424 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 502.7527 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; themicon &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0388637 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0154371 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 86.85474 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 203.2468 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; rgb_alpha &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0386542 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0090163 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 98.36349 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 277.3833 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; lackofdexterity &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Graphing the Data
+
+
+```r
+ggplot(data = parsed, aes(x = return_52Weeks)) +
+  geom_histogram(fill = "blue", colour = "black") +
+  labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", 
+       x = "52 Week Returns")
+```
+
+![](index_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+## More Graphs
+
+
+```r
+ggplot(data = parsed, aes(x = corrRep, y = mmcRep)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Correlation vs MMC")
+```
+
+![](index_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

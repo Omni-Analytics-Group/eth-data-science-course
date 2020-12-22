@@ -1,0 +1,111 @@
+---
+title: "Interacting with and Analyzing Numerai Network Growth"
+subtitle: "<br/>with GraphQL and `ggplot2`"
+author: "Omni Analytics Group"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+## Background
+
+Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit models. These models are then used by the AI-based Numerai backend to perform trades. Numerai has seen explosive growth in recent years... can we use R-based tools to analyze this growth?
+
+---
+
+## GraphQL
+
+Numerai's API uses GraphQL as a backend, which is a structured query language much like SQL itself. There are two primary methods of accessing the data
+
+- Directly, using the `ghql` R package
+- Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R
+
+We will use `ghql` to keep the steps reproducible.
+
+---
+
+## `ghql`
+
+Let's begin by installing `ghql`:
+
+```{r, eval=FALSE}
+install.packages("ghql")
+```
+
+Next, we connect to the Numerai API:
+
+```{r}
+library(ghql)
+
+con <- GraphqlClient$new(
+  url = "https://api-tournament.numer.ai/"
+)
+```
+
+---
+
+## Making a Query
+
+We can perform a query with the following:
+
+```{r}
+qry <- Query$new()
+
+qry$query('leaderboard', '{
+  v2Leaderboard {
+    username
+    corrRep
+    mmcRep
+    return_52Weeks
+    return_13Weeks
+  }
+}')
+
+result <- con$exec(qry$queries$leaderboard)
+```
+
+---
+
+## Viewing the Results
+
+```{r, echo=FALSE, message=FALSE}
+library(jsonlite)
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+```
+
+```{r}
+parsed <- fromJSON(result)[[1]]$v2Leaderboard
+head(parsed) %>%
+  kable()
+```
+
+---
+
+## Graphing the Data
+
+```{r, message=FALSE, fig.height=5, warning=FALSE}
+ggplot(data = parsed, aes(x = return_52Weeks)) +
+  geom_histogram(fill = "blue", colour = "black") +
+  labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", 
+       x = "52 Week Returns")
+```
+
+---
+
+## More Graphs
+
+```{r, message=FALSE, fig.height=5, warning=FALSE}
+ggplot(data = parsed, aes(x = corrRep, y = mmcRep)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "Correlation vs MMC")
+```
+
