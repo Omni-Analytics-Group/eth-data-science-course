@@ -16,11 +16,28 @@ output:
 
 Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit models. These models are then used by the AI-based Numerai backend to perform trades. Numerai has seen explosive growth in recent years... can we use R-based tools to analyze this growth?
 
+![](images/numerai.png)
+
 ---
 
 ## GraphQL
 
-Numerai's API uses GraphQL as a backend, which is a structured query language much like SQL itself. There are two primary methods of accessing the data
+Numerai's API uses GraphQL as a backend, which is a structured query language much like SQL itself.
+
+- Developed initially as an internal project by Facebook
+- Provides a method for development of APIs much like REST
+- Flexible and rich compared to REST and therefore may be less suitable for more simple web APIs
+- Where REST APIs are organized as a collection of endpoints, GraphQL is organized as a collection of types and fields with their associated datatype specification.
+
+Let's take a look at how to interact with GraphQL in R...
+
+<div style="text-align: center;"><img src="images/graphql.png" width=500></div>
+
+---
+
+## GraphQL in R
+
+There are two primary methods of accessing the Numerai data:
 
 - Directly, using the `ghql` R package
 - Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R
@@ -47,9 +64,11 @@ con <- GraphqlClient$new(
 )
 ```
 
+This connection object maintains the GraphQL client connection to the Numerai API server. Note that it is an <a href="https://adv-r.hadley.nz/r6.html">R6-style object</a> and hence is initialized with 
+
 ---
 
-## Making a Query
+## Making a Leaderboard Query
 
 We can perform a query with the following:
 
@@ -69,6 +88,11 @@ qry$query('leaderboard', '{
 result <- con$exec(qry$queries$leaderboard)
 ```
 
+Note that we begin with the initialization of a new instance of the R6 `Query` class, and then call the `query()` method, passing in two arguments:
+
+- The name of the resulting object
+- The raw GraphQL query that is to be executed
+
 ---
 
 ## Viewing the Results
@@ -81,18 +105,29 @@ library(kableExtra)
 library(ggplot2)
 ```
 
+A quick peak at the raw return value shows JSON data that we need to parse using the `fromJSON()` function, in order to retrieve a data frame:
+
 ```{r}
-parsed <- fromJSON(result)[[1]]$v2Leaderboard
-head(parsed) %>%
+print(paste0(substring(result, 1, 50), "..."))
+```
+
+And the parsed data:
+
+```{r}
+nmr <- fromJSON(result)[[1]]$v2Leaderboard
+
+head(nmr, 4) %>%
   kable()
 ```
 
 ---
 
-## Graphing the Data
+## 52 Week Returns
+
+Now we can use `ggplot()` in order to visualize aspects of the data!
 
 ```{r, message=FALSE, fig.height=5, warning=FALSE}
-ggplot(data = parsed, aes(x = return_52Weeks)) +
+ggplot(data = nmr, aes(x = return_52Weeks)) +
   geom_histogram(fill = "blue", colour = "black") +
   labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", 
        x = "52 Week Returns")
@@ -100,12 +135,38 @@ ggplot(data = parsed, aes(x = return_52Weeks)) +
 
 ---
 
-## More Graphs
+## 13 Week Returns
+
+Now we can use `ggplot()` in order to visualize aspects of the data!
 
 ```{r, message=FALSE, fig.height=5, warning=FALSE}
-ggplot(data = parsed, aes(x = corrRep, y = mmcRep)) +
+ggplot(data = nmr, aes(x = return_13Weeks)) +
+  geom_histogram(fill = "blue", colour = "black") +
+  labs(title = "13 Week Returns on Staked NMR in the 'Classic' Tournament", 
+       x = "13 Week Returns")
+```
+
+---
+
+## 52 Week Returns vs 13 Week Returns
+
+```{r, message=FALSE, fig.height=5, warning=FALSE}
+ggplot(data = nmr, aes(x = return_13Weeks, y = return_52Weeks)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(title = "52 Week Returns vs 13 Week Returns")
+```
+
+---
+
+## Correlation vs MMC
+
+```{r, message=FALSE, fig.height=5, warning=FALSE}
+ggplot(data = nmr, aes(x = corrRep, y = mmcRep)) +
   geom_point() +
   geom_smooth(method = "lm") +
   labs(title = "Correlation vs MMC")
 ```
+
+---
 
