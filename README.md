@@ -21,7 +21,7 @@ Module 1 - Basic Data Structures and Munging
 * Data structures
 * Reshaping with dplyr
 
-Data Sources: *CryptoPunks*, *Crypto Art Pulse*
+Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
 
 Module 2 - Statistical Graphics and Visualization
 * Why graph?
@@ -87,7 +87,7 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 
 ## Featured Projects
 
-* CryptoPunks
-* Crypto Art Pulse
-* Numerai
-* Tornado Cash
+* [CryptoPunks](https://www.larvalabs.com/cryptopunks)
+* [Crypto Art Pulse](https://cryptoartpulse.com/)
+* [Numerai](https://numer.ai/)
+* [Tornado Cash](https://tornado.cash/)
