@@ -1,0 +1,12 @@
+.title-slide {
+  background-image: url(images/classroom/bb_blank1.png);
+  background-size: cover;
+}
+
+.title-slide h1 {
+  margin-top: -100px;
+}
+
+.title-slide .remark-slide-number {
+  display: none;
+}

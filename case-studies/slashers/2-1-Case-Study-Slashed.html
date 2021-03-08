@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Case Study</title>
+    <title>The Art of Slashing</title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Case Study
+# The Art of Slashing <br> <br> <br> <br> <br>
 ### Omni Analytics Group
 
 ---
@@ -32,6 +33,11 @@ Ethereum is a technology that lets you send cryptocurrency to anyone for a small
 
 Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/. 
 
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_18.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Slot-Slashed Dataset
@@ -65,18 +71,18 @@ sample_n(df_slashed,5)
 ```
 
 ```
-##      X epoch   slot               age validatorSlashed slashedBy
-## 1  862  3337 106796 53 days 3 hrs ago            25331     20794
-## 2 1360  3283 105063 53 days 8 hrs ago            10446     31622
-## 3   41 14407 461052 3 days 22 hrs ago            38852     15138
-## 4   38 14423 461548 3 days 20 hrs ago            38887     19335
-## 5  189 12567 402159 12 days 2 hrs ago            29134     36677
+##      X epoch   slot                age validatorSlashed slashedBy
+## 1 1713  3250 104010 53 days 12 hrs ago             8122     13469
+## 2  118 12567 402159  12 days 2 hrs ago            15378     36677
+## 3  696  3352 107294   53 days 1 hr ago            24211     14561
+## 4  303  7147 228714  36 days 4 hrs ago             2250     27206
+## 5   71 13527 432876  7 days 20 hrs ago            38868     43676
 ##                     reason
 ## 1 Attestation rule offense
 ## 2 Attestation rule offense
 ## 3 Attestation rule offense
-## 4    Proposer rule offense
-## 5 Attestation rule offense
+## 4 Attestation rule offense
+## 5    Proposer rule offense
 ```
 
 
@@ -107,7 +113,7 @@ skim(df_slashed)
 
 --
 
-.center[![summary1](summary1.PNG)]
+.center[![summary1](images/summary1.PNG)]
 
 ---
 
@@ -277,7 +283,12 @@ We can find out more about the epoch elapsed between slashings.
 1. Verify the fact that about 41% of the 'epochelapsed' is 1. 
 2. Draw a red timeseries of 'epochelapsed' using 'previousepoch' and give it a title.  
 
+&lt;br&gt; &lt;br&gt;
+&lt;p align="left"&gt;
 
+&lt;img src="images/Cut_outs/Cut_out_02.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Answer
@@ -474,6 +485,13 @@ Create a time series of the cumulative number of the reason similar to the previ
 
 Hint: you will need to use &lt;b&gt; group_by() &lt;/b&gt; twice here. 
 
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt; 
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 ## Answer
 
@@ -697,7 +715,7 @@ df_join_slasher %&gt;%
 
 ---
 
-.center[![table1](table1.PNG)]
+.center[![table1](images/table1.PNG)]
 
 The table shows the top 10 validators that have done the most slashings. These slashers have similar current balance and effective balance. Most of them were also active for a long period of time. According to the tier system we created on the Case Study we did on validator data, 8 out of these top 10 slashers reside in tier 3 where validators' performance becomes noticeably worse.
 
@@ -824,6 +842,12 @@ we can see 8 validators that have done a high number of slashes and each of them
 
 Hint: use &lt;b&gt; sort() &lt;/b&gt; and &lt;b&gt; which() &lt;/b&gt;
 
+&lt;br&gt; &lt;br&gt;
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_22.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Answers
@@ -862,9 +886,9 @@ plot(dnetwork[[70]],layout=layout.davidson.harel(dnetwork[[70]]),vertex.size=5, 
 
 ## Interesting observations
 
-There were two interesting observations about the slashing behavior that were particularly important to understanding the nature of the network visualizations. T
+There were two interesting observations about the slashing behavior that were particularly important to understanding the nature of the network visualizations. 
 
-he first was that there was not one validator that had been slashed by the same validator twice. 
+The first was that there was not one validator that had been slashed by the same validator twice. 
 
 The second observation we discovered was that there were no instances of "revenge slashing" in which a validator slashed a second validator, and then the second validator eventually slashed the first in return. 
 
@@ -989,6 +1013,33 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
 
 <script>
 slideshow._releaseMath = function(el) {

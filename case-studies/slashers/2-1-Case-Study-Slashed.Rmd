@@ -1,8 +1,11 @@
 ---
-title: "Case Study"
+title: "The Art of Slashing <br> <br> <br> <br> <br>"
 author: "Omni Analytics Group"
 output:
   xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
     lib_dir: libs
     nature:
       ratio: 16:9
@@ -29,6 +32,11 @@ Ethereum is a technology that lets you send cryptocurrency to anyone for a small
 
 Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/. 
 
+<p align="center">
+
+<img src="images/Cut_outs/Cut_out_18.png"  width="200px" height="150px">
+
+</p>
 ---
 
 ## Slot-Slashed Dataset
@@ -87,7 +95,7 @@ skim(df_slashed)
 
 --
 
-.center[![summary1](summary1.PNG)]
+.center[![summary1](images/summary1.PNG)]
 
 ---
 
@@ -232,7 +240,12 @@ We can find out more about the epoch elapsed between slashings.
 1. Verify the fact that about 41% of the 'epochelapsed' is 1. 
 2. Draw a red timeseries of 'epochelapsed' using 'previousepoch' and give it a title.  
 
+<br> <br>
+<p align="left">
 
+<img src="images/Cut_outs/Cut_out_02.png"  width="200px" height="150px">
+
+</p>
 ---
 
 ## Answer
@@ -399,6 +412,13 @@ Create a time series of the cumulative number of the reason similar to the previ
 
 Hint: you will need to use <b> group_by() </b> twice here. 
 
+
+<br> <br> <br> <br> 
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px">
+
+</p>
 ---
 ## Answer
 
@@ -624,7 +644,7 @@ df_join_slasher %>%
 
 ---
 
-.center[![table1](table1.PNG)]
+.center[![table1](images/table1.PNG)]
 
 The table shows the top 10 validators that have done the most slashings. These slashers have similar current balance and effective balance. Most of them were also active for a long period of time. According to the tier system we created on the Case Study we did on validator data, 8 out of these top 10 slashers reside in tier 3 where validators' performance becomes noticeably worse.
 
@@ -734,6 +754,12 @@ we can see 8 validators that have done a high number of slashes and each of them
 
 Hint: use <b> sort() </b> and <b> which() </b>
 
+<br> <br>
+<p align="center">
+
+<img src="images/Cut_outs/Cut_out_22.png"  width="200px" height="150px">
+
+</p>
 ---
 
 ## Answers
@@ -757,9 +783,9 @@ plot(dnetwork[[70]],layout=layout.davidson.harel(dnetwork[[70]]),vertex.size=5, 
 
 ## Interesting observations
 
-There were two interesting observations about the slashing behavior that were particularly important to understanding the nature of the network visualizations. T
+There were two interesting observations about the slashing behavior that were particularly important to understanding the nature of the network visualizations. 
 
-he first was that there was not one validator that had been slashed by the same validator twice. 
+The first was that there was not one validator that had been slashed by the same validator twice. 
 
 The second observation we discovered was that there were no instances of "revenge slashing" in which a validator slashed a second validator, and then the second validator eventually slashed the first in return. 
 
