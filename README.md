@@ -15,10 +15,10 @@ Our ultimate vision is to spur and inspire the next generation of developers thr
 ## Tentative Course Outline
 
 Module 1 - Basic Data Structures and Munging
-* Setting up your R environment
-* Basics of syntax
-* Importing data
-* Data structures
+* [Motivating Example](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html)
+* [Reading Files](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html)
+* [Basics](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html)
+* [Data structures](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html)
 * Reshaping with dplyr
 
 Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
@@ -47,7 +47,7 @@ Module 4 - Case Studies
 * [Interacting with and Analyzing Numerai Network Growth with GraphQL and ggplot2]()
 * [Tornado.Cash Initial Distribution Analysis]()
 * [Stable Coin Analysis]()
-* [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/)
+* [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/)([Part 1](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-1-ShinyIntro.html),[Part 2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-2-ShinyStructure.html),[Part 3](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-3-ShinyTools.html),[Part 4](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-4-BuildShinyAppPart1.html),[Part 5](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-5-BuildShinyAppPart2.html),[Part 6](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-6-BuildShinyAppPart3.html),[Part 7](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-7-BuildShinyAppPart4.html),[Part 8](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-8-BuildShinyAppPart5.html),[Part 9](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-9-BuildShinyAppFinalPart.html))
 
 Data Sources: *Beaconscan, Numerai Tournament Data*
 
