@@ -41,7 +41,7 @@ Module 3 - Supervised and Unsupervised Machine Learning
 Data Sources: *Numerai Tournament Data, UniSwap*
 
 Module 4 - Case Studies
-* [Clustering and segmenting Ethereum validator performance](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/) ([R], [Python], [Video])
+* [Clustering and segmenting Ethereum validator performance](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/) ([R], [Python], [Video](https://youtu.be/2JLRnKmlV8I))
 * [Visualizing slashings in the Ethereum Medalla testnet](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/slashers/) ([R], [Python])
 * [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/)
 * [Reconstructing the Crypto Sentiment Investment Curve in ggplot2]() 
