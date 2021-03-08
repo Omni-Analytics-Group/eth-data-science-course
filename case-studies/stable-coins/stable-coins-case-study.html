@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Stable Coins Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Stable Coins Analysis <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Stable Coins
+
+Stablecoins are cryptocurrencies designed to minimize the volatility of the price of the stablecoin, relative to some "stable" asset or basket of assets. A stablecoin can be pegged to a cryptocurrency, fiat money, or to exchange-traded commodities (such as precious metals or industrial metals).
+
+The &lt;b&gt;denome&lt;/b&gt; created a youtube video: https://youtu.be/2vvHqQ0QCrQ, where he ranked some properties of the some stable coins as follows:
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/stable-coin.png" width="600px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Motivation
+
+*Some motivation*
+
+We will be using the following libraries:
+
+
+```r
+library(tidyverse)
+library(ggimage)
+library(psych)
+library(knitr)
+library(kableExtra)
+library(factoextra)
+library(stats)
+```
+
+---
+
+## The Data
+
+Using the rankings from the youtube video, we have the following table:
+
+
+```r
+stab &lt;- read_csv("stablecoins.csv")
+stab %&gt;%
+    kable() %&gt;%
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+&lt;table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Coin &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Security &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Liquidity &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Yield &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Lawful &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Transparency &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Price_Stability &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Backed &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; TUSD &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; DAI &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAX &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RSV &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BUSD &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDJ &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDN &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDT &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDC &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
+
+## Dimensionality Reduction
+
+For better visualization of the ranking of these stable coins, we will perform Principal Component Analysis.
+
+
+```r
+pc &lt;- prcomp(stab %&gt;% select(-Coin), scale = TRUE)
+```
+
+Using the `factoextra` package, we can easily visualize the components. 
+
+&lt;br&gt; &lt;br&gt;
+&lt;p align="left"&gt;
+
+&lt;img src="Cut_outs/Cut_out_02.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+---
+
+## Screeplot
+
+
+```r
+fviz_eig(pc)
+```
+
+&lt;img src="stable-coins-case-study_files/figure-html/unnamed-chunk-4-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Biplot 
+
+
+```r
+fviz_pca_biplot(pc, repel = TRUE, # Avoid text overlapping
+                 col.var = "red", # Variables color
+                 col.ind = "blue")  # Individuals color
+```
+
+&lt;img src="stable-coins-case-study_files/figure-html/unnamed-chunk-5-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Readibility
+
+Most of the time we read things from left to right (low to high) and down to up (low to high), so let's flip the signs of the principal components. 
+
+
+```r
+pc$x &lt;- -pc$x
+pc$rotation &lt;- -pc$rotation
+```
+
+&lt;br&gt;
+
+&lt;p align="right"&gt;
+
+&lt;img src="Cut_outs/Cut_out_25f.png"  width="150px" height="250px"&gt;
+
+&lt;/p&gt;
+---
+
+## Biplot (after flipping signs)
+
+
+```r
+fviz_pca_biplot(pc, repel = TRUE, # Avoid text overlapping
+                 col.var = "red", # Variables color
+                 col.ind = "blue")
+```
+
+&lt;img src="stable-coins-case-study_files/figure-html/unnamed-chunk-7-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Interpretation
+
+From the biplot, we see the following:
+
+* A stable coin being on the right side of the graph will have a higher score compared to being on the left side. 
+
+* A stable coin being on the top side of the graph will have a higher score in terms of Transparency, Security, and Lawful compared to those on the bottom side. 
+
+* A stable coin being on the bottom side of the graph will have a higher score in terms of Yield, Liquidity and Price Stability compared to those on the top side. 
+
+&lt;p align="center"&gt;
+
+&lt;img src="Cut_outs/Cut_out_04.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Plot 1
+We can use `geom_point()` from `ggplot2` to create a simple plot as well. 
+
+```r
+pc$x %&gt;% as_tibble() %&gt;% ggplot(aes(x = PC1, y = PC2)) + geom_point()
+```
+
+&lt;img src="stable-coins-case-study_files/figure-html/unnamed-chunk-8-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Coins' Symbols
+Let's show the coins' names and the coins' symbols in the plot as well! We have the coins' names in the `stab` table. We also have the coins' symbols in our images folder. They are downloaded from the CoinGecko website: https://www.coingecko.com/en. 
+
+We will create a table with the principal components, coins' names and the paths to the coins' symbols as follows: 
+
+
+```r
+mypc &lt;- pc$x %&gt;%
+    as_tibble() %&gt;%
+    mutate(Coin = stab$Coin,
+           Path = paste0("images/", Coin, ".png"))
+```
+
+---
+
+## Plot 2
+Using `geom_image()` and `geom_label()`, we have the following plot:
+
+
+```r
+ggplot(data = mypc, aes(x = PC1, y = PC2)) + geom_point() + 
+  geom_image(aes(image = Path), size = 0.08) + 
+  geom_label(aes(label = Coin), alpha = 0.8)
+```
+
+&lt;img src="stable-coins-case-study_files/figure-html/unnamed-chunk-10-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+## Plot 3
+To finalize the plot, we will do the following:
+
+* Add dividers at `\(x=0\)` and `\(y=0\)` using `geom_hline()` and `geom_vline()`
+* Add title and axis label using `labs()`
+* Include some interpretations in the plot using `scale_y_continuous` and `scale_x_continuous`
+
+
+```r
+p3&lt;- ggplot(data = mypc, aes(x = PC1, y = PC2)) +
+    geom_point() +
+    geom_image(aes(image = Path), size = 0.08) +
+    geom_label(aes(label = Coin), alpha = 0.8) +
+    geom_hline(yintercept = 0) +
+    geom_vline(xintercept = 0) +
+    scale_x_continuous(limits = c(-3, 3), breaks = -3:3, labels = c("", "Lower Scores", expression(symbol("\254")), "", expression(symbol("\256")), "Higher Scores", "")) +
+    scale_y_continuous(limits = c(-3, 3), breaks = -3:3, labels = c("", "Investment Focused", expression(symbol("\254")), "", expression(symbol("\256")), "Security Focused", "")) +
+    theme(axis.text.y = element_text(angle = 90, hjust = 0.5)) +
+    labs(y = "Focus",
+        x = "Overall Score",
+        title = "A Visualization of the Stablecoin Landscape",
+        subtitle = "Analysis and Rankings by @denomeme")
+```
+
+---
+
+
+```r
+p3
+```
+
+&lt;img src="stable-coins-case-study_files/figure-html/unnamed-chunk-12-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Conclusion
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

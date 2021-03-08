@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Tornado.Cash Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Tornado.Cash Analysis <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Tornado Cash
+
+Tornado.cash is a fully autonomous, decentralized transaction mixer that provides private value transfers on the Ethereum blockchain. On December 17th, a Decentralized Autonomous Organization was formed around the Tornado.Cash protocol, and it's native token `$vTORN` was distributed to early adopters and users of the service.  As it stands, the `$vTRON` tokens have a 45 day lock up where transfers have been disabled until governance has decided on the best way forward.  Having said that, it is quite common for token's "airdropped" on to users to have some fair market trade value.  
+
+---
+
+## Motivation
+
+This case study will be speculative in nature and involve the procurement of the data, transforming variables using a few common themes we've learned from other cryptocurrency analysis, and end with a set of estimates of the average expected dollar value of the tokens a recipient will gain.
+
+We will be using the following libraries:
+
+
+```r
+library(knitr)
+library(tidyverse)
+library(kableExtra)
+library(formattable)
+library(scales)
+```
+
+&lt;p align="center"&gt;
+
+&lt;img src="Cut_outs/Cut_out_17.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## The Data
+For data, we'll use the open sourced table of wallet addresses and the raw amounts supplied by the team within their announcement: https://github.com/tornadocash/airdrop/blob/master/airdrop.csv.
+
+We took the liberty and named the columns as `Wallet Address` and `Raw`. Below are the first few columns of the data:
+
+
+```r
+torn &lt;- read_csv("airdrop.csv")
+torn %&gt;%
+  head() %&gt;%
+  kable() %&gt;%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+&lt;table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Wallet Address &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Raw &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x0039F22efB07A647557C7C5d17854CFD6D489eF3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6.167693e+20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0xbB1332e692E701bFC0e3C19FfD4Dd619C599ea2a &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.014204e+20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x9305D3b084FA269Afe5A1a8Ca414715D39041eb9 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.786841e+20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x7f7DC314fC75658D474DBBfe598EbB058CA6aAcd &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.285185e+20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x3ac2483105a248b77BDe927cA41A5bbDA968603D &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.215414e+20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0xA61A8CeC64C404B0050EB3fA3Dd2B4A9C9aE53e7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.009907e+20 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Number Of Tokens 
+First, we can convert the `Raw` column to the number of TORN TOkens by simply dividing it by `\(10^(18)\)`. 
+
+
+```r
+torn &lt;- torn %&gt;% mutate(TORN = Raw/10^(18))
+torn %&gt;% summarise( sum = sum(TORN))
+```
+
+```
+## # A tibble: 1 x 1
+##      sum
+##    &lt;dbl&gt;
+## 1 500000
+```
+We can see that we have a total of `\(50000\)` TORN Tokens.
+
+&lt;p align="right"&gt;
+
+&lt;img src="Cut_outs/Cut_out_14.png"  width="150" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Summary Statistics
+
+Now let us look a the summary statistics of these TORN Tokens.  
+
+
+```r
+summary(torn$TORN)
+```
+
+```
+##      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+##    0.0062    9.5943   21.2435   66.5425   58.3479 2539.9524
+```
+From the summary, we can see that the mean is slightly higher than the third quartile and the maximum is very big compared to the rest. 
+
+
+---
+
+## Distribution of TORN Tokens
+
+Let's take a look at the distribution of the TORN Tokens using `ggplot2` and `scales` packages. 
+
+
+```r
+torn %&gt;% ggplot(aes(x=TORN))+ geom_histogram(color="darkblue", fill="lightblue", boundary=0)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+ 
+  scale_x_continuous(breaks = scales::pretty_breaks(n=20))+
+  labs(title = "Distribution of TORN Tokens", x = "TORN Tokens")
+```
+
+&lt;p align="left"&gt;
+
+&lt;img src="Cut_outs/Cut_out_08.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+---
+
+&lt;img src="tornado_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Log transformation
+Since there are many huge values (outliers), we can use log transform the x-axis to have a better sense of the distribution via `scale_x_log10()`.
+
+Also, note that we created `scaleFUN` to make sure it displays 2 decimals.
+
+
+```r
+scaleFUN &lt;- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.03,0.1,0.3, 1, 3, 10,30,100,300,1000)
+p1 &lt;- torn %&gt;% ggplot(aes(x=TORN))+
+  geom_histogram(color="darkblue", fill="lightblue", boundary=0)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  scale_x_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  labs(title = "Distribution of TORN Tokens", x = "TORN Tokens")+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))
+```
+
+---
+
+&lt;img src="tornado_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Market Capitalization Estimates  &lt;img src="stickers/calc1.png"  width="100px" height="100px"&gt;
+
+The market capitalization of a token is simply: Number of Tokens * The price of the token. We will assume that the `\(500000\)` tokens are the only tokens in existence.
+
+We chose the following market capitalizations: 
+&lt;b&gt; Val1MCap, Val2MCap, Val5MCap, Val10MCap, Val25MCap, Val50MCap, Val100MCap, Val250MCap, Val500MCap, Val1BCap &lt;/b&gt;
+
+along with some other recent air drops: 
+&lt;b&gt; `$Badger2MCap`, `$MIR17MCap`, `$1Inch164MCap`, `$UNI734MCap` &lt;/b&gt;.
+
+For instance, to get &lt;b&gt; Val1MCap &lt;/b&gt;, we will need the price of the token to be $2 as we have `\(500000\)` tokens. 
+
+---
+
+Let's create these the table where we have the dollar value of each of `Wallet Address` based on the market capitalization. We Can simply multiply by the appropriate price of the token with the number of tokens for each row as follows:
+
+
+```r
+cap &lt;- torn %&gt;% 
+  select(TORN) %&gt;%
+  mutate(Val1MCap = TORN*2,
+         '$Badger2MCap' = TORN*4,
+         Val5MCap = TORN*10,
+         Val10MCap = TORN*20,
+         'MIR17MCap' = TORN*34,
+         Val25MCap = TORN*50,
+         Val50MCap = TORN*100,
+         Val100MCap = TORN*200,
+         '$Inch164MCap' = TORN*328,
+         Val250MCap = TORN*500,
+         Val500MCap = TORN*1000,
+         '$UNI734MCap' = TORN*1468,
+         Val1BCap = TORN*2000) 
+```
+
+---
+
+## The Market Capitalization Table
+
+Below shows the first few rows and columns of the table:
+
+
+```r
+cap %&gt;%
+  select(1:8) %&gt;%
+  head() %&gt;%
+  kable() %&gt;%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+&lt;table class="table table-striped table-hover" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; TORN &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Val1MCap &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; $Badger2MCap &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Val5MCap &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Val10MCap &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MIR17MCap &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Val25MCap &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Val50MCap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 616.7693 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1233.5386 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2467.0773 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6167.693 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12335.386 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20970.157 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30838.466 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61676.93 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 101.4204 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 202.8408 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 405.6816 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1014.204 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2028.408 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3448.294 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5071.020 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10142.04 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 478.6841 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 957.3682 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1914.7364 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4786.841 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9573.682 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16275.259 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 23934.205 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 47868.41 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 328.5185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 657.0369 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1314.0738 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3285.185 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6570.369 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11169.627 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16425.923 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32851.85 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 121.5414 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 243.0827 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 486.1655 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1215.414 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2430.827 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4132.406 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6077.068 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12154.14 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 200.9907 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 401.9814 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 803.9629 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2009.907 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4019.814 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6833.684 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10049.536 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20099.07 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Summary of Market Capitalization
+
+For simplicity, we can use the following summary statistics to give an overview of what people can expect:
+
+&lt;b&gt; Maximum, 90th percentile, 75th percentile, Median, Mean, 25th percentile, 10th percentile, Minimum &lt;/b&gt; 
+
+We will first use `gather()` to pivot the table into a long table so we can `group_by()` market capitalization.
+
+
+```r
+summary &lt;- cap %&gt;% 
+  gather() %&gt;%
+  group_by(key) %&gt;%
+  summarise(Max = max(value),
+            '90%-tile' = quantile(value, 0.9),
+            '70%-tile' = quantile(value, 0.75),
+            Median = mean(value),
+            '25%-tile' = quantile(value, 0.25),
+            '10%-tile' = quantile(value,0.1),
+            Min = min(value)) %&gt;%
+  column_to_rownames(var="key")
+```
+
+---
+
+
+```r
+summary
+```
+
+```
+##                      Max    90%-tile     70%-tile       Median    25%-tile
+## $Badger2MCap   10159.810    589.7860    233.39164    266.16982    38.37708
+## $Inch164MCap  833104.398  48362.4549  19138.11425  21825.92494  3146.92065
+## $UNI734MCap  3728650.171 216451.4748  85654.73085  97684.32260 14084.38877
+## MIR17MCap      86358.383   5013.1813   1983.82892   2262.44344   326.20519
+## TORN            2539.952    147.4465     58.34791     66.54245     9.59427
+## Val100MCap    507990.486  29489.3017  11669.58186  13308.49082  1918.85406
+## Val10MCap      50799.049   2948.9302   1166.95819   1330.84908   191.88541
+## Val1BCap     5079904.864 294893.0174 116695.81860 133084.90817 19188.54057
+## Val1MCap        5079.905    294.8930    116.69582    133.08491    19.18854
+## Val250MCap   1269976.216  73723.2543  29173.95465  33271.22704  4797.13514
+## Val25MCap     126997.622   7372.3254   2917.39547   3327.12270   479.71351
+## Val500MCap   2539952.432 147446.5087  58347.90930  66542.45409  9594.27028
+## Val50MCap     253995.243  14744.6509   5834.79093   6654.24541   959.42703
+## Val5MCap       25399.524   1474.4651    583.47909    665.42454    95.94270
+##                 10%-tile          Min
+## $Badger2MCap   13.337580  0.024883902
+## $Inch164MCap 1093.681570  2.040479979
+## $UNI734MCap  4894.891904  9.132392099
+## MIR17MCap     113.369431  0.211513169
+## TORN            3.334395  0.006220976
+## Val100MCap    666.879006  1.244195109
+## Val10MCap      66.687901  0.124419511
+## Val1BCap     6668.790060 12.441951089
+## Val1MCap        6.668790  0.012441951
+## Val250MCap   1667.197515  3.110487772
+## Val25MCap     166.719752  0.311048777
+## Val500MCap   3334.395030  6.220975544
+## Val50MCap     333.439503  0.622097554
+## Val5MCap       33.343950  0.062209755
+```
+
+## Readibility  
+For readibility, let's transpose the table, round the values to 2 decimals, and reorder the market capitalization as follows. 
+
+
+```r
+summary_t &lt;- t(summary)
+
+summary_t &lt;- as.data.frame(summary_t) %&gt;%
+  rownames_to_column(., var = "rowname") %&gt;%
+  mutate_if(is.numeric, round, 2) %&gt;%
+  column_to_rownames(var="rowname") %&gt;%
+  select(TORN,
+         Val1MCap,
+         '$Badger2MCap',
+         Val5MCap,
+         Val10MCap,
+         'MIR17MCap',
+         Val25MCap,
+         Val50MCap,
+         Val100MCap,
+         '$Inch164MCap',
+         Val250MCap,
+         Val500MCap,
+         '$UNI734MCap',
+         Val1BCap)
+```
+
+---
+
+
+```r
+summary_t
+```
+
+```
+##             TORN Val1MCap $Badger2MCap Val5MCap Val10MCap MIR17MCap Val25MCap
+## Max      2539.95  5079.90     10159.81 25399.52  50799.05  86358.38 126997.62
+## 90%-tile  147.45   294.89       589.79  1474.47   2948.93   5013.18   7372.33
+## 70%-tile   58.35   116.70       233.39   583.48   1166.96   1983.83   2917.40
+## Median     66.54   133.08       266.17   665.42   1330.85   2262.44   3327.12
+## 25%-tile    9.59    19.19        38.38    95.94    191.89    326.21    479.71
+## 10%-tile    3.33     6.67        13.34    33.34     66.69    113.37    166.72
+## Min         0.01     0.01         0.02     0.06      0.12      0.21      0.31
+##          Val50MCap Val100MCap $Inch164MCap Val250MCap Val500MCap $UNI734MCap
+## Max      253995.24  507990.49    833104.40 1269976.22 2539952.43  3728650.17
+## 90%-tile  14744.65   29489.30     48362.45   73723.25  147446.51   216451.47
+## 70%-tile   5834.79   11669.58     19138.11   29173.95   58347.91    85654.73
+## Median     6654.25   13308.49     21825.92   33271.23   66542.45    97684.32
+## 25%-tile    959.43    1918.85      3146.92    4797.14    9594.27    14084.39
+## 10%-tile    333.44     666.88      1093.68    1667.20    3334.40     4894.89
+## Min           0.62       1.24         2.04       3.11       6.22        9.13
+##            Val1BCap
+## Max      5079904.86
+## 90%-tile  294893.02
+## 70%-tile  116695.82
+## Median    133084.91
+## 25%-tile   19188.54
+## 10%-tile    6668.79
+## Min           12.44
+```
+
+---
+
+## Formattable 
+To make it prettier, we can use `formattable` to create colors based on the values as follows:
+
+
+```r
+colortile &lt;- function(min.color = "lightpink", max.color = "lightgreen", fun = "currency") {
+  fun &lt;- match.fun(fun)
+  formatter("span", x ~ fun(x),
+            style = function(y) style(
+              display = "block",
+              direction = "rtl",
+              "border-radius" = "4px",
+              "padding-right" = "2px",
+              "background-color" = csscolor(gradient(as.numeric(y),min.color='lightpink', max.color = 'lightgreen'))
+            )
+  )
+}
+
+formattable(summary_t,
+  lapply(1:nrow(summary_t), function(row) {
+  area(row, col = -1) ~ colortile()
+    }
+  )
+)
+```
+
+---
+&lt;p align="center"&gt;
+
+&lt;img src="summary.png"&gt;
+
+&lt;/p&gt;
+
+
+---
+## Conclusion
+
+
+
+&lt;p align="right"&gt;
+
+&lt;img src="Cut_outs/Cut_out_07.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

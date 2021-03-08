@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Interacting with and Analyzing Numerai Network Growth</title>
+    <title>Interacting with and Analyzing   Numerai Network Growth</title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
-    <meta name="date" content="2020-12-23" />
-    <script src="libs/header-attrs-2.5/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Interacting with and Analyzing Numerai Network Growth
-## <br/>with GraphQL and <code>ggplot2</code>
+# Interacting with and Analyzing <br> Numerai Network Growth
+## with GraphQL and <code>ggplot2</code><br> <br><br><br>
 ### Omni Analytics Group
-### 2020-12-23
 
 ---
 
 
+
+
 ## Background
 
-Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit models. These models are then used by the AI-based Numerai backend to perform trades. Numerai has seen explosive growth in recent years... can we use R-based tools to analyze this growth?
+Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit stock market predictions in a weekly tournament. These predictions are then crowd-sourced into an AI-based ensemble model that performs trades on behalf of Numerai. Over the last 3 years, the Numerai network has seen explosive growth and this case study will teach you how to analyze that growth using R's graphQL capabilities.
 
 ![](images/numerai.png)
 
@@ -53,6 +53,12 @@ There are two primary methods of accessing the Numerai data:
 
 We will use `ghql` to keep the steps reproducible.
 
+
+&lt;p align="right"&gt;
+
+&lt;img src="Cut_outs/Cut_out_05.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## `ghql`
@@ -75,17 +81,17 @@ con &lt;- GraphqlClient$new(
 )
 ```
 
-This connection object maintains the GraphQL client connection to the Numerai API server. Note that it is an &lt;a href="https://adv-r.hadley.nz/r6.html"&gt;R6-style object&lt;/a&gt; and hence is initialized with 
+This connection object maintains the GraphQL client connection to the Numerai API server. Note that it is an &lt;a href="https://adv-r.hadley.nz/r6.html"&gt;R6-style object&lt;/a&gt; and hence is initialized with the GraphqlClient’s new() function
 
 ---
 
-## Making a Leaderboard Query
+## Making a Leaderboard Query 
 
 We can perform a query with the following:
 
 
 ```r
-qry &lt;- Query$new()
+qry &lt;- Query$new() #create a new query
 
 qry$query('leaderboard', '{
   v2Leaderboard {
@@ -97,17 +103,19 @@ qry$query('leaderboard', '{
   }
 }')
 
-result &lt;- con$exec(qry$queries$leaderboard)
+result &lt;- con$exec(qry$queries$leaderboard) #execute query 
 ```
 
 Note that we begin with the initialization of a new instance of the R6 `Query` class, and then call the `query()` method, passing in two arguments:
 
-- The name of the resulting object
+- The name of the resulting object 
 - The raw GraphQL query that is to be executed
+
+Here 'leaderboard' indicates the name of the query.
 
 ---
 
-## Viewing the Results
+## Viewing the Results &lt;img src="stickers/book1.png"  width="70px" height="70px"&gt;
 
 
 
@@ -119,7 +127,7 @@ print(paste0(substring(result, 1, 50), "..."))
 ```
 
 ```
-## [1] "{\"data\":{\"v2Leaderboard\":[{\"corrRep\":0.04212874041..."
+## [1] "{\"data\":{\"v2Leaderboard\":[{\"corrRep\":0.05131718502..."
 ```
 
 And the parsed data:
@@ -128,7 +136,7 @@ And the parsed data:
 ```r
 nmr &lt;- fromJSON(result)[[1]]$v2Leaderboard
 
-head(nmr, 4) %&gt;%
+head(nmr, 3) %&gt;%
   kable()
 ```
 
@@ -144,32 +152,25 @@ head(nmr, 4) %&gt;%
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0421287 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0218499 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 130.45863 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 356.8333 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; era__mix__2000 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0407043 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0164406 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 85.57485 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 432.7505 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; themiconmanweb &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0404415 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0159812 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 95.13242 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 216.6807 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; rgb_alpha &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0401757 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0157641 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0513172 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0235345 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 154.67672 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; tb &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; quantyquant &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0493736 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0224515 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 161.39390 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 519.6086 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; benben11 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.0469501 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0190929 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 49.33033 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 204.3398 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; labrat &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -184,11 +185,10 @@ Now we can use `ggplot()` in order to visualize aspects of the data!
 ```r
 ggplot(data = nmr, aes(x = return_52Weeks)) +
   geom_histogram(fill = "blue", colour = "black") +
-  labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", 
-       x = "52 Week Returns")
+  labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", x = "52 Week Returns")
 ```
 
-![](index_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="600" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -200,11 +200,10 @@ Now we can use `ggplot()` in order to visualize aspects of the data!
 ```r
 ggplot(data = nmr, aes(x = return_13Weeks)) +
   geom_histogram(fill = "blue", colour = "black") +
-  labs(title = "13 Week Returns on Staked NMR in the 'Classic' Tournament", 
-       x = "13 Week Returns")
+  labs(title = "13 Week Returns on Staked NMR in the 'Classic' Tournament", x = "13 Week Returns")
 ```
 
-![](index_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-8-1.png" width="600" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -218,7 +217,7 @@ ggplot(data = nmr, aes(x = return_13Weeks, y = return_52Weeks)) +
   labs(title = "52 Week Returns vs 13 Week Returns")
 ```
 
-![](index_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="600" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -232,14 +231,32 @@ ggplot(data = nmr, aes(x = corrRep, y = mmcRep)) +
   labs(title = "Correlation vs MMC")
 ```
 
-![](index_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+&lt;img src="index_files/figure-html/unnamed-chunk-10-1.png" width="600" style="display: block; margin: auto;" /&gt;
 
 ---
 
+## Conclusion
+
+You can now do the following using `ghql` and `jsonlite` R packages:
+
+* Connect to Numerai API
+* Create a Query
+* Execute a query
+* Parse the data
+
+Try it yourself!
+
+
+&lt;p align="right"&gt;
+
+&lt;img src="Cut_outs/Cut_out_16f.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
+"ratio": "16:9",
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false
@@ -326,6 +343,33 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
 
 <script>
 slideshow._releaseMath = function(el) {

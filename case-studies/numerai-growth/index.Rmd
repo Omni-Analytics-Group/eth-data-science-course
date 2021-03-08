@@ -1,20 +1,28 @@
 ---
-title: "Interacting with and Analyzing Numerai Network Growth"
-subtitle: "<br/>with GraphQL and `ggplot2`"
+title: "Interacting with and Analyzing <br> Numerai Network Growth"
+subtitle: "with GraphQL and `ggplot2`<br> <br><br><br>"
 author: "Omni Analytics Group"
-date: "`r Sys.Date()`"
+
 output:
   xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
     lib_dir: libs
     nature:
+      ratio: 16:9
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=10, fig.height=7, out.width=600)
+```
+
 ## Background
 
-Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit models. These models are then used by the AI-based Numerai backend to perform trades. Numerai has seen explosive growth in recent years... can we use R-based tools to analyze this growth?
+Numerai is a modern-day hedge fund where a large pool of anonymous data scientists submit stock market predictions in a weekly tournament. These predictions are then crowd-sourced into an AI-based ensemble model that performs trades on behalf of Numerai. Over the last 3 years, the Numerai network has seen explosive growth and this case study will teach you how to analyze that growth using R's graphQL capabilities.
 
 ![](images/numerai.png)
 
@@ -44,6 +52,12 @@ There are two primary methods of accessing the Numerai data:
 
 We will use `ghql` to keep the steps reproducible.
 
+
+<p align="right">
+
+<img src="Cut_outs/Cut_out_05.png"  width="200px" height="200px">
+
+</p>
 ---
 
 ## `ghql`
@@ -64,16 +78,16 @@ con <- GraphqlClient$new(
 )
 ```
 
-This connection object maintains the GraphQL client connection to the Numerai API server. Note that it is an <a href="https://adv-r.hadley.nz/r6.html">R6-style object</a> and hence is initialized with 
+This connection object maintains the GraphQL client connection to the Numerai API server. Note that it is an <a href="https://adv-r.hadley.nz/r6.html">R6-style object</a> and hence is initialized with the GraphqlClient’s new() function
 
 ---
 
-## Making a Leaderboard Query
+## Making a Leaderboard Query 
 
 We can perform a query with the following:
 
 ```{r}
-qry <- Query$new()
+qry <- Query$new() #create a new query
 
 qry$query('leaderboard', '{
   v2Leaderboard {
@@ -85,17 +99,19 @@ qry$query('leaderboard', '{
   }
 }')
 
-result <- con$exec(qry$queries$leaderboard)
+result <- con$exec(qry$queries$leaderboard) #execute query 
 ```
 
 Note that we begin with the initialization of a new instance of the R6 `Query` class, and then call the `query()` method, passing in two arguments:
 
-- The name of the resulting object
+- The name of the resulting object 
 - The raw GraphQL query that is to be executed
+
+Here 'leaderboard' indicates the name of the query.
 
 ---
 
-## Viewing the Results
+## Viewing the Results <img src="stickers/book1.png"  width="70px" height="70px">
 
 ```{r, echo=FALSE, message=FALSE}
 library(jsonlite)
@@ -116,7 +132,7 @@ And the parsed data:
 ```{r}
 nmr <- fromJSON(result)[[1]]$v2Leaderboard
 
-head(nmr, 4) %>%
+head(nmr, 3) %>%
   kable()
 ```
 
@@ -129,8 +145,7 @@ Now we can use `ggplot()` in order to visualize aspects of the data!
 ```{r, message=FALSE, fig.height=5, warning=FALSE}
 ggplot(data = nmr, aes(x = return_52Weeks)) +
   geom_histogram(fill = "blue", colour = "black") +
-  labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", 
-       x = "52 Week Returns")
+  labs(title = "52 Week Returns on Staked NMR in the 'Classic' Tournament", x = "52 Week Returns")
 ```
 
 ---
@@ -142,8 +157,7 @@ Now we can use `ggplot()` in order to visualize aspects of the data!
 ```{r, message=FALSE, fig.height=5, warning=FALSE}
 ggplot(data = nmr, aes(x = return_13Weeks)) +
   geom_histogram(fill = "blue", colour = "black") +
-  labs(title = "13 Week Returns on Staked NMR in the 'Classic' Tournament", 
-       x = "13 Week Returns")
+  labs(title = "13 Week Returns on Staked NMR in the 'Classic' Tournament", x = "13 Week Returns")
 ```
 
 ---
@@ -169,4 +183,22 @@ ggplot(data = nmr, aes(x = corrRep, y = mmcRep)) +
 ```
 
 ---
+
+## Conclusion
+
+You can now do the following using `ghql` and `jsonlite` R packages:
+
+* Connect to Numerai API
+* Create a Query
+* Execute a query
+* Parse the data
+
+Try it yourself!
+
+
+<p align="right">
+
+<img src="Cut_outs/Cut_out_16f.png"  width="200px" height="200px">
+
+</p>
 

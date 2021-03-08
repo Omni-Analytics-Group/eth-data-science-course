@@ -1,0 +1,216 @@
+---
+title: "Stable Coins Analysis <br> <br> <br> <br> <br> "
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=10, fig.height=7, out.width=600)
+```
+
+## Stable Coins
+
+Stablecoins are cryptocurrencies designed to minimize the volatility of the price of the stablecoin, relative to some "stable" asset or basket of assets. A stablecoin can be pegged to a cryptocurrency, fiat money, or to exchange-traded commodities (such as precious metals or industrial metals).
+
+The <b>denome</b> created a youtube video: https://youtu.be/2vvHqQ0QCrQ, where he ranked some properties of the some stable coins as follows:
+
+<p align="center">
+
+<img src="images/stable-coin.png" width="600px">
+
+</p>
+
+---
+
+## Motivation
+
+*Some motivation*
+
+We will be using the following libraries:
+
+```{r}
+library(tidyverse)
+library(ggimage)
+library(psych)
+library(knitr)
+library(kableExtra)
+library(factoextra)
+library(stats)
+```
+
+---
+
+## The Data
+
+Using the rankings from the youtube video, we have the following table:
+
+```{r}
+stab <- read_csv("stablecoins.csv")
+stab %>%
+    kable() %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+
+---
+
+## Dimensionality Reduction
+
+For better visualization of the ranking of these stable coins, we will perform Principal Component Analysis.
+
+```{r}
+pc <- prcomp(stab %>% select(-Coin), scale = TRUE)
+```
+
+Using the `factoextra` package, we can easily visualize the components. 
+
+<br> <br>
+<p align="left">
+
+<img src="Cut_outs/Cut_out_02.png"  width="200px" height="200px">
+
+</p>
+---
+
+## Screeplot
+
+```{r}
+fviz_eig(pc)
+```
+
+---
+
+## Biplot 
+
+```{r}
+fviz_pca_biplot(pc, repel = TRUE, # Avoid text overlapping
+                 col.var = "red", # Variables color
+                 col.ind = "blue")  # Individuals color
+```
+
+---
+
+## Readibility
+
+Most of the time we read things from left to right (low to high) and down to up (low to high), so let's flip the signs of the principal components. 
+
+```{r}
+pc$x <- -pc$x
+pc$rotation <- -pc$rotation
+```
+
+<br>
+
+<p align="right">
+
+<img src="Cut_outs/Cut_out_25f.png"  width="150px" height="250px">
+
+</p>
+---
+
+## Biplot (after flipping signs)
+
+```{r}
+fviz_pca_biplot(pc, repel = TRUE, # Avoid text overlapping
+                 col.var = "red", # Variables color
+                 col.ind = "blue")
+```
+
+---
+
+## Interpretation
+
+From the biplot, we see the following:
+
+* A stable coin being on the right side of the graph will have a higher score compared to being on the left side. 
+
+* A stable coin being on the top side of the graph will have a higher score in terms of Transparency, Security, and Lawful compared to those on the bottom side. 
+
+* A stable coin being on the bottom side of the graph will have a higher score in terms of Yield, Liquidity and Price Stability compared to those on the top side. 
+
+<p align="center">
+
+<img src="Cut_outs/Cut_out_04.png"  width="200px" height="200px">
+
+</p>
+
+---
+
+## Plot 1
+We can use `geom_point()` from `ggplot2` to create a simple plot as well. 
+```{r}
+pc$x %>% as_tibble() %>% ggplot(aes(x = PC1, y = PC2)) + geom_point()
+
+```
+
+---
+
+## Coins' Symbols
+Let's show the coins' names and the coins' symbols in the plot as well! We have the coins' names in the `stab` table. We also have the coins' symbols in our images folder. They are downloaded from the CoinGecko website: https://www.coingecko.com/en. 
+
+We will create a table with the principal components, coins' names and the paths to the coins' symbols as follows: 
+
+```{r}
+mypc <- pc$x %>%
+    as_tibble() %>%
+    mutate(Coin = stab$Coin,
+           Path = paste0("images/", Coin, ".png"))
+```
+
+---
+
+## Plot 2
+Using `geom_image()` and `geom_label()`, we have the following plot:
+
+```{r fig.height=6}
+ggplot(data = mypc, aes(x = PC1, y = PC2)) + geom_point() + 
+  geom_image(aes(image = Path), size = 0.08) + 
+  geom_label(aes(label = Coin), alpha = 0.8)
+```
+
+---
+## Plot 3
+To finalize the plot, we will do the following:
+
+* Add dividers at $x=0$ and $y=0$ using `geom_hline()` and `geom_vline()`
+* Add title and axis label using `labs()`
+* Include some interpretations in the plot using `scale_y_continuous` and `scale_x_continuous`
+
+```{r}
+p3<- ggplot(data = mypc, aes(x = PC1, y = PC2)) +
+    geom_point() +
+    geom_image(aes(image = Path), size = 0.08) +
+    geom_label(aes(label = Coin), alpha = 0.8) +
+    geom_hline(yintercept = 0) +
+    geom_vline(xintercept = 0) +
+    scale_x_continuous(limits = c(-3, 3), breaks = -3:3, labels = c("", "Lower Scores", expression(symbol("\254")), "", expression(symbol("\256")), "Higher Scores", "")) +
+    scale_y_continuous(limits = c(-3, 3), breaks = -3:3, labels = c("", "Investment Focused", expression(symbol("\254")), "", expression(symbol("\256")), "Security Focused", "")) +
+    theme(axis.text.y = element_text(angle = 90, hjust = 0.5)) +
+    labs(y = "Focus",
+        x = "Overall Score",
+        title = "A Visualization of the Stablecoin Landscape",
+        subtitle = "Analysis and Rankings by @denomeme")
+
+```
+
+---
+
+```{r, fig.height= 9}
+p3
+```
+
+---
+
+## Conclusion
+
+
