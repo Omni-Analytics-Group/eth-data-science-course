@@ -1,8 +1,11 @@
 ---
-title: "Case Study"
+title: "A Ranking and Segmentation Study <br> of Validator Behavior <br> <br> <br> <br> <br> "
 author: "Omni Analytics Group"
 output:
   xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
     lib_dir: libs
     nature:
       ratio: 16:9
@@ -12,7 +15,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = TRUE, tidy = FALSE )
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FALSE, tidy = FALSE )
 options(htmltools.dir.version = FALSE)
 ```
 
@@ -30,6 +33,11 @@ Ethereum is a technology that lets you send cryptocurrency to anyone for a small
 
 Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/. 
 
+<p align="center">
+
+<img src="images/Cut_outs/Cut_out_18.png"  width="200px" height="150px">
+
+</p>
 ---
 
 ## Validator Dataset
@@ -125,14 +133,14 @@ skim(valid)
 
 --
 
-.center[![summary1_1](summary1_1.PNG)]
+.center[![summary1_1](images/summary1_1.PNG)]
 
 ---
 
  
  
  
-.center[![summary1_2](summary1_2.PNG)]
+.center[![summary1_2](images/summary1_2.PNG)]
 
 We see that the data consists of 80392 rows and 12 columns (1 character, 1 logical, and 10 numeric), along with various summary statistics. Note that we do have missing data in some of the columns. 
 
@@ -266,7 +274,7 @@ exit_time <- valid %>%
 skim(exit_time$timeToExit)
 ```
 
-.center[![summary2](summary2.PNG)]
+.center[![summary2](images/summary2.PNG)]
 
 We see that a total of 6304 validators have exited with an average of 363 hours or around 15.1 days. Also, the fastest exit time is actually less than 1 hour. 
 
@@ -281,6 +289,11 @@ We can better observe these trends over time with both a traditional time series
 3. Plot a time series of the count and color the line blue.
 4. Plot a time series of the cumulative sum.
 
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px">
+
+</p>
 ---
 
 ## Answers
@@ -304,7 +317,7 @@ sample_n(exits,3)
 skim(exits$count)
 ```
 
-.center[![summary3](summary3.PNG)]
+.center[![summary3](images/summary3.PNG)]
 
 ---
 
@@ -436,6 +449,13 @@ By treating the executions and assignments skipped as proportions, we can visual
 
 * Create two histogram plots that show the distribution of 'Execution Rate' and 'Skipped Rate'. Give clear titles and different colors for these two plots. 
 
+<br><br>
+
+<p align="left">
+
+<img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="150px">
+
+</p>
 ---
 
 ## Answers 
@@ -619,10 +639,9 @@ Now that we have a general idea, let's code!
 
 ```{r}
 valid_ranks <- valid_stats %>%
-    mutate(-index) %>%
     mutate(across(c(currentBalance, executions, skips, slashed, active, active_time), rank)) %>%
     mutate(active_time = active_time / 4) %>%
-    gather(key = Variable, value = Rank, 2:ncol(.)) %>%
+    gather(key = Variable, value = Rank, 3:ncol(.)) %>%
     group_by(publickey) %>%
     summarise(Score = sum(Rank)) %>%
     mutate(Rank = rank(-1 * Score)) %>%
@@ -725,7 +744,7 @@ valid_tiers <- valid_all %>% mutate(Tier = ifelse(Rank <= 2489, 1, ifelse(Rank <
 
 ## Your turn
 
-Recreate the Sorted Validator Scores plot. However, this time make sure that the color will show different tiers. An example output is shown below.
+Recreate the Scores vs Rank plot. However, this time make sure that the color will show different tiers. An example output is shown below.
 
 
 .center[
@@ -895,7 +914,7 @@ formattable(summary_table)
 
 --
 
-.center[![table1_1](table1_1.PNG)]
+.center[![table1_1](images/table1_1.PNG)]
 
 It looks so much better!
 
@@ -920,7 +939,7 @@ formattable(summary_table, list(
 
 --
 
-.center[![table1_2](table1_2.PNG)]
+.center[![table1_2](images/table1_2.PNG)]
 
 ---
 ## Characteristic Behaviors Of Each Tier
@@ -958,7 +977,13 @@ formattable(summary_table, list(
 
 <span style="color: #FF4233 ">Tier 7</span> (Ranks 75645 – 80392):  The vast majority of validators in this bottom tier are all inactive and have had their proposals slashed at least once.  There are also a few that left due to an insufficient balance as a result of a disproportionate number of skipped blocks. This group has the lowest current balance 
 
+<br> <br>
 
+<p align="center">
+
+<img src="images/Cut_outs/Cut_out_11.png"  width="200px" height="200px">
+
+</p>
 ---
 
 ## Princpal Component Analysis
@@ -979,7 +1004,7 @@ After some investigation, we managed to get one representation of the score "sur
 .pull-left[
 ```{r p17, eval=FALSE}
 valid_tiers %>%
-  mutate(Label = ifelse(Rank %in% c( 80357, 78634, 21108, 62163, 71158, 15372, 4979, 304, 16418, 65418, 74210, 50116,39220), index, NA)) %>%
+  mutate(Label = ifelse(Rank %in% c(55821, 76695, 77761, 33530, 66925, 67885, 14959, 4979, 304, 19820, 55757, 66918, 72185), index, NA)) %>%
   select(Label, index, Tier) %>%
   cbind(pca$x %>% as_tibble()) %>%
   ggplot(aes(x = PC3, y = PC1, color = factor(Tier), label = index)) +
@@ -1004,7 +1029,7 @@ valid_tiers %>%
 Here, we show the representative sample of the most common validator profiles within each tier.
 ```{r, echo = FALSE, eval = FALSE}
 representative <- valid_tiers %>%
-  mutate(Label = ifelse(Rank %in% c(55558, 80357, 78634, 21108, 63221, 71158, 15372, 4979, 304, 16418, 46194, 65418, 74210), Rank, NA)) %>%
+  mutate(Label = ifelse(Rank %in% c(55821, 76695, 77761, 33530, 66925, 67885, 14959, 4979, 304, 19820, 55757, 66918, 72185), Rank, NA)) %>%
   filter(!is.na(Label)) %>% 
   select(-publickey, -Label)
 
@@ -1021,7 +1046,7 @@ formattable(representative, list(
 
 ```
 
-.center[![table2](table2.PNG)]
+.center[![table2](images/table2.PNG)]
 
 ---
 

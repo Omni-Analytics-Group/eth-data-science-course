@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Case Study</title>
+    <title>A Ranking and Segmentation Study   of Validator Behavior</title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Case Study
+# A Ranking and Segmentation Study <br> of Validator Behavior <br> <br> <br> <br> <br>
 ### Omni Analytics Group
 
 ---
@@ -33,6 +34,11 @@ Ethereum is a technology that lets you send cryptocurrency to anyone for a small
 
 Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/. 
 
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_18.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Validator Dataset
@@ -66,11 +72,11 @@ sample_n(valid_raw,5)
 ## # A tibble: 5 x 11
 ##      X1 publickey index currentBalance effectiveBalance proposed
 ##   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;   
-## 1 66623 0x8150f0~ 18518 31.60494 ETH   31 ETH           "7 \xa0~
-## 2 63120 0x93bd21~ 19480 31.67453 ETH   31 ETH           "13 \xa~
-## 3  6178 0x878ebb~ 40389 32.37997 ETH   32 ETH           "12 \xa~
-## 4  3794 0x811731~ 36957 32.42627 ETH   32 ETH           "9 \xa0~
-## 5 88945 0x947800~ 13765 18.56481 ETH   18 ETH           "2 \xa0~
+## 1  4910 0xa3f265~ 38299 32.39865 ETH   32 ETH           "4 \xa0~
+## 2 83704 0xa8c412~  2843 20.45477 ETH   20 ETH           "11 \xa~
+## 3 12927 0x890c3f~ 44761 32.31266 ETH   32 ETH           "5 \xa0~
+## 4  2709 0xa55d5a~ 32995 32.44281 ETH   32 ETH           "7 \xa0~
+## 5 71784 0xa30e07~ 21266 31.3375 ETH    31 ETH           "9 \xa0~
 ## # ... with 5 more variables: eligibilityEpoch &lt;chr&gt;, activationEpoch &lt;chr&gt;,
 ## #   exitEpoch &lt;chr&gt;, withEpoch &lt;chr&gt;, slashed &lt;lgl&gt;
 ```
@@ -135,11 +141,11 @@ sample_n(valid,5)
 ## # A tibble: 5 x 12
 ##   publickey index currentBalance effectiveBalance assigned executed skipped
 ##   &lt;chr&gt;     &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
-## 1 0x80b385~  9522           30.5               30       10        2       8
-## 2 0xaae517~  1098           31.7               31       12       10       2
-## 3 0x9786ff~ 70111           32.1               32        3        3       0
-## 4 0x8c2616~ 30640           30.8               31       15        4      11
-## 5 0x91c81c~ 20115           31.9               32        1        0       1
+## 1 0xb91015~ 73495           32.0               32        0        0       0
+## 2 0xa463f8~ 73611           32.0               32        0        0       0
+## 3 0xb7168b~  7445           31.8               31       12       10       2
+## 4 0xa2f152~  2326           20.3               20        4        0       4
+## 5 0xa0e4a7~ 63489           32.1               32        3        3       0
 ## # ... with 5 more variables: eligibilityEpoch &lt;dbl&gt;, activationEpoch &lt;dbl&gt;,
 ## #   exitEpoch &lt;dbl&gt;, withEpoch &lt;dbl&gt;, slashed &lt;lgl&gt;
 ```
@@ -157,14 +163,14 @@ skim(valid)
 
 --
 
-.center[![summary1_1](summary1_1.PNG)]
+.center[![summary1_1](images/summary1_1.PNG)]
 
 ---
 
  
  
  
-.center[![summary1_2](summary1_2.PNG)]
+.center[![summary1_2](images/summary1_2.PNG)]
 
 We see that the data consists of 80392 rows and 12 columns (1 character, 1 logical, and 10 numeric), along with various summary statistics. Note that we do have missing data in some of the columns. 
 
@@ -310,7 +316,7 @@ exit_time &lt;- valid %&gt;%
 skim(exit_time$timeToExit)
 ```
 
-.center[![summary2](summary2.PNG)]
+.center[![summary2](images/summary2.PNG)]
 
 We see that a total of 6304 validators have exited with an average of 363 hours or around 15.1 days. Also, the fastest exit time is actually less than 1 hour. 
 
@@ -325,6 +331,11 @@ We can better observe these trends over time with both a traditional time series
 3. Plot a time series of the count and color the line blue.
 4. Plot a time series of the cumulative sum.
 
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Answers
@@ -345,9 +356,9 @@ sample_n(exits,3)
 ## # A tibble: 3 x 3
 ##   exitEpoch count count_cume
 ##       &lt;dbl&gt; &lt;int&gt;      &lt;int&gt;
-## 1      2433     4        496
-## 2      2527     4        872
-## 3      3280     4       1568
+## 1      2496     4        748
+## 2      3429     4       2164
+## 3      4041     4       4612
 ```
 
 
@@ -359,7 +370,7 @@ sample_n(exits,3)
 skim(exits$count)
 ```
 
-.center[![summary3](summary3.PNG)]
+.center[![summary3](images/summary3.PNG)]
 
 ---
 
@@ -501,6 +512,13 @@ By treating the executions and assignments skipped as proportions, we can visual
 
 * Create two histogram plots that show the distribution of 'Execution Rate' and 'Skipped Rate'. Give clear titles and different colors for these two plots. 
 
+&lt;br&gt;&lt;br&gt;
+
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Answers 
@@ -686,7 +704,7 @@ Now that we have a general idea, let's code!
 valid_ranks &lt;- valid_stats %&gt;%
     mutate(across(c(currentBalance, executions, skips, slashed, active, active_time), rank)) %&gt;%
     mutate(active_time = active_time / 4) %&gt;%
-    gather(key = Variable, value = Rank, 2:ncol(.)) %&gt;%
+    gather(key = Variable, value = Rank, 3:ncol(.)) %&gt;%
     group_by(publickey) %&gt;%
     summarise(Score = sum(Rank)) %&gt;%
     mutate(Rank = rank(-1 * Score)) %&gt;%
@@ -791,7 +809,7 @@ valid_tiers &lt;- valid_all %&gt;% mutate(Tier = ifelse(Rank &lt;= 2489, 1, ifel
 
 ## Your turn
 
-Recreate the Sorted Validator Scores plot. However, this time make sure that the color will show different tiers. An example output is shown below.
+Recreate the Scores vs Rank plot. However, this time make sure that the color will show different tiers. An example output is shown below.
 
 
 .center[
@@ -947,13 +965,13 @@ summary_table
 ## # A tibble: 7 x 9
 ##    Tier Count `Time Active` `Current Balanc~ `Successful Blo~ `Skipped Blocks`
 ##   &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-## 1     1  2489         1121.             32.9             9.73          0      
-## 2     2  4453         1020.             33.0             6.75          0.00180
-## 3     3 31454          689.             32.6             3.30          0.147  
-## 4     4 18138         1090.             32.8             6.24          1.19   
-## 5     5 11343         1303.             33.1             5.05          3.57   
-## 6     6  7767         1410.             30.3             1.88          7.84   
-## 7     7  4748          367.             20.4             2.65          1.34   
+## 1     1  2489         1189.             33.0            9.70            0     
+## 2     2  4453         1094.             32.8            6.91            0.0341
+## 3     3 31454         1028.             32.7            5.91            0.478 
+## 4     4 18138          806.             32.5            3.64            1.17  
+## 5     5 11343          917.             32.8            2.55            3.13  
+## 6     6  7767         1208.             30.8            0.983           7.24  
+## 7     7  4748          356.             20.5            2.61            1.23  
 ## # ... with 3 more variables: `Proportion Slashed` &lt;dbl&gt;, `Proportion
 ## #   Active` &lt;dbl&gt;, Score &lt;dbl&gt;
 ```
@@ -973,7 +991,7 @@ formattable(summary_table)
 
 --
 
-.center[![table1_1](table1_1.PNG)]
+.center[![table1_1](images/table1_1.PNG)]
 
 It looks so much better!
 
@@ -999,7 +1017,7 @@ formattable(summary_table, list(
 
 --
 
-.center[![table1_2](table1_2.PNG)]
+.center[![table1_2](images/table1_2.PNG)]
 
 ---
 ## Characteristic Behaviors Of Each Tier
@@ -1037,7 +1055,13 @@ formattable(summary_table, list(
 
 &lt;span style="color: #FF4233 "&gt;Tier 7&lt;/span&gt; (Ranks 75645 – 80392):  The vast majority of validators in this bottom tier are all inactive and have had their proposals slashed at least once.  There are also a few that left due to an insufficient balance as a result of a disproportionate number of skipped blocks. This group has the lowest current balance 
 
+&lt;br&gt; &lt;br&gt;
 
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_11.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
 ---
 
 ## Princpal Component Analysis
@@ -1062,7 +1086,7 @@ str(pca)
 ##  $ center  : Named num [1:6] 31.7907 4.4246 1.6661 0.0664 0.9216 ...
 ##   ..- attr(*, "names")= chr [1:6] "currentBalance" "executions" "skips" "slashed" ...
 ##  $ scale   : logi FALSE
-##  $ x       : num [1:80392, 1:6] 353.8 -59.6 -96.6 252.9 -41.5 ...
+##  $ x       : num [1:80392, 1:6] -713 -713 -713 -713 -713 ...
 ##   ..- attr(*, "dimnames")=List of 2
 ##   .. ..$ : NULL
 ##   .. ..$ : chr [1:6] "PC1" "PC2" "PC3" "PC4" ...
@@ -1077,7 +1101,7 @@ After some investigation, we managed to get one representation of the score "sur
 
 ```r
 valid_tiers %&gt;%
-  mutate(Label = ifelse(Rank %in% c( 80357, 78634, 21108, 62163, 71158, 15372, 4979, 304, 16418, 65418, 74210, 50116,39220), index, NA)) %&gt;%
+  mutate(Label = ifelse(Rank %in% c(55821, 76695, 77761, 33530, 66925, 67885, 14959, 4979, 304, 19820, 55757, 66918, 72185), index, NA)) %&gt;%
   select(Label, index, Tier) %&gt;%
   cbind(pca$x %&gt;% as_tibble()) %&gt;%
   ggplot(aes(x = PC3, y = PC1, color = factor(Tier), label = index)) +
@@ -1101,7 +1125,7 @@ valid_tiers %&gt;%
 Here, we show the representative sample of the most common validator profiles within each tier.
 
 
-.center[![table2](table2.PNG)]
+.center[![table2](images/table2.PNG)]
 
 ---
 
@@ -1240,6 +1264,33 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
 
 <script>
 slideshow._releaseMath = function(el) {
