@@ -21,7 +21,7 @@ Module 1 - Basic Data Structures and Munging
 * Data structures
 * Reshaping with dplyr
 
-Data Sources: *CryptoPunks* *Crypto Art Pulse*
+Data Sources: *CryptoPunks*, *Crypto Art Pulse*
 
 Module 2 - Statistical Graphics and Visualization
 * Why graph?
@@ -85,9 +85,9 @@ We'll initially focus on the statistical language R, but then expand to Python. 
 *Can I request a topic?*  
 Sure! Once we flesh out the initial course material. If funding persists, we'd be more than happy to take suggestions on case studies or topics.
 
-## Project Featured
+## Featured Projects
 
-* Numerai
 * CryptoPunks
 * Crypto Art Pulse
+* Numerai
 * Tornado Cash
