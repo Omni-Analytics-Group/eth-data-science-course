@@ -3,8 +3,6 @@ title: "Constructing the Investment Curve <br> in ggplot2 <br> <br> <br> <br> <b
 author: "Omni Analytics Group"
 output:
   xaringan::moon_reader:
-    includes:
-      after_body: insert-logo.html
     css: [default, default-fonts, classroom.css]
     lib_dir: libs
     nature:
