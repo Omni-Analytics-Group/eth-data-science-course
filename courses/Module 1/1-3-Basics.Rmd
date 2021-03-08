@@ -1,0 +1,531 @@
+---
+title: "R Basics <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+## Loading CryptoPunks Data set
+This data set displays the sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020. 
+
+
+```{r}
+Punks <- read.csv("punks.csv")
+names(Punks) # See all column names
+```
+
+---
+
+## First 6 Rows
+
+Recall that `head()` displays the first 6 rows of our data.
+```{r}
+head(Punks)
+```
+
+---
+
+## Some Computations
+
+### Addition and Subtraction
+How much more in ETH did Punk 3830 last sell for compared to Punk 1?
+```{r}
+99.99-60.00
+```
+
+--
+
+### Multiplication/Division
+What is the average sale price in ETH for Punk 0?
+```{r}
+(0.98+1.6+25)/3
+```
+
+---
+
+## More Calculator Operations
+
+```{r}
+# Integer division
+82 %/% 10
+
+# Modulo operator (Remainder)
+82 %% 10
+
+# Powers
+8^3
+```
+
+---
+
+## Even More Functions
+
+- Exponentiation 
+  * `exp(x)`
+  
+- Logarithms
+  * `log(x)`
+  * `log(x, base = 10)`
+  
+- Trigonometric functions
+  * `sin(x)`
+  * `asin(x)`
+  * `cos(x)`
+  * `tan(x)`
+
+---
+
+## Creating Variables
+
+We can create variables using the assignment operator `<-`:
+  
+```{r}
+alien.punk <- 13
+```
+
+We can then perform any of the functions on the variables:
+  
+```{r}
+# Logarithm
+log(alien.punk)
+# Square root
+sqrt(alien.punk)
+# Square
+alien.punk^2
+```
+
+---
+
+## Rules for Variable Creation
+
+- Variable names can't start with a number
+- Variables in R are case-sensitive
+- Some common letters are used internally by R and should be avoided as variable names:
+  * c, q, t, C, D, F, T, I
+- There are reserved words that R won't let you use for variable names e.g. 
+  * for, in, while, if, else, repeat, break, next
+- R will let you use the name of a predefined function. Try not to overwrite those though! 
+
+<br> <br>
+<p align="center">
+
+<img src="images/stickers/book2.png"  width="200px" height="150px">
+<img src="images/stickers/pen1.png"  width="200px" height="150px">
+
+
+</p>
+---
+
+## Vectors
+  
+A variable does not need to be a single value. We can create a **vector** using the `c()` (combine) function:
+  
+What are the top 5 highest sales in ETH? 
+
+```{r}
+y <- c(189.99, 185, 150, 140, 100)  # Creates vector of top 5 highest sales
+```
+
+Operations will then be done element-wise. For example, We can do divide the vector by 5:
+
+```{r}
+y / 5
+```
+
+---
+
+## Getting Help
+
+We will talk MUCH more about vectors in a later, but for now, let's talk about a couple ways to get help. The primary function to use is the `help` function. Just pass in the name of the function you need help with:
+
+```{r, eval=FALSE}
+help(head) 
+```
+
+The `?` function also works:
+
+```{r, eval=FALSE}
+?head
+```
+
+Googling for help is a bit hard. You might need to search for R + CRAN + (your query) to get good results
+
+---
+
+## R Reference Card
+
+You can download and R reference card from:
+
+http://cran.r-project.org/doc/contrib/Short-refcard.pdf
+
+Having this open or printed off and near you while working is helpful until you master the basics.
+
+---
+
+## Your Turn 
+
+Using the R Reference Card (and the Help pages, if needed), do the following:
+
+1. Find out how many rows and columns the CryptoPunks data set has using at least 2 ways.
+2. Create a vector with the number of slots for the top 5 sales in ETH.
+
+<br> <br> <br>
+
+<p align="center">
+
+<img src="images/Cut_outs/Cut_out_02.png"  width="200px" height="150px">
+
+
+</p>
+---
+
+## Answers
+
+### 1.
+```{r}
+dim(Punks) # Finds dimension of data frame
+
+str(Punks) # Finds structure of data
+```
+
+---
+
+### 2.
+```{r}
+top5 <- c(3,3,4,2,0) # Vector of top5
+```
+
+---
+
+## Some Useful Functions
+
+There are a whole variety of useful functions to operate on vectors. A couple of the more common ones are `length()`, which returns the length (number of elements) of a vector, and `sum()`, which adds up all the elements of a vector.
+
+```{r}
+length(top5) # calculates the length of this vector
+sum(top5) # Calculates the sum of the vector elements
+```
+
+---
+
+## Data Frames Introduction
+
+- `Punks` is a data frame.
+- Data frames hold data sets
+- Not every column need be the same type - like an Excel spreadsheet
+- Each column in a data frame is a vector - so each column needs to have values that are all the same type.
+- We can access different columns using the `$` operator.
+
+```{r}
+type <- Punks$Type # Creates column named type
+skin <- Punks$Skin # Creates column named skin
+slots <- Punks$Slots # Creates column named slots
+```
+
+---
+
+## More about Vectors
+
+A vector is a list of values that are all the same type. We have seen that we can create them using the `c()` or the `rep()` function. We can also use the `:` operator if we wish to create consecutive values:
+
+```{r}
+a <- 10:15
+a
+```
+
+We can extract the specific elements of the vector like so:
+
+```{r}
+type[3] # Selects the 3rd type in the type column
+```
+
+---
+
+## Indexing Vectors
+
+We saw that we can access individual elements of the vector. But **indexing** is a lot more powerful than that:
+
+```{r}
+head(type)
+
+type[c(1, 3, 5)] # Selects the 1st, 3rd, and 5th type
+```
+
+```{r}
+type[1:6] # Selects the 1st through 6th type
+```
+
+---
+
+## Logical Values
+
+- R has built in support for logical values
+- TRUE and FALSE are built in.  T (for TRUE) and F (for FALSE) are supported but can be modified
+- Logicals can result from a comparison using
+    - $<$
+    - $>$
+    - $<=$
+    - $>=$
+    - $==$
+    - $!=$
+    
+---
+
+## Indexing with Logicals
+
+We can index vectors using logical values as well:
+```{r}
+
+x <- slots[1:5] #Pulls the total points for first 5 players
+x > 3 # Which of the first 5 slots are greater than 3
+x[x < 3] # Which is less than 3
+```
+
+---
+
+## Logical Examples
+
+We gather the ID of Punks that are Alien Type. 
+
+```{r}
+alien_ID <- (Punks$ID[Punks$Type == "Alien"]) 
+# creates variable, alien_ID, the ID of Punks that are Alien Type
+str(alien_ID)
+```
+
+We see which ID are less than 5000 to find certain punks which are labeled `little`.
+```{r}
+little <- alien_ID < 5000 # Finds players that play less than 8000 minutes
+alien_ID[little]
+```
+
+---
+
+This code locates the Punks ID that correspond to those slots
+```{r}
+(Punks$ID[little][Punks$Type == "Alien"])
+```
+
+---
+
+## Element-wise Logical Operators
+
+- `&` (elementwise AND)
+- `|` (elementwise OR)
+
+```{r}
+c(T, T, F, F) & c(T, F, T, F)
+c(T, T, F, F) | c(T, F, T, F)
+```
+
+---
+
+## Your Turn 
+
+1. When was **Punk 9976** last sold? Note: There are many ways to answer this. Some are faster than others.
+
+2. Find out the number of sales in the Punks data.
+
+**Challenge**: Among all the sales, how many of the sales are more than or equal to 1.00 ETH? Hint(You will need to use <b> 2. </b>.)
+
+<br> <br> <br>
+
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px">
+
+
+</p>
+
+---
+
+## Answers
+
+### 1
+```{r}
+Punks$Txn[Punks$ID == 9976 & Punks$Transaction == "Sold"][1]
+```
+
+### 2.
+```{r}
+sold <- Punks$Transaction == "Sold"
+sum(sold)
+```
+
+---
+
+### **Challenge**
+
+```{r}
+# Finds the minutes for those players
+sales_1_ETH <- Punks$Crypto[sold] >= 1.00
+sum(sales_1_ETH)
+```
+
+---
+
+## Modifying Vectors
+
+We can modify vectors using indexing as well. Here we create a new data frame that consists of the first 5 columns of the Punks data set.
+
+```{r}
+x <- Punks[1:5]
+head(x)
+```
+
+---
+
+We can replace all the `Claimed` with `Free` by the following:
+
+```{r}
+x[1][x[1] == "Claimed"] <- "Free"
+head(x)
+```
+
+---
+
+## Data Types in R
+
+- Can use `mode()` or `class()` to find out information about variables
+- `str()` is useful to find information about the structure of your data
+- Many data types: numeric, integer, character, date, and factor most common
+    
+```{r}
+str(Punks)
+```
+
+---
+
+## Vector Elements
+
+Elements of a vector must all be the same type:
+
+```{r}
+claims <- Punks$Transaction == "Claimed"
+head(claims)
+str(claims)
+claims[claims == "FALSE"] <- ":-(" #Replacing FALSE with a frownie face.
+head(claims)
+str(claims)
+```
+
+By changing one value to character, all values are now character instead of logical.
+
+---
+
+## Converting Between Types
+
+We can convert between different types using the `as` series of functions:
+
+```{r}
+ids <- head(Punks$ID) # Creates vector of first 6 rows 
+ids
+as.character(ids) # Converts to character
+as.numeric("2") 
+```
+Notice that in one instance there are quotation marks and in the other there is not. Hence one is a character and the other is numeric.
+
+---
+
+## Statistical Functions
+
+Using the basic functions we have learned, it would not be hard to compute some basic statistics.
+
+```{r}
+(n <- length(slots)) # Assigns n to be the number of elements in slots
+(meanslots <- sum(slots)/n) # Calculates mean by usual formula
+# Calculates standard deviation by usual formula
+(standdev <- sqrt(sum((slots - meanslots)^2) / (n - 1))) 
+```
+
+This is fairly easy, that is, if you know the formulas!
+
+---
+
+## Built-in Statistical Functions
+We don't need to memorize formulas. R does the work for us!
+```{r}
+mean(slots) # Calculates mean
+sd(slots) # Calculates standard deviation
+summary(slots) # calculates number summary
+quantile(slots, c(.025, .975)) # 2.5% and 97.5% quartiles
+```
+
+---
+
+Which Punk has sold more than 20.00 ETH and has 1 slot?
+```{r}
+condition <- which(Punks$Crypto > 20.00 & Punks$Slots == 1)
+Punks[condition,]
+```
+
+Just Punk 1963, 3105, 5426, 5944, 9909!
+
+---
+
+## Your Turn 
+  
+1. Determine which Punk has sold more than 100 ETH or has 7 slot.
+2. Which Punk was sold first? Punk 1111 or Punk 3773? 
+  
+<br> <br> <br>
+
+<p align="left">
+
+<img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="150px">
+
+
+</p>
+---
+
+## Answers
+  
+### 1.
+```{r}
+condition <- which(Punks$Crypto > 100 | Punks$Slots == 7)
+Punks[condition,][!duplicated(Punks[condition,]$ID),] #Note !duplicated means NOT duplicated
+```
+
+---
+
+### 2.
+
+```{r}
+Punk1111 <- Punks$Txn[which(Punks$ID == 1111 & Punks$Transaction == "Sold")]
+Punk3773 <- Punks$Txn[which(Punks$ID == 3773 & Punks$Transaction == "Sold")]
+
+Punk1111[length(Punk1111)] #Get the last value in the vector using the length() function
+Punk3773[length(Punk3773)]
+
+#We can also compare the dates using logic
+
+Punk1111[length(Punk1111)] < Punk3773[length(Punk3773)] 
+```
+Thus, Punk 3773 was first sold before Punk 1111. 
+
+
+
+
+
+
+
+
+
+
+
+
+

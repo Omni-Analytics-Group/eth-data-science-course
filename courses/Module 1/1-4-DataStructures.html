@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Structures</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Structures <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Data Frames
+
+- Data Frames are the work horse of R objects
+- Structured by rows and columns and can be indexed
+- Each column is a specified variable type
+- Columns names can be used to index a variable
+- Advice for naming variable applys to editing columns names
+- Can be specified by grouping vectors of equal length as columns
+
+
+&lt;br&gt; &lt;br&gt;
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_07.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Data Frame Indexing
+
+- Elements indexed similar to a vector using `[` `]`
+- `df[i,j]` will select the element in the `\(i^{th}\)` row and `\(j^{th}\)` column
+- `df[ ,j]` will select the entire `\(j^{th}\)` column and treat it as a vector
+- `df[i ,]` will select the entire `\(i^{th}\)` row and treat it as a vector
+- Logical vectors can be used in place of i and j used to subset the row and columns
+
+--
+
+## Adding a New Variable to a Data Frame
+
+- Create a new vector that is the same length as other columns
+- Append new column to the data frame using the `$` operator
+- The new data frame column will adopt the name of the vector
+
+---
+
+## Data Frame Demo
+
+Loading previously used Punks data set:
+
+
+```r
+Punks &lt;- read.csv("punks.csv")
+```
+
+Select the date column (6th column):
+
+
+```r
+Punks[,6]
+```
+
+Select the date and skin columns (6th and 10th columns):
+
+
+```r
+Punks[,c(6,10)]
+```
+
+---
+
+## Demo (Continued)
+
+Select ID column with the `$` operator:
+
+
+```r
+Punks$ID
+```
+
+We now determine the row location, in our data, where the ID is 9117.
+
+```r
+punk_9126 &lt;- Punks$ID == 9126 # Creates vector of T/F values if the entry is 9999.
+head(punk_9126)
+```
+
+```
+## [1] FALSE FALSE FALSE FALSE FALSE FALSE
+```
+This output doesn't show much. It would be much easier if we could see which positions are `TRUE`!
+
+```r
+which(punk_9126 == TRUE) # Tells row number where the ID is 9999
+```
+
+```
+## [1] 15965 15966 15967 15968 15969
+```
+
+---
+
+## Demo (Continued)
+Displaying part of the Punks data set where the ID is 9998 by subsetting rows.
+
+```r
+Punks[Punks$ID == 9126, ] #or Punks[punk_9126, ]
+```
+
+```
+##       Transaction     From       To Crypto  USD        Txn   ID  Sex   Type
+## 15965        Sold 0x81ed84 0x3e17fa   6.00 2111 2020-09-27 9126 Girl Female
+## 15966        Sold 0xab96b9 0x81ed84   3.00  963 2020-07-28 9126 Girl Female
+## 15967        Sold  Pranksy 0xab96b9   1.99  454 2020-06-19 9126 Girl Female
+## 15968        Sold 0x00d7c9  Pranksy   0.25   45 2019-09-02 9126 Girl Female
+## 15969     Claimed     &lt;NA&gt; 0x00d7c9     NA   NA 2017-06-23 9126 Girl Female
+##       Skin Slots        Rank
+## 15965  Mid     4 3780480000%
+## 15966  Mid     4 3780480000%
+## 15967  Mid     4 3780480000%
+## 15968  Mid     4 3780480000%
+## 15969  Mid     4 3780480000%
+```
+
+---
+
+## Creating our own Data Frame
+
+Creating our own data frame using the `data.frame()` function:
+
+
+```r
+mydf &lt;- data.frame(NUMS = 1:5, 
+                   LETS = letters[1:5],
+                   PUNK_TYPES = c("Male", "Female", "Alien", "Ape", "Zombie"))
+mydf
+```
+
+```
+##   NUMS LETS PUNK_TYPES
+## 1    1    a       Male
+## 2    2    b     Female
+## 3    3    c      Alien
+## 4    4    d        Ape
+## 5    5    e     Zombie
+```
+Note that in a data frame, each column has to have the same length!
+
+---
+
+## Renaming columns
+
+We can use the `names()` function to set that first column to lowercase:
+
+
+```r
+names(mydf)[1] &lt;- "nums" # Changes the names of the first column in mydf
+mydf
+```
+
+```
+##   nums LETS PUNK_TYPES
+## 1    1    a       Male
+## 2    2    b     Female
+## 3    3    c      Alien
+## 4    4    d        Ape
+## 5    5    e     Zombie
+```
+
+---
+## Renaming columns (Continued)
+We can also rename all the columns at once using the `colnames()` command.
+
+
+```r
+colnames(mydf) &lt;- c("numbers","letters","punk_types") # Changes all columns at once
+mydf
+```
+
+```
+##   numbers letters punk_types
+## 1       1       a       Male
+## 2       2       b     Female
+## 3       3       c      Alien
+## 4       4       d        Ape
+## 5       5       e     Zombie
+```
+
+---
+
+## Your Turn 
+
+1. Construct a data frame where column 1 contains any 5 Punks and column 2 is their Slot number.
+2. Select only the rows where the Slot number is even.
+3. Determine which rows of the Punks data set contains the Alien Type.
+
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_03.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Answers
+
+### 1.
+
+
+```r
+mydf &lt;- data.frame(Punk = c(0,1,2,3,4), 
+                   Slot = c(3,2,1,3,4)
+                   )
+mydf
+```
+
+```
+##   Punk Slot
+## 1    0    3
+## 2    1    2
+## 3    2    1
+## 4    3    3
+## 5    4    4
+```
+
+---
+
+### 2.
+
+
+```r
+mydf[c(2,5),]
+```
+
+```
+##   Punk Slot
+## 2    1    2
+## 5    4    4
+```
+
+--
+
+### 3.
+
+```r
+alien &lt;- Punks$Type == "Alien" 
+which(alien == TRUE)
+```
+
+```
+##  [1]   698  4358  4802  5536  5537  9983  9984 10121 10122 10457 10458 13103
+## [13] 13104 13595 13596
+```
+
+---
+
+## Lists
+
+- Lists are a structured collection of R objects
+- R objects in a list need not be the same type
+- Create lists using the `list` function
+- Lists indexed using double square brackets `[[ ]]` to select an object
+
+---
+## List Example
+
+Creating a list containing a matrix of size 2 by 5, and a vector of length 5, and a string:
+
+
+```r
+mylist &lt;- list(matrix(letters[1:10], nrow = 2, ncol = 5),
+               c("Alien", "Ape", "Female", "Male", "Zombie"),
+               "CryptoPunks are awesome!")
+mylist
+```
+
+```
+## [[1]]
+##      [,1] [,2] [,3] [,4] [,5]
+## [1,] "a"  "c"  "e"  "g"  "i" 
+## [2,] "b"  "d"  "f"  "h"  "j" 
+## 
+## [[2]]
+## [1] "Alien"  "Ape"    "Female" "Male"   "Zombie"
+## 
+## [[3]]
+## [1] "CryptoPunks are awesome!"
+```
+
+---
+## List Example (Continued)
+Note that unlike data frames, list can contain elements of varying sizes and structures.
+
+Use indexing to select the second list element:
+
+```r
+mylist[[3]] # Selections third argument in mylist
+```
+
+```
+## [1] "CryptoPunks are awesome!"
+```
+
+---
+
+## Your Turn 
+
+1. Create a list containing `mydf` as well as a vector of length 7 containing different Punk Skins
+2. Use indexing to select mydf from your list
+
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Answers
+
+### 1.
+
+```r
+mylist &lt;- list(mydf,
+               c("Albino","Alien","Ape","Dark","Light", "Mid", "Zombie"))
+```
+
+--
+
+### 2.
+
+```r
+mylist[[1]]
+```
+
+```
+##   Punk Slot
+## 1    0    3
+## 2    1    2
+## 3    2    1
+## 4    3    3
+## 5    4    4
+```
+
+---
+
+## Examining Objects
+
+- `head(x)` - View top 6 rows of a data frame
+- `tail(x)` - View bottom 6 rows of a data frame
+- `summary(x)` - Summary statistics   
+- `str(x)` - View structure of object  
+- `dim(x)` - View dimensions of object 
+- `length(x)` - Returns the length of a vector
+
+---
+
+## Examining Objects Demo
+
+We can examine the first two values of an object by passing the `n` parameter to the `head()` function:
+
+
+```r
+head(Punks, n = 2) # n = 2 displays only the first two rows.
+```
+
+```
+##   Transaction     From       To Crypto  USD        Txn ID  Sex   Type Skin
+## 1        Sold 0xf5099e 14715954   25.0 2822 2018-11-30  0 Girl Female  Mid
+## 2        Sold 0x00d7c9 10528156    1.6  386 2017-07-07  0 Girl Female  Mid
+##   Slots        Rank
+## 1     3 3682560000%
+## 2     3 3682560000%
+```
+
+---
+## Examining Objects Demo (Continued)
+What's its structure?
+
+
+```r
+str(Punks)
+```
+
+```
+## 'data.frame':	17554 obs. of  12 variables:
+##  $ Transaction: chr  "Sold" "Sold" "Sold" "Claimed" ...
+##  $ From       : chr  "0xf5099e" "0x00d7c9" "0xc352b5" NA ...
+##  $ To         : chr  "14715954" "10528156" "55241" "12800693" ...
+##  $ Crypto     : num  25 1.6 0.98 NA 60 31 0.42 NA NA NA ...
+##  $ USD        : num  2822 386 320 NA 36305 ...
+##  $ Txn        : chr  "2018-11-30" "2017-07-07" "2017-06-23" "2017-06-23" ...
+##  $ ID         : int  0 0 0 0 1 1 1 1 2 3 ...
+##  $ Sex        : chr  "Girl" "Girl" "Girl" "Girl" ...
+##  $ Type       : chr  "Female" "Female" "Female" "Female" ...
+##  $ Skin       : chr  "Mid" "Mid" "Mid" "Mid" ...
+##  $ Slots      : int  3 3 3 3 2 2 2 2 1 3 ...
+##  $ Rank       : chr  "3682560000%" "3682560000%" "3682560000%" "3682560000%" ...
+```
+
+---
+
+## Your Turn 
+
+1. View the last 4 rows of Punks data
+2. How many rows are in Punks data set? (try finding this using dim or indexing + length)
+
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_15.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+---
+
+## Answers
+
+### 1.
+
+```r
+tail(Punks, n=4)
+```
+
+```
+##       Transaction    From        To Crypto  USD        Txn   ID  Sex   Type
+## 17551     Claimed    &lt;NA&gt;    TJ2010     NA   NA 2017-06-23 9997  Guy Zombie
+## 17552        Sold 7595170 TokenAng…     15 9499 2020-12-27 9998 Girl Female
+## 17553     Claimed    &lt;NA&gt;  0x73e4a2     NA   NA 2017-06-23 9998 Girl Female
+## 17554     Claimed    &lt;NA&gt;   8269084     NA   NA 2017-06-23 9999 Girl Female
+##         Skin Slots         Rank
+## 17551 Zombie     2 0.023188000%
+## 17552    Mid     3  1452800000%
+## 17553    Mid     3  1452800000%
+## 17554   Dark     2  1752960000%
+```
+
+---
+
+### 2.
+
+
+```r
+dim(Punks)
+```
+
+```
+## [1] 17554    12
+```
+
+```r
+dim(Punks)[1] #Picks first output element
+```
+
+```
+## [1] 17554
+```
+
+---
+
+## Working with Output from a Function
+
+- Can save output from a function as an object
+- An object is generally a list of output objects
+- Can pull off items from the output for further computing
+- Examine objects using functions like `str()`
+
+--
+
+## Saving Output Demo
+
+- Apply t-test using the Punks data set to see if the Sale Price in Crypto for punks with 1 slot and 7 slots are statistically different
+- `t.test()` can only handle two groups, so we subset out the every other slots.
+
+---
+
+## Demo (Continued)
+
+Save the output of the t-test to an object:
+
+
+```r
+tout &lt;- t.test(Crypto ~ Slots, data = Punks[Punks$Slots %in% c(1,7), ])
+tout
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  Crypto by Slots
+## t = -1.3373, df = 2.0036, p-value = 0.3127
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -139.46701   73.24138
+## sample estimates:
+## mean in group 1 mean in group 7 
+##        4.520519       37.633333
+```
+An interpretation of this is that there is not a statistical difference in the average sale price in Crypto between the 1 and 7 slots Punks. 
+
+---
+
+Let's look at the structure of this object:
+
+
+```r
+str(tout)
+```
+
+```
+## List of 10
+##  $ statistic  : Named num -1.34
+##   ..- attr(*, "names")= chr "t"
+##  $ parameter  : Named num 2
+##   ..- attr(*, "names")= chr "df"
+##  $ p.value    : num 0.313
+##  $ conf.int   : num [1:2] -139.5 73.2
+##   ..- attr(*, "conf.level")= num 0.95
+##  $ estimate   : Named num [1:2] 4.52 37.63
+##   ..- attr(*, "names")= chr [1:2] "mean in group 1" "mean in group 7"
+##  $ null.value : Named num 0
+##   ..- attr(*, "names")= chr "difference in means"
+##  $ stderr     : num 24.8
+##  $ alternative: chr "two.sided"
+##  $ method     : chr "Welch Two Sample t-test"
+##  $ data.name  : chr "Crypto by Slots"
+##  - attr(*, "class")= chr "htest"
+```
+
+---
+
+## Demo: Extracting the P-Value
+
+Since this is simply a list, we can use our regular indexing:
+
+
+```r
+tout$p.value
+```
+
+```
+## [1] 0.3127299
+```
+
+```r
+tout[[3]]
+```
+
+```
+## [1] 0.3127299
+```
+
+---
+
+## Your Turn
+
+1. Pull the p-value from t.test comparing the difference between Sale Price in USD from the 2 and 4 Slots.
+2. What does this p-value imply?
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_09.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+---
+
+## Answer
+
+### 1.
+
+```r
+tout &lt;- t.test(USD ~ Slots, data = Punks[Punks$Slots %in% c(2,4), ])
+tout
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  USD by Slots
+## t = 0.54773, df = 2123.8, p-value = 0.5839
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -141.4595  251.1010
+## sample estimates:
+## mean in group 2 mean in group 4 
+##        903.6992        848.8785
+```
+
+---
+
+### 2.
+Since p = 0.5839 &gt; 0.05, there is no significant difference in the means of the two groups. From this we can claim that the Punks with 2 slots and 4 slots are sold at similar price.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

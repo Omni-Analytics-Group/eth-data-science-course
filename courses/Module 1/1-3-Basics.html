@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>R Basics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# R Basics <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Loading CryptoPunks Data set
+This data set displays the sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020. 
+
+
+
+```r
+Punks &lt;- read.csv("punks.csv")
+names(Punks) # See all column names
+```
+
+```
+##  [1] "Transaction" "From"        "To"          "Crypto"      "USD"        
+##  [6] "Txn"         "ID"          "Sex"         "Type"        "Skin"       
+## [11] "Slots"       "Rank"
+```
+
+---
+
+## First 6 Rows
+
+Recall that `head()` displays the first 6 rows of our data.
+
+```r
+head(Punks)
+```
+
+```
+##   Transaction      From       To Crypto   USD        Txn ID  Sex   Type Skin
+## 1        Sold  0xf5099e 14715954  25.00  2822 2018-11-30  0 Girl Female  Mid
+## 2        Sold  0x00d7c9 10528156   1.60   386 2017-07-07  0 Girl Female  Mid
+## 3        Sold  0xc352b5    55241   0.98   320 2017-06-23  0 Girl Female  Mid
+## 4     Claimed      &lt;NA&gt; 12800693     NA    NA 2017-06-23  0 Girl Female  Mid
+## 5        Sold EliteCat… 0xcf6165  60.00 36305 2020-11-30  1  Guy   Male Dark
+## 6        Sold  0xf5099e GoWest23  31.00  5155 2019-04-06  1  Guy   Male Dark
+##   Slots        Rank
+## 1     3 3682560000%
+## 2     3 3682560000%
+## 3     3 3682560000%
+## 4     3 3682560000%
+## 5     2 2050240500%
+## 6     2 2050240500%
+```
+
+---
+
+## Some Computations
+
+### Addition and Subtraction
+How much more in ETH did Punk 3830 last sell for compared to Punk 1?
+
+```r
+99.99-60.00
+```
+
+```
+## [1] 39.99
+```
+
+--
+
+### Multiplication/Division
+What is the average sale price in ETH for Punk 0?
+
+```r
+(0.98+1.6+25)/3
+```
+
+```
+## [1] 9.193333
+```
+
+---
+
+## More Calculator Operations
+
+
+```r
+# Integer division
+82 %/% 10
+```
+
+```
+## [1] 8
+```
+
+```r
+# Modulo operator (Remainder)
+82 %% 10
+```
+
+```
+## [1] 2
+```
+
+```r
+# Powers
+8^3
+```
+
+```
+## [1] 512
+```
+
+---
+
+## Even More Functions
+
+- Exponentiation 
+  * `exp(x)`
+  
+- Logarithms
+  * `log(x)`
+  * `log(x, base = 10)`
+  
+- Trigonometric functions
+  * `sin(x)`
+  * `asin(x)`
+  * `cos(x)`
+  * `tan(x)`
+
+---
+
+## Creating Variables
+
+We can create variables using the assignment operator `&lt;-`:
+  
+
+```r
+alien.punk &lt;- 13
+```
+
+We can then perform any of the functions on the variables:
+  
+
+```r
+# Logarithm
+log(alien.punk)
+```
+
+```
+## [1] 2.564949
+```
+
+```r
+# Square root
+sqrt(alien.punk)
+```
+
+```
+## [1] 3.605551
+```
+
+```r
+# Square
+alien.punk^2
+```
+
+```
+## [1] 169
+```
+
+---
+
+## Rules for Variable Creation
+
+- Variable names can't start with a number
+- Variables in R are case-sensitive
+- Some common letters are used internally by R and should be avoided as variable names:
+  * c, q, t, C, D, F, T, I
+- There are reserved words that R won't let you use for variable names e.g. 
+  * for, in, while, if, else, repeat, break, next
+- R will let you use the name of a predefined function. Try not to overwrite those though! 
+
+&lt;br&gt; &lt;br&gt;
+&lt;p align="center"&gt;
+
+&lt;img src="images/stickers/book2.png"  width="200px" height="150px"&gt;
+&lt;img src="images/stickers/pen1.png"  width="200px" height="150px"&gt;
+
+
+&lt;/p&gt;
+---
+
+## Vectors
+  
+A variable does not need to be a single value. We can create a **vector** using the `c()` (combine) function:
+  
+What are the top 5 highest sales in ETH? 
+
+
+```r
+y &lt;- c(189.99, 185, 150, 140, 100)  # Creates vector of top 5 highest sales
+```
+
+Operations will then be done element-wise. For example, We can do divide the vector by 5:
+
+
+```r
+y / 5
+```
+
+```
+## [1] 37.998 37.000 30.000 28.000 20.000
+```
+
+---
+
+## Getting Help
+
+We will talk MUCH more about vectors in a later, but for now, let's talk about a couple ways to get help. The primary function to use is the `help` function. Just pass in the name of the function you need help with:
+
+
+```r
+help(head) 
+```
+
+The `?` function also works:
+
+
+```r
+?head
+```
+
+Googling for help is a bit hard. You might need to search for R + CRAN + (your query) to get good results
+
+---
+
+## R Reference Card
+
+You can download and R reference card from:
+
+http://cran.r-project.org/doc/contrib/Short-refcard.pdf
+
+Having this open or printed off and near you while working is helpful until you master the basics.
+
+---
+
+## Your Turn 
+
+Using the R Reference Card (and the Help pages, if needed), do the following:
+
+1. Find out how many rows and columns the CryptoPunks data set has using at least 2 ways.
+2. Create a vector with the number of slots for the top 5 sales in ETH.
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_02.png"  width="200px" height="150px"&gt;
+
+
+&lt;/p&gt;
+---
+
+## Answers
+
+### 1.
+
+```r
+dim(Punks) # Finds dimension of data frame
+```
+
+```
+## [1] 17554    12
+```
+
+```r
+str(Punks) # Finds structure of data
+```
+
+```
+## 'data.frame':	17554 obs. of  12 variables:
+##  $ Transaction: chr  "Sold" "Sold" "Sold" "Claimed" ...
+##  $ From       : chr  "0xf5099e" "0x00d7c9" "0xc352b5" NA ...
+##  $ To         : chr  "14715954" "10528156" "55241" "12800693" ...
+##  $ Crypto     : num  25 1.6 0.98 NA 60 31 0.42 NA NA NA ...
+##  $ USD        : num  2822 386 320 NA 36305 ...
+##  $ Txn        : chr  "2018-11-30" "2017-07-07" "2017-06-23" "2017-06-23" ...
+##  $ ID         : int  0 0 0 0 1 1 1 1 2 3 ...
+##  $ Sex        : chr  "Girl" "Girl" "Girl" "Girl" ...
+##  $ Type       : chr  "Female" "Female" "Female" "Female" ...
+##  $ Skin       : chr  "Mid" "Mid" "Mid" "Mid" ...
+##  $ Slots      : int  3 3 3 3 2 2 2 2 1 3 ...
+##  $ Rank       : chr  "3682560000%" "3682560000%" "3682560000%" "3682560000%" ...
+```
+
+---
+
+### 2.
+
+```r
+top5 &lt;- c(3,3,4,2,0) # Vector of top5
+```
+
+---
+
+## Some Useful Functions
+
+There are a whole variety of useful functions to operate on vectors. A couple of the more common ones are `length()`, which returns the length (number of elements) of a vector, and `sum()`, which adds up all the elements of a vector.
+
+
+```r
+length(top5) # calculates the length of this vector
+```
+
+```
+## [1] 5
+```
+
+```r
+sum(top5) # Calculates the sum of the vector elements
+```
+
+```
+## [1] 12
+```
+
+---
+
+## Data Frames Introduction
+
+- `Punks` is a data frame.
+- Data frames hold data sets
+- Not every column need be the same type - like an Excel spreadsheet
+- Each column in a data frame is a vector - so each column needs to have values that are all the same type.
+- We can access different columns using the `$` operator.
+
+
+```r
+type &lt;- Punks$Type # Creates column named type
+skin &lt;- Punks$Skin # Creates column named skin
+slots &lt;- Punks$Slots # Creates column named slots
+```
+
+---
+
+## More about Vectors
+
+A vector is a list of values that are all the same type. We have seen that we can create them using the `c()` or the `rep()` function. We can also use the `:` operator if we wish to create consecutive values:
+
+
+```r
+a &lt;- 10:15
+a
+```
+
+```
+## [1] 10 11 12 13 14 15
+```
+
+We can extract the specific elements of the vector like so:
+
+
+```r
+type[3] # Selects the 3rd type in the type column
+```
+
+```
+## [1] "Female"
+```
+
+---
+
+## Indexing Vectors
+
+We saw that we can access individual elements of the vector. But **indexing** is a lot more powerful than that:
+
+
+```r
+head(type)
+```
+
+```
+## [1] "Female" "Female" "Female" "Female" "Male"   "Male"
+```
+
+```r
+type[c(1, 3, 5)] # Selects the 1st, 3rd, and 5th type
+```
+
+```
+## [1] "Female" "Female" "Male"
+```
+
+
+```r
+type[1:6] # Selects the 1st through 6th type
+```
+
+```
+## [1] "Female" "Female" "Female" "Female" "Male"   "Male"
+```
+
+---
+
+## Logical Values
+
+- R has built in support for logical values
+- TRUE and FALSE are built in.  T (for TRUE) and F (for FALSE) are supported but can be modified
+- Logicals can result from a comparison using
+    - `\(&lt;\)`
+    - `\(&gt;\)`
+    - `\(&lt;=\)`
+    - `\(&gt;=\)`
+    - `\(==\)`
+    - `\(!=\)`
+    
+---
+
+## Indexing with Logicals
+
+We can index vectors using logical values as well:
+
+```r
+x &lt;- slots[1:5] #Pulls the total points for first 5 players
+x &gt; 3 # Which of the first 5 slots are greater than 3
+```
+
+```
+## [1] FALSE FALSE FALSE FALSE FALSE
+```
+
+```r
+x[x &lt; 3] # Which is less than 3
+```
+
+```
+## [1] 2
+```
+
+---
+
+## Logical Examples
+
+We gather the ID of Punks that are Alien Type. 
+
+
+```r
+alien_ID &lt;- (Punks$ID[Punks$Type == "Alien"]) 
+# creates variable, alien_ID, the ID of Punks that are Alien Type
+str(alien_ID)
+```
+
+```
+##  int [1:15] 635 2890 3100 3443 3443 5822 5822 5905 5905 6089 ...
+```
+
+We see which ID are less than 5000 to find certain punks which are labeled `little`.
+
+```r
+little &lt;- alien_ID &lt; 5000 # Finds players that play less than 8000 minutes
+alien_ID[little]
+```
+
+```
+## [1]  635 2890 3100 3443 3443
+```
+
+---
+
+This code locates the Punks ID that correspond to those slots
+
+```r
+(Punks$ID[little][Punks$Type == "Alien"])
+```
+
+```
+##  [1] 1648 7504 8244 9479 9479   NA   NA   NA   NA   NA   NA   NA   NA   NA   NA
+```
+
+---
+
+## Element-wise Logical Operators
+
+- `&amp;` (elementwise AND)
+- `|` (elementwise OR)
+
+
+```r
+c(T, T, F, F) &amp; c(T, F, T, F)
+```
+
+```
+## [1]  TRUE FALSE FALSE FALSE
+```
+
+```r
+c(T, T, F, F) | c(T, F, T, F)
+```
+
+```
+## [1]  TRUE  TRUE  TRUE FALSE
+```
+
+---
+
+## Your Turn 
+
+1. When was **Punk 9976** last sold? Note: There are many ways to answer this. Some are faster than others.
+
+2. Find out the number of sales in the Punks data.
+
+**Challenge**: Among all the sales, how many of the sales are more than or equal to 1.00 ETH? Hint(You will need to use &lt;b&gt; 2. &lt;/b&gt;.)
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px"&gt;
+
+
+&lt;/p&gt;
+
+---
+
+## Answers
+
+### 1
+
+```r
+Punks$Txn[Punks$ID == 9976 &amp; Punks$Transaction == "Sold"][1]
+```
+
+```
+## [1] "2020-01-10"
+```
+
+### 2.
+
+```r
+sold &lt;- Punks$Transaction == "Sold"
+sum(sold)
+```
+
+```
+## [1] 7554
+```
+
+---
+
+### **Challenge**
+
+
+```r
+# Finds the minutes for those players
+sales_1_ETH &lt;- Punks$Crypto[sold] &gt;= 1.00
+sum(sales_1_ETH)
+```
+
+```
+## [1] 3846
+```
+
+---
+
+## Modifying Vectors
+
+We can modify vectors using indexing as well. Here we create a new data frame that consists of the first 5 columns of the Punks data set.
+
+
+```r
+x &lt;- Punks[1:5]
+head(x)
+```
+
+```
+##   Transaction      From       To Crypto   USD
+## 1        Sold  0xf5099e 14715954  25.00  2822
+## 2        Sold  0x00d7c9 10528156   1.60   386
+## 3        Sold  0xc352b5    55241   0.98   320
+## 4     Claimed      &lt;NA&gt; 12800693     NA    NA
+## 5        Sold EliteCat… 0xcf6165  60.00 36305
+## 6        Sold  0xf5099e GoWest23  31.00  5155
+```
+
+---
+
+We can replace all the `Claimed` with `Free` by the following:
+
+
+```r
+x[1][x[1] == "Claimed"] &lt;- "Free"
+head(x)
+```
+
+```
+##   Transaction      From       To Crypto   USD
+## 1        Sold  0xf5099e 14715954  25.00  2822
+## 2        Sold  0x00d7c9 10528156   1.60   386
+## 3        Sold  0xc352b5    55241   0.98   320
+## 4        Free      &lt;NA&gt; 12800693     NA    NA
+## 5        Sold EliteCat… 0xcf6165  60.00 36305
+## 6        Sold  0xf5099e GoWest23  31.00  5155
+```
+
+---
+
+## Data Types in R
+
+- Can use `mode()` or `class()` to find out information about variables
+- `str()` is useful to find information about the structure of your data
+- Many data types: numeric, integer, character, date, and factor most common
+    
+
+```r
+str(Punks)
+```
+
+```
+## 'data.frame':	17554 obs. of  12 variables:
+##  $ Transaction: chr  "Sold" "Sold" "Sold" "Claimed" ...
+##  $ From       : chr  "0xf5099e" "0x00d7c9" "0xc352b5" NA ...
+##  $ To         : chr  "14715954" "10528156" "55241" "12800693" ...
+##  $ Crypto     : num  25 1.6 0.98 NA 60 31 0.42 NA NA NA ...
+##  $ USD        : num  2822 386 320 NA 36305 ...
+##  $ Txn        : chr  "2018-11-30" "2017-07-07" "2017-06-23" "2017-06-23" ...
+##  $ ID         : int  0 0 0 0 1 1 1 1 2 3 ...
+##  $ Sex        : chr  "Girl" "Girl" "Girl" "Girl" ...
+##  $ Type       : chr  "Female" "Female" "Female" "Female" ...
+##  $ Skin       : chr  "Mid" "Mid" "Mid" "Mid" ...
+##  $ Slots      : int  3 3 3 3 2 2 2 2 1 3 ...
+##  $ Rank       : chr  "3682560000%" "3682560000%" "3682560000%" "3682560000%" ...
+```
+
+---
+
+## Vector Elements
+
+Elements of a vector must all be the same type:
+
+
+```r
+claims &lt;- Punks$Transaction == "Claimed"
+head(claims)
+```
+
+```
+## [1] FALSE FALSE FALSE  TRUE FALSE FALSE
+```
+
+```r
+str(claims)
+```
+
+```
+##  logi [1:17554] FALSE FALSE FALSE TRUE FALSE FALSE ...
+```
+
+```r
+claims[claims == "FALSE"] &lt;- ":-(" #Replacing FALSE with a frownie face.
+head(claims)
+```
+
+```
+## [1] ":-("  ":-("  ":-("  "TRUE" ":-("  ":-("
+```
+
+```r
+str(claims)
+```
+
+```
+##  chr [1:17554] ":-(" ":-(" ":-(" "TRUE" ":-(" ":-(" ":-(" "TRUE" "TRUE" ...
+```
+
+By changing one value to character, all values are now character instead of logical.
+
+---
+
+## Converting Between Types
+
+We can convert between different types using the `as` series of functions:
+
+
+```r
+ids &lt;- head(Punks$ID) # Creates vector of first 6 rows 
+ids
+```
+
+```
+## [1] 0 0 0 0 1 1
+```
+
+```r
+as.character(ids) # Converts to character
+```
+
+```
+## [1] "0" "0" "0" "0" "1" "1"
+```
+
+```r
+as.numeric("2") 
+```
+
+```
+## [1] 2
+```
+Notice that in one instance there are quotation marks and in the other there is not. Hence one is a character and the other is numeric.
+
+---
+
+## Statistical Functions
+
+Using the basic functions we have learned, it would not be hard to compute some basic statistics.
+
+
+```r
+(n &lt;- length(slots)) # Assigns n to be the number of elements in slots
+```
+
+```
+## [1] 17554
+```
+
+```r
+(meanslots &lt;- sum(slots)/n) # Calculates mean by usual formula
+```
+
+```
+## [1] 2.778227
+```
+
+```r
+# Calculates standard deviation by usual formula
+(standdev &lt;- sqrt(sum((slots - meanslots)^2) / (n - 1))) 
+```
+
+```
+## [1] 0.7992775
+```
+
+This is fairly easy, that is, if you know the formulas!
+
+---
+
+## Built-in Statistical Functions
+We don't need to memorize formulas. R does the work for us!
+
+```r
+mean(slots) # Calculates mean
+```
+
+```
+## [1] 2.778227
+```
+
+```r
+sd(slots) # Calculates standard deviation
+```
+
+```
+## [1] 0.7992775
+```
+
+```r
+summary(slots) # calculates number summary
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.000   2.000   3.000   2.778   3.000   7.000
+```
+
+```r
+quantile(slots, c(.025, .975)) # 2.5% and 97.5% quartiles
+```
+
+```
+##  2.5% 97.5% 
+##     1     4
+```
+
+---
+
+Which Punk has sold more than 20.00 ETH and has 1 slot?
+
+```r
+condition &lt;- which(Punks$Crypto &gt; 20.00 &amp; Punks$Slots == 1)
+Punks[condition,]
+```
+
+```
+##       Transaction     From       To Crypto   USD        Txn   ID  Sex   Type
+## 2588         Sold      sov    DANNY     23  8458 2020-09-15 1963 Girl Female
+## 4815         Sold 0x88bd20 GoWest23     35 12797 2020-10-01 3105 Girl Female
+## 4816         Sold 0x5aaeb9 0x88bd20     58 20636 2020-09-30 3105 Girl Female
+## 4817         Sold GoWest23 0x5aaeb9     55 20080 2020-09-28 3105 Girl Female
+## 9240         Sold 0xa7eba7    DANNY     29  9979 2020-09-22 5426 Girl Female
+## 10197        Sold  Snowfro    DANNY     35 12534 2020-09-06 5944  Guy Zombie
+## 17383        Sold 0x832179    trill     50 19870 2020-10-28 9909  Guy Zombie
+##         Skin Slots         Rank
+## 2588     Mid     1 0.672000000%
+## 4815    Dark     1 0.330240000%
+## 4816    Dark     1 0.330240000%
+## 4817    Dark     1 0.330240000%
+## 9240     Mid     1  1021440000%
+## 10197 Zombie     1 0.038808000%
+## 17383 Zombie     1 0.030888000%
+```
+
+Just Punk 1963, 3105, 5426, 5944, 9909!
+
+---
+
+## Your Turn 
+  
+1. Determine which Punk has sold more than 100 ETH or has 7 slot.
+2. Which Punk was sold first? Punk 1111 or Punk 3773? 
+  
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="150px"&gt;
+
+
+&lt;/p&gt;
+---
+
+## Answers
+  
+### 1.
+
+```r
+condition &lt;- which(Punks$Crypto &gt; 100 | Punks$Slots == 7)
+Punks[condition,][!duplicated(Punks[condition,]$ID),] #Note !duplicated means NOT duplicated
+```
+
+```
+##       Transaction      From        To Crypto    USD        Txn   ID  Sex   Type
+## 4420         Sold  0x4dcaf3     DANNY 150.00  71403 2020-11-13 2923  Guy   Male
+## 5235         Sold       jmg  0x7224a1 189.99 137522 2020-12-30 3306  Guy   Male
+## 7600         Sold     DANNY tycoon.e… 185.00  63788 2020-10-03 4512 Girl Female
+## 9026         Sold EliteCat… friskynf… 140.00  54978 2020-09-17 5314  Guy    Ape
+## 14602        Sold EliteCat…     DANNY  85.00  18102 2020-05-20 8348  Guy   Male
+##        Skin Slots         Rank
+## 4420  Light     4  2406541500%
+## 5235    Mid     3  6437574000%
+## 7600    Mid     3  1995520000%
+## 9026    Ape     2 0.010020000%
+## 14602   Mid     7 0.000423161%
+```
+
+---
+
+### 2.
+
+
+```r
+Punk1111 &lt;- Punks$Txn[which(Punks$ID == 1111 &amp; Punks$Transaction == "Sold")]
+Punk3773 &lt;- Punks$Txn[which(Punks$ID == 3773 &amp; Punks$Transaction == "Sold")]
+
+Punk1111[length(Punk1111)] #Get the last value in the vector using the length() function
+```
+
+```
+## [1] "2020-09-03"
+```
+
+```r
+Punk3773[length(Punk3773)]
+```
+
+```
+## [1] "2017-07-11"
+```
+
+```r
+#We can also compare the dates using logic
+
+Punk1111[length(Punk1111)] &lt; Punk3773[length(Punk3773)] 
+```
+
+```
+## [1] FALSE
+```
+Thus, Punk 3773 was first sold before Punk 1111.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,382 @@
+---
+title: "Data Structures <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+## Data Frames
+
+- Data Frames are the work horse of R objects
+- Structured by rows and columns and can be indexed
+- Each column is a specified variable type
+- Columns names can be used to index a variable
+- Advice for naming variable applys to editing columns names
+- Can be specified by grouping vectors of equal length as columns
+
+
+<br> <br>
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_07.png"  width="200px" height="150px">
+
+</p>
+---
+
+## Data Frame Indexing
+
+- Elements indexed similar to a vector using `[` `]`
+- `df[i,j]` will select the element in the $i^{th}$ row and $j^{th}$ column
+- `df[ ,j]` will select the entire $j^{th}$ column and treat it as a vector
+- `df[i ,]` will select the entire $i^{th}$ row and treat it as a vector
+- Logical vectors can be used in place of i and j used to subset the row and columns
+
+--
+
+## Adding a New Variable to a Data Frame
+
+- Create a new vector that is the same length as other columns
+- Append new column to the data frame using the `$` operator
+- The new data frame column will adopt the name of the vector
+
+---
+
+## Data Frame Demo
+
+Loading previously used Punks data set:
+
+```{r}
+Punks <- read.csv("punks.csv")
+```
+
+Select the date column (6th column):
+
+```{r, eval = FALSE}
+Punks[,6]
+```
+
+Select the date and skin columns (6th and 10th columns):
+
+```{r, eval = FALSE}
+Punks[,c(6,10)]
+```
+
+---
+
+## Demo (Continued)
+
+Select ID column with the `$` operator:
+
+```{r, eval = FALSE}
+Punks$ID
+```
+
+We now determine the row location, in our data, where the ID is 9117.
+```{r}
+punk_9126 <- Punks$ID == 9126 # Creates vector of T/F values if the entry is 9999.
+head(punk_9126)
+```
+This output doesn't show much. It would be much easier if we could see which positions are `TRUE`!
+```{r}
+which(punk_9126 == TRUE) # Tells row number where the ID is 9999
+```
+
+---
+
+## Demo (Continued)
+Displaying part of the Punks data set where the ID is 9998 by subsetting rows.
+```{r}
+Punks[Punks$ID == 9126, ] #or Punks[punk_9126, ]
+```
+
+---
+
+## Creating our own Data Frame
+
+Creating our own data frame using the `data.frame()` function:
+
+```{r}
+mydf <- data.frame(NUMS = 1:5, 
+                   LETS = letters[1:5],
+                   PUNK_TYPES = c("Male", "Female", "Alien", "Ape", "Zombie"))
+mydf
+```
+Note that in a data frame, each column has to have the same length!
+
+---
+
+## Renaming columns
+
+We can use the `names()` function to set that first column to lowercase:
+
+```{r}
+names(mydf)[1] <- "nums" # Changes the names of the first column in mydf
+mydf
+```
+
+---
+## Renaming columns (Continued)
+We can also rename all the columns at once using the `colnames()` command.
+
+```{r}
+colnames(mydf) <- c("numbers","letters","punk_types") # Changes all columns at once
+mydf
+```
+
+---
+
+## Your Turn 
+
+1. Construct a data frame where column 1 contains any 5 Punks and column 2 is their Slot number.
+2. Select only the rows where the Slot number is even.
+3. Determine which rows of the Punks data set contains the Alien Type.
+
+
+<br> <br> <br>
+<p align="left">
+
+<img src="images/Cut_outs/Cut_out_03.png"  width="200px" height="150px">
+
+</p>
+
+---
+
+## Answers
+
+### 1.
+
+```{r}
+mydf <- data.frame(Punk = c(0,1,2,3,4), 
+                   Slot = c(3,2,1,3,4)
+                   )
+mydf
+```
+
+---
+
+### 2.
+
+```{r}
+mydf[c(2,5),]
+```
+
+--
+
+### 3.
+```{r}
+alien <- Punks$Type == "Alien" 
+which(alien == TRUE)
+```
+
+---
+
+## Lists
+
+- Lists are a structured collection of R objects
+- R objects in a list need not be the same type
+- Create lists using the `list` function
+- Lists indexed using double square brackets `[[ ]]` to select an object
+
+---
+## List Example
+
+Creating a list containing a matrix of size 2 by 5, and a vector of length 5, and a string:
+
+```{r}
+mylist <- list(matrix(letters[1:10], nrow = 2, ncol = 5),
+               c("Alien", "Ape", "Female", "Male", "Zombie"),
+               "CryptoPunks are awesome!")
+mylist
+```
+
+---
+## List Example (Continued)
+Note that unlike data frames, list can contain elements of varying sizes and structures.
+
+Use indexing to select the second list element:
+```{r}
+mylist[[3]] # Selections third argument in mylist
+```
+
+---
+
+## Your Turn 
+
+1. Create a list containing `mydf` as well as a vector of length 7 containing different Punk Skins
+2. Use indexing to select mydf from your list
+
+
+<br> <br> <br> <br>
+
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px">
+
+</p>
+---
+
+## Answers
+
+### 1.
+```{r}
+mylist <- list(mydf,
+               c("Albino","Alien","Ape","Dark","Light", "Mid", "Zombie"))
+```
+
+--
+
+### 2.
+```{r}
+mylist[[1]]
+```
+
+---
+
+## Examining Objects
+
+- `head(x)` - View top 6 rows of a data frame
+- `tail(x)` - View bottom 6 rows of a data frame
+- `summary(x)` - Summary statistics   
+- `str(x)` - View structure of object  
+- `dim(x)` - View dimensions of object 
+- `length(x)` - Returns the length of a vector
+
+---
+
+## Examining Objects Demo
+
+We can examine the first two values of an object by passing the `n` parameter to the `head()` function:
+
+```{r}
+head(Punks, n = 2) # n = 2 displays only the first two rows.
+```
+
+---
+## Examining Objects Demo (Continued)
+What's its structure?
+
+```{r}
+str(Punks)
+```
+
+---
+
+## Your Turn 
+
+1. View the last 4 rows of Punks data
+2. How many rows are in Punks data set? (try finding this using dim or indexing + length)
+
+
+<br> <br> <br>
+<p align="left">
+
+<img src="images/Cut_outs/Cut_out_15.png"  width="200px" height="200px">
+
+</p>
+---
+
+## Answers
+
+### 1.
+```{r}
+tail(Punks, n=4)
+```
+
+---
+
+### 2.
+
+```{r}
+dim(Punks)
+dim(Punks)[1] #Picks first output element
+```
+
+---
+
+## Working with Output from a Function
+
+- Can save output from a function as an object
+- An object is generally a list of output objects
+- Can pull off items from the output for further computing
+- Examine objects using functions like `str()`
+
+--
+
+## Saving Output Demo
+
+- Apply t-test using the Punks data set to see if the Sale Price in Crypto for punks with 1 slot and 7 slots are statistically different
+- `t.test()` can only handle two groups, so we subset out the every other slots.
+
+---
+
+## Demo (Continued)
+
+Save the output of the t-test to an object:
+
+```{r}
+tout <- t.test(Crypto ~ Slots, data = Punks[Punks$Slots %in% c(1,7), ])
+tout
+```
+An interpretation of this is that there is not a statistical difference in the average sale price in Crypto between the 1 and 7 slots Punks. 
+
+---
+
+Let's look at the structure of this object:
+
+```{r}
+str(tout)
+```
+
+---
+
+## Demo: Extracting the P-Value
+
+Since this is simply a list, we can use our regular indexing:
+
+```{r}
+tout$p.value
+tout[[3]]
+```
+
+---
+
+## Your Turn
+
+1. Pull the p-value from t.test comparing the difference between Sale Price in USD from the 2 and 4 Slots.
+2. What does this p-value imply?
+
+<br> <br> <br> <br>
+<p align="center">
+
+<img src="images/Cut_outs/Cut_out_09.png"  width="200px" height="200px">
+
+</p>
+---
+
+## Answer
+
+### 1.
+```{r}
+tout <- t.test(USD ~ Slots, data = Punks[Punks$Slots %in% c(2,4), ])
+tout
+```
+
+---
+
+### 2.
+Since p = 0.5839 > 0.05, there is no significant difference in the means of the two groups. From this we can claim that the Punks with 2 slots and 4 slots are sold at similar price. 
+

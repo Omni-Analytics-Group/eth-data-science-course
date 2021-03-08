@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Reading Files</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Reading Files <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+
+## Outline
+- Reading files: Excel and .csv
+
+
+## Importing Data
+
+We often need to import in our own data rather than just using built-in datasets.
+
+- First need to tell R where the data is saved using `setwd()`
+- Data read in using R functions such as:
+    - `read.table()` for reading in .txt files
+    - `read.csv()` for reading in .csv files
+- Assign the data to new R object when reading in the file
+
+---
+
+## Importing Data Demo
+
+We first create a .csv file. We can use a text editor, excel... Then we load it in:
+
+
+```r
+setwd(/pathtodirectory)
+```
+
+```r
+crypto_art &lt;- read.csv("crypto_art_pulse.csv")
+```
+
+--
+
+## Data in Excel
+Formats xls and csv - what's the difference? File extensions .xls or .xlsx are proprietary Excel formats, they are binary files .csv is the extension for comma separated value files. They are text files - and directly readable.
+
+---
+
+## Excel file in Excel
+
+&lt;center&gt;&lt;img src="images/excelinexcel.png" width="800px" height="500px"&gt;&lt;/center&gt;
+
+---
+
+## Excel file in notepad
+&lt;center&gt;&lt;img src="images/excelnp.png" width="800px"&gt;&lt;/center&gt;
+
+---
+
+## .csv file in notepad
+&lt;center&gt;&lt;img src="images/csvexample.png" width="800px"&gt;&lt;/center&gt;
+
+---
+
+## Reading Files in R
+
+Text files, usually comma separated or tabular separated (space) can both be read in with `read.csv()`
+
+
+```r
+read.csv(file, header = TRUE, sep = ",", quote = "\\"",
+ dec = ".", fill = TRUE, comment.char = "", ...)
+```
+For a comma separated file, we set `sep = ","` else for a tabular separated file use `sep = ""`
+
+&lt;br&gt; &lt;br&gt; 
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_08.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Reading .csv File
+ 
+
+```r
+Punks &lt;- read.csv("punks.csv")
+head(Punks)
+```
+
+```
+##   Transaction      From       To Crypto   USD        Txn ID  Sex   Type Skin
+## 1        Sold  0xf5099e 14715954  25.00  2822 2018-11-30  0 Girl Female  Mid
+## 2        Sold  0x00d7c9 10528156   1.60   386 2017-07-07  0 Girl Female  Mid
+## 3        Sold  0xc352b5    55241   0.98   320 2017-06-23  0 Girl Female  Mid
+## 4     Claimed      &lt;NA&gt; 12800693     NA    NA 2017-06-23  0 Girl Female  Mid
+## 5        Sold EliteCat… 0xcf6165  60.00 36305 2020-11-30  1  Guy   Male Dark
+## 6        Sold  0xf5099e GoWest23  31.00  5155 2019-04-06  1  Guy   Male Dark
+##   Slots        Rank
+## 1     3 3682560000%
+## 2     3 3682560000%
+## 3     3 3682560000%
+## 4     3 3682560000%
+## 5     2 2050240500%
+## 6     2 2050240500%
+```
+
+---
+
+
+```r
+str(Punks)
+```
+
+```
+## 'data.frame':	17554 obs. of  12 variables:
+##  $ Transaction: chr  "Sold" "Sold" "Sold" "Claimed" ...
+##  $ From       : chr  "0xf5099e" "0x00d7c9" "0xc352b5" NA ...
+##  $ To         : chr  "14715954" "10528156" "55241" "12800693" ...
+##  $ Crypto     : num  25 1.6 0.98 NA 60 31 0.42 NA NA NA ...
+##  $ USD        : num  2822 386 320 NA 36305 ...
+##  $ Txn        : chr  "2018-11-30" "2017-07-07" "2017-06-23" "2017-06-23" ...
+##  $ ID         : int  0 0 0 0 1 1 1 1 2 3 ...
+##  $ Sex        : chr  "Girl" "Girl" "Girl" "Girl" ...
+##  $ Type       : chr  "Female" "Female" "Female" "Female" ...
+##  $ Skin       : chr  "Mid" "Mid" "Mid" "Mid" ...
+##  $ Slots      : int  3 3 3 3 2 2 2 2 1 3 ...
+##  $ Rank       : chr  "3682560000%" "3682560000%" "3682560000%" "3682560000%" ...
+```
+
+---
+
+## Reading Excel File
+Need another package: `readxl`
+
+
+```r
+install.packages(readxl)
+```
+
+
+```r
+library(readxl)
+
+Punks2 &lt;- read_excel("punks.xlsx",sheet = 1)
+head(Punks2)
+```
+
+```
+## # A tibble: 6 x 12
+##   Transaction From  To    Crypto USD   Txn      ID Sex   Type  Skin  Slots Rank 
+##   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;
+## 1 Sold        0xf5~ 1471~ 25     2822  2018~     0 Girl  Fema~ Mid       3 3682~
+## 2 Sold        0x00~ 1052~ 1.6    386   2017~     0 Girl  Fema~ Mid       3 3682~
+## 3 Sold        0xc3~ 55241 0.98   320   2017~     0 Girl  Fema~ Mid       3 3682~
+## 4 Claimed     NA    1280~ NA     NA    2017~     0 Girl  Fema~ Mid       3 3682~
+## 5 Sold        FALSE 0xcf~ 60     36305 2020~     1 Guy   Male  Dark      2 2050~
+## 6 Sold        0xf5~ GoWe~ 31     5155  2019~     1 Guy   Male  Dark      2 2050~
+```
+
+---
+
+## Your Turn
+Using the crypto_art_pulse.csv file, do the following:
+
+1. Read the data into an object called crypto_art. 
+
+2. Use the `head()` function to display some rows.
+
+3. Use the `str()` function to see each variable type.
+
+&lt;br&gt; 
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Answers
+
+### 1.
+
+```r
+crypto_art &lt;- read.csv("crypto_art_pulse.csv")
+```
+
+---
+### 2.
+
+```r
+head(crypto_art)
+```
+
+```
+##   asset_token_id asset_contract_address asset_collection
+## 1         211201           1.438286e+48     Known-origin
+## 2          16773           1.057293e+48        Superrare
+## 3          16113           1.057293e+48        Superrare
+## 4          17443           1.057293e+48        Superrare
+## 5          38926           2.413598e+47      Makersplace
+## 6          16041           1.057293e+48        Superrare
+##                                 asset_name asset_artist
+## 1              Wi-Five / Cuban Impressions     Adoption
+## 2    SUBTERRANEAN HOMESICK ALIEN (TRIBUTE)    rubahitam
+## 3                                Somewhere          MrY
+## 4 TINY ROOMS TWO - IN DA CLUB 2020 EDITION          MrY
+## 5                                 Boredoom        wizmo
+## 6                  Censored Venus Scanning    Van Gango
+##                                                                                                                                      asset_image
+## 1  https://lh3.googleusercontent.com/RAcLH_YifV2aFzM6kNOprpv0vko8TEfMm67IGiZ62MvLxhb-J0V5obKZJ0Ulefe9Ld138QCd9VUvAAiS4Wh2zPX36Mvg8YdYTV1hog=s128
+## 2                https://lh3.googleusercontent.com/pKhMQQNVUt3JSN5r4DbWUwi_BOlfKq6nbdRvZDUfaQ3k9KcIzmr5-v-89TEw-mkliixJ3U9a9Cse0ZuSwnDbqx5z=s128
+## 3  https://lh3.googleusercontent.com/9ycKTkeIZTrohSjPS7qbOqYVLIB3p8viapAmb8kk0avO3fNsWqoJFK36mmizgS-CRnrW10dmlUMe8YtSN9dqwvTk-BMMmFDD92ZtIw=s128
+## 4    https://lh3.googleusercontent.com/WgD9n7W0B8EtR959na-OsZLqj72guchpuWe70bECwi2W32S9oKl-5wl8rAr3yBIFet49oNpKof3Asej1aSndjM365EwQ6ybBt35Y=s128
+## 5 https://lh3.googleusercontent.com/HY5jSHOtLn3gy5oc9-bIugtYMBo_UmO0hX2TAr4cuh2aqCE1mfUBMeFtOf4hdDJ-OZn3hhvnnvHd0tQqHlZE0RcAi-BX50qQhvtoKsg=s128
+## 6              https://lh3.googleusercontent.com/4EznVskm_yBniUlOCSJdAEZj92HZ8lj4mz_mJlm4Xo9LSgjxE6H3DuPMZqSJEs6CQvKr6inzg6QWZ0-SYTIrhNseqA=s128
+##                                                                    asset_link
+## 1 https://opensea.io/assets/0xfbeef911dc5821886e1dda71586d90ed28174b7d/211201
+## 2  https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/16773
+## 3  https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/16113
+## 4  https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/17443
+## 5  https://opensea.io/assets/0x2a46f2ffd99e19a89476e2f62270e0a35bbf0756/38926
+## 6  https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/16041
+##                                                                                                   asset_external_link
+## 1                                                                                 https://knownorigin.io/token/211201
+## 2 https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F16773
+## 3 https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F16113
+## 4 https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F17443
+## 5                              https://makersplace.com/product/token/0x2a46f2ffd99e19a89476e2f62270e0a35bbf0756/38926
+## 6 https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F16041
+##   asset_first_sale_price asset_last_sale_price asset_last_sale_owner_name
+## 1                8.0e+17               8.0e+17                    mattiac
+## 2                1.5e+18               1.5e+18                           
+## 3                5.0e+17               5.0e+17           endless_traveler
+## 4                5.0e+17               5.0e+17           endless_traveler
+## 5                5.0e+17               5.0e+17           brandonkangfilms
+## 6                1.4e+17               1.4e+17                           
+##   asset_last_sale_owner_address asset_sale_grows asset_num_sales
+## 1                  4.990549e+47                0               1
+## 2                  9.001576e+47                0               1
+## 3                  3.780877e+47                0               1
+## 4                  3.780877e+47                0               1
+## 5                  6.510549e+47                0               1
+## 6                  2.503354e+47                0               1
+##   asset_last_sale_date
+## 1  2020-12-31 14:02:57
+## 2  2020-12-31 13:35:20
+## 3  2020-12-31 13:19:51
+## 4  2020-12-31 13:19:51
+## 5  2020-12-31 09:28:46
+## 6  2020-12-31 08:22:10
+```
+
+---
+### 3.
+
+```r
+str(crypto_art)
+```
+
+```
+## 'data.frame':	25336 obs. of  15 variables:
+##  $ asset_token_id               : num  211201 16773 16113 17443 38926 ...
+##  $ asset_contract_address       : num  1.44e+48 1.06e+48 1.06e+48 1.06e+48 2.41e+47 ...
+##  $ asset_collection             : chr  "Known-origin" "Superrare" "Superrare" "Superrare" ...
+##  $ asset_name                   : chr  "Wi-Five / Cuban Impressions" "SUBTERRANEAN HOMESICK ALIEN (TRIBUTE)" "Somewhere" "TINY ROOMS TWO - IN DA CLUB 2020 EDITION" ...
+##  $ asset_artist                 : chr  "Adoption" "rubahitam" "MrY" "MrY" ...
+##  $ asset_image                  : chr  "https://lh3.googleusercontent.com/RAcLH_YifV2aFzM6kNOprpv0vko8TEfMm67IGiZ62MvLxhb-J0V5obKZJ0Ulefe9Ld138QCd9VUvA"| __truncated__ "https://lh3.googleusercontent.com/pKhMQQNVUt3JSN5r4DbWUwi_BOlfKq6nbdRvZDUfaQ3k9KcIzmr5-v-89TEw-mkliixJ3U9a9Cse0"| __truncated__ "https://lh3.googleusercontent.com/9ycKTkeIZTrohSjPS7qbOqYVLIB3p8viapAmb8kk0avO3fNsWqoJFK36mmizgS-CRnrW10dmlUMe8"| __truncated__ "https://lh3.googleusercontent.com/WgD9n7W0B8EtR959na-OsZLqj72guchpuWe70bECwi2W32S9oKl-5wl8rAr3yBIFet49oNpKof3As"| __truncated__ ...
+##  $ asset_link                   : chr  "https://opensea.io/assets/0xfbeef911dc5821886e1dda71586d90ed28174b7d/211201" "https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/16773" "https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/16113" "https://opensea.io/assets/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/17443" ...
+##  $ asset_external_link          : chr  "https://knownorigin.io/token/211201" "https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F16773" "https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F16113" "https://superrare.co/?origin=https%3A%2F%2Fopensea.io%2Fassets%2F0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0%2F17443" ...
+##  $ asset_first_sale_price       : num  8.0e+17 1.5e+18 5.0e+17 5.0e+17 5.0e+17 ...
+##  $ asset_last_sale_price        : num  8.0e+17 1.5e+18 5.0e+17 5.0e+17 5.0e+17 ...
+##  $ asset_last_sale_owner_name   : chr  "mattiac" "" "endless_traveler" "endless_traveler" ...
+##  $ asset_last_sale_owner_address: num  4.99e+47 9.00e+47 3.78e+47 3.78e+47 6.51e+47 ...
+##  $ asset_sale_grows             : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ asset_num_sales              : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ asset_last_sale_date         : chr  "2020-12-31 14:02:57" "2020-12-31 13:35:20" "2020-12-31 13:19:51" "2020-12-31 13:19:51" ...
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

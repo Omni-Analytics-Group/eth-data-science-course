@@ -1,0 +1,160 @@
+---
+title: "Reading Files <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+
+## Outline
+- Reading files: Excel and .csv
+
+
+## Importing Data
+
+We often need to import in our own data rather than just using built-in datasets.
+
+- First need to tell R where the data is saved using `setwd()`
+- Data read in using R functions such as:
+    - `read.table()` for reading in .txt files
+    - `read.csv()` for reading in .csv files
+- Assign the data to new R object when reading in the file
+
+---
+
+## Importing Data Demo
+
+We first create a .csv file. We can use a text editor, excel... Then we load it in:
+
+```{r, eval=FALSE}
+setwd(/pathtodirectory)
+```
+```{r}
+crypto_art <- read.csv("crypto_art_pulse.csv")
+```
+
+--
+
+## Data in Excel
+Formats xls and csv - what's the difference? File extensions .xls or .xlsx are proprietary Excel formats, they are binary files .csv is the extension for comma separated value files. They are text files - and directly readable.
+
+---
+
+## Excel file in Excel
+
+<center><img src="images/excelinexcel.png" width="800px" height="500px"></center>
+
+---
+
+## Excel file in notepad
+<center><img src="images/excelnp.png" width="800px"></center>
+
+---
+
+## .csv file in notepad
+<center><img src="images/csvexample.png" width="800px"></center>
+
+---
+
+## Reading Files in R
+
+Text files, usually comma separated or tabular separated (space) can both be read in with `read.csv()`
+
+```{r,eval = F}
+read.csv(file, header = TRUE, sep = ",", quote = "\\"",
+ dec = ".", fill = TRUE, comment.char = "", ...)
+```
+For a comma separated file, we set `sep = ","` else for a tabular separated file use `sep = ""`
+
+<br> <br> 
+<p align="left">
+
+<img src="images/Cut_outs/Cut_out_08.png"  width="200px" height="150px">
+
+</p>
+---
+
+## Reading .csv File
+ 
+```{r}
+Punks <- read.csv("punks.csv")
+head(Punks)
+```
+
+---
+
+```{r}
+str(Punks)
+```
+
+---
+
+## Reading Excel File
+Need another package: `readxl`
+
+```{r,eval =F}
+install.packages(readxl)
+```
+
+```{r}
+library(readxl)
+
+Punks2 <- read_excel("punks.xlsx",sheet = 1)
+head(Punks2)
+
+```
+
+---
+
+## Your Turn
+Using the crypto_art_pulse.csv file, do the following:
+
+1. Read the data into an object called crypto_art. 
+
+2. Use the `head()` function to display some rows.
+
+3. Use the `str()` function to see each variable type.
+
+<br> 
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px">
+
+</p>
+---
+
+## Answers
+
+### 1.
+```{r}
+crypto_art <- read.csv("crypto_art_pulse.csv")
+```
+
+---
+### 2.
+```{r}
+head(crypto_art)
+```
+
+---
+### 3.
+```{r}
+str(crypto_art)
+```
+
+
+

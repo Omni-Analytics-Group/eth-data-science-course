@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Motivating Example</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Motivating Example <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Motivating Example
+
+- Explore a real data set using R
+- Goal: get good understanding of using R for data management and exploration 
+- Dont worry about understanding all coding right away
+- We will go back and explain how it all works in detail
+ 
+
+## CryptoPunks 
+
+The CryptoPunks are 10,000 uniquely generated characters and each one of them are officially owned by a single person on the Ethereum blockchain. Originally, they were all claimed by for free. Now, you can buy, bid on, and offer punks for sale via the marketplace that's also embedded in the blockchain. 
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/punk-image.png" width="800px" height="200px"&gt;
+
+&lt;/p&gt;
+---
+
+## CryptoPunks Dataset
+
+- Shows sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020. 
+- Several pieces of info are accounted for
+  * Details of each sales
+  * Details of the Punk
+  * Rarity Rank of the Punk
+
+Note that the data may not be 100 percent accurate!
+
+#### Let's get started!
+
+--
+
+## Load the Data
+
+First, we load Punks using `read.csv()`:
+
+
+```r
+Punks &lt;- read.csv("punks.csv")
+```
+
+---
+
+## First look at data in R
+
+Let's use R to look at the top few rows of the Punks data set. The `head()` function allows you to look at first 6 rows of the data and `tail()` allows you to look at last 6 rows
+
+
+```r
+head(Punks)
+```
+
+```
+##   Transaction      From       To Crypto   USD        Txn ID  Sex   Type Skin
+## 1        Sold  0xf5099e 14715954  25.00  2822 2018-11-30  0 Girl Female  Mid
+## 2        Sold  0x00d7c9 10528156   1.60   386 2017-07-07  0 Girl Female  Mid
+## 3        Sold  0xc352b5    55241   0.98   320 2017-06-23  0 Girl Female  Mid
+## 4     Claimed      &lt;NA&gt; 12800693     NA    NA 2017-06-23  0 Girl Female  Mid
+## 5        Sold EliteCat… 0xcf6165  60.00 36305 2020-11-30  1  Guy   Male Dark
+## 6        Sold  0xf5099e GoWest23  31.00  5155 2019-04-06  1  Guy   Male Dark
+##   Slots        Rank
+## 1     3 3682560000%
+## 2     3 3682560000%
+## 3     3 3682560000%
+## 4     3 3682560000%
+## 5     2 2050240500%
+## 6     2 2050240500%
+```
+
+---
+
+## CryptoPunks Data Attributes
+The command `str()`, short for structure, gives us a summary of each variable along with the size of the "data frame".
+
+
+```r
+str(Punks)
+```
+
+```
+## 'data.frame':	17554 obs. of  12 variables:
+##  $ Transaction: chr  "Sold" "Sold" "Sold" "Claimed" ...
+##  $ From       : chr  "0xf5099e" "0x00d7c9" "0xc352b5" NA ...
+##  $ To         : chr  "14715954" "10528156" "55241" "12800693" ...
+##  $ Crypto     : num  25 1.6 0.98 NA 60 31 0.42 NA NA NA ...
+##  $ USD        : num  2822 386 320 NA 36305 ...
+##  $ Txn        : chr  "2018-11-30" "2017-07-07" "2017-06-23" "2017-06-23" ...
+##  $ ID         : int  0 0 0 0 1 1 1 1 2 3 ...
+##  $ Sex        : chr  "Girl" "Girl" "Girl" "Girl" ...
+##  $ Type       : chr  "Female" "Female" "Female" "Female" ...
+##  $ Skin       : chr  "Mid" "Mid" "Mid" "Mid" ...
+##  $ Slots      : int  3 3 3 3 2 2 2 2 1 3 ...
+##  $ Rank       : chr  "3682560000%" "3682560000%" "3682560000%" "3682560000%" ...
+```
+As we can see the Punks data frame has 17554 observations (rows) and 12 variables (columns).
+
+---
+
+## CryptoPunks Variables Summary
+
+Let's summarize the values for each variable in Punks with the `summary()` command. With this command we immediately have summary statistics of each variable.
+
+
+
+```r
+summary(Punks)
+```
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_16.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+```
+##  Transaction            From                To                Crypto      
+##  Length:17554       Length:17554       Length:17554       Min.   :  0.01  
+##  Class :character   Class :character   Class :character   1st Qu.:  0.30  
+##  Mode  :character   Mode  :character   Mode  :character   Median :  1.00  
+##                                                           Mean   :  2.39  
+##                                                           3rd Qu.:  2.90  
+##                                                           Max.   :189.99  
+##                                                           NA's   :10000   
+##       USD                Txn                  ID           Sex           
+##  Min.   :     0.01   Length:17554       Min.   :   0   Length:17554      
+##  1st Qu.:    72.00   Class :character   1st Qu.:2906   Class :character  
+##  Median :   232.50   Mode  :character   Median :5189   Mode  :character  
+##  Mean   :   867.31                      Mean   :5194                     
+##  3rd Qu.:  1003.25                      3rd Qu.:7557                     
+##  Max.   :137522.00                      Max.   :9999                     
+##  NA's   :10000                                                           
+##      Type               Skin               Slots           Rank          
+##  Length:17554       Length:17554       Min.   :0.000   Length:17554      
+##  Class :character   Class :character   1st Qu.:2.000   Class :character  
+##  Mode  :character   Mode  :character   Median :3.000   Mode  :character  
+##                                        Mean   :2.778                     
+##                                        3rd Qu.:3.000                     
+##                                        Max.   :7.000                     
+## 
+```
+
+---
+
+## Scatterplots
+
+Let's look at the relationship between Crypto and USD  First, we need to install and load ggplot2, a special package for plotting.
+
+
+```r
+install.packages("ggplot2")
+```
+
+
+```r
+library(ggplot2)
+```
+
+Using the `qplot()` command we can create a simple scatter plot.
+
+Do not let the `qplot()` command or any of the parameters confuse you. We will discuss in detail this function in later lessons.
+---
+
+## Scatter Plot
+
+
+```r
+qplot(Crypto, USD, geom="point", data = Punks, main = "USD vs. Crypto (ETH)")
+```
+
+&lt;img src="1-1-Motivating-Example-Crypto-Punk_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## More Scatterplots
+
+
+```r
+qplot(Crypto, USD, geom="point", data = Punks, main = "USD vs. Crypto (ETH)", colour = Type)
+```
+
+&lt;img src="1-1-Motivating-Example-Crypto-Punk_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Even More Scatterplots
+
+
+```r
+qplot(Crypto, USD, geom="point", data = Punks, main = "USD vs. Crypto (ETH) with Regression Line")+
+  geom_smooth(method = "lm")
+```
+
+&lt;img src="1-1-Motivating-Example-Crypto-Punk_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Creating A New Variable
+
+We will make a new variable in the Punks data set to account for ratio between Crypto and USD that is, `Ratio of Currency = USD / Crypto`.
+
+
+```r
+# Creates new column Ratio.of.Currency in Punks data
+Punks$Ratio.of.Currency &lt;- Punks$USD / Punks$Crypto 
+```
+Notice that we had to place periods between words. R does not allow users to separate phrases with spaces.
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Summary 
+
+```r
+summary(Punks$Ratio.of.Currency)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##     1.0   202.9   326.9   328.0   367.2  1409.1   10000
+```
+
+One way we can interpret this is to say that on average, 1 ETH is worth $328.00.
+
+## Column Names
+
+```r
+names(Punks) # Provides the name of each column
+```
+
+```
+##  [1] "Transaction"       "From"              "To"               
+##  [4] "Crypto"            "USD"               "Txn"              
+##  [7] "ID"                "Sex"               "Type"             
+## [10] "Skin"              "Slots"             "Rank"             
+## [13] "Ratio.of.Currency"
+```
+
+---
+
+## Crypto Histogram
+
+We now plot a histogram of the Crypto to see its distribution.
+
+
+```r
+qplot(Crypto, data = Punks, binwidth = 2.5, main = "Histogram of Crypto") # binwidth is the length of each rectangular bar
+```
+
+&lt;img src="1-1-Motivating-Example-Crypto-Punk_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Most expensive Punk that was last sold in the sample data
+
+We can look at the most expensive Punk that was last sold using `which.max()`. 
+
+```r
+Punks[which.max(Punks$Crypto),]
+```
+
+```
+##      Transaction From       To Crypto    USD        Txn   ID Sex Type Skin
+## 5235        Sold  jmg 0x7224a1 189.99 137522 2020-12-30 3306 Guy Male  Mid
+##      Slots        Rank Ratio.of.Currency
+## 5235     3 6437574000%          723.8381
+```
+Thus, the most expensive Punk is &lt;b&gt; Punk 3306 &lt;/b&gt; sold at 189.99 ETH on December 30, 2020. 
+
+--
+## Wait a minute!
+
+--
+
+Did you fact check this by visiting the official CryptoPunks website? Did you notice something strange when you looked up &lt;b&gt; Punk 3306 &lt;/b&gt;?
+
+--
+It turns out that it's &lt;b&gt; Punk 3307 &lt;/b&gt; sold at 189.99 ETH on December 30, 2020. This is a common 'off by one' mistake made in the data science world and it is something we need to be aware of as we learn more about the data. 
+
+
+---
+## Average Slots By Sex
+
+Looking at the average number of slots, we noticed that &lt;b&gt; Girl &lt;/b&gt; and &lt;b&gt; Guy &lt;/b&gt; punks have similar number of slots.  
+
+
+```r
+mean((Punks$Slots)[Punks$Sex == "Girl"])
+```
+
+```
+## [1] 2.763077
+```
+
+```r
+mean((Punks$Slots)[Punks$Sex == "Guy"])
+```
+
+```
+## [1] 2.786449
+```
+
+As a breakdown:
+
+- `mean()` - provides mean of argument
+- `Punks$Slots` - selects the column in the nba data set named Minutes.Per.Game
+- `[Punks$Sex == "XX"]` - subsets the column with the chosen Sex XX
+
+---
+
+## Combine Types
+
+We can label Alien, Ape and Zombie as non_humans, and similarly we can label Female and Male as humans.
+
+This code works by creating new columns **non_human** and **human** by selecting the rows that contain `c("Alien", "Ape", "Zombie")` and `c("Female", "Male")` in the Position column, respectfully
+
+
+```r
+non_human &lt;- (Punks$Type %in% c("Alien", "Ape", "Zombie"))
+head(non_human)
+```
+
+```
+## [1] FALSE FALSE FALSE FALSE FALSE FALSE
+```
+
+
+```r
+human &lt;- (Punks$Type %in% c("Female", "Male"))
+head(human)
+```
+
+```
+## [1] TRUE TRUE TRUE TRUE TRUE TRUE
+```
+---
+
+## Average Slots by Types
+
+Finding the mean of each based on the newly created Types
+
+```r
+mean(Punks$Slots[non_human])
+```
+
+```
+## [1] 2.22467
+```
+
+```r
+mean(Punks$Slots[human])
+```
+
+```
+## [1] 2.785479
+```
+We can see that on average, **human** type punks have more slots than **non_human** type punks. 
+
+---
+
+## Box Plots
+
+We could compare the slots for the different types of punks with a side by side boxplot.
+
+
+```r
+qplot(Type, Slots, geom = "boxplot", data = Punks, main = "Box Plot of Slots by Types")
+```
+
+&lt;img src="1-1-Motivating-Example-Crypto-Punk_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Your Turn
+
+Try playing with chunks of code from this session to further investigate the Punks data:
+
+1. Get a summary of the Crypto values.
+2. Make a boxplot comparing Crypto for different Skins.
+3. Find the average slots for the pale (Alien, Albino, Light) and dark (Dark, Mid).
+
+&lt;br&gt; &lt;br&gt; 
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Answers
+
+### 1 
+
+```r
+summary(Punks$Crypto)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+##    0.01    0.30    1.00    2.39    2.90  189.99   10000
+```
+
+---
+
+### 2
+
+```r
+qplot(Skin, Crypto, geom = "boxplot", data = Punks, main = "Box Plot of Crypto by Skins")
+```
+
+&lt;img src="1-1-Motivating-Example-Crypto-Punk_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+### 3
+
+```r
+pale &lt;- (Punks$Skin %in% c("Alien", "Albino", "Light"))
+dark &lt;- (Punks$Skin %in% c("Dark", "Mid"))
+mean(Punks$Slots[pale])
+```
+
+```
+## [1] 2.748796
+```
+
+```r
+mean(Punks$Slots[dark])
+```
+
+```
+## [1] 2.808334
+```
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
