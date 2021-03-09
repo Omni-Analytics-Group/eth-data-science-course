@@ -19,7 +19,6 @@ Our ultimate vision is to spur and inspire the next generation of developers thr
 * [Reading Files](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html)
 * [Basics](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html)
 * [Data structures](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html)
-* Reshaping with dplyr
 
 Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
 
