@@ -1,7 +1,7 @@
 # Learning Data Science on the Ethereum Blockchain with [@OmniAnalytics](https://twitter.com/OmniAnalytics)
 
 <p align="center">
-<img src="images/cover_art.png">
+<img src="images/omnianalytics-Classroom_gif-optimized.gif">
 </p>
 
 ## Description
