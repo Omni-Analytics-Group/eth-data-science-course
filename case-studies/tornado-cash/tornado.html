@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Tornado.Cash Analysis</title>
+    <title>Tornado.Cash Airdrop Analysis</title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Tornado.Cash Analysis <br> <br> <br> <br> <br>
+# Tornado.Cash Airdrop Analysis <br> <br> <br> <br> <br>
 ### Omni Analytics Group
 
 ---
@@ -24,7 +24,7 @@ class: center, middle, inverse, title-slide
 
 ## Tornado Cash
 
-Tornado.cash is a fully autonomous, decentralized transaction mixer that provides private value transfers on the Ethereum blockchain. On December 17th, a Decentralized Autonomous Organization was formed around the Tornado.Cash protocol, and it's native token `$vTORN` was distributed to early adopters and users of the service.  As it stands, the `$vTRON` tokens have a 45 day lock up where transfers have been disabled until governance has decided on the best way forward.  Having said that, it is quite common for token's "airdropped" on to users to have some fair market trade value.  
+Tornado.cash is a fully autonomous, decentralized transaction mixer that provides private value transfers on the Ethereum blockchain. On December 17th, a Decentralized Autonomous Organization was formed around the Tornado.Cash protocol, and its native token `$vTORN` was distributed to early adopters and users of the service.  As it stands, the `$vTRON` tokens have a 45 day lock up where transfers have been disabled until governance decides on the best way forward.  Having said that, it is quite common for tokens "airdropped" on to users to have some fair market trade value.
 
 ---
 
@@ -102,7 +102,7 @@ torn %&gt;%
 ---
 
 ## Number Of Tokens 
-First, we can convert the `Raw` column to the number of TORN TOkens by simply dividing it by `\(10^(18)\)`. 
+First, we can convert the `Raw` column to the number of TORN TOkens by simply dividing it by `\(10^{18}\)`. 
 
 
 ```r
@@ -116,7 +116,7 @@ torn %&gt;% summarise( sum = sum(TORN))
 ##    &lt;dbl&gt;
 ## 1 500000
 ```
-We can see that we have a total of `\(50000\)` TORN Tokens.
+We can see that we have a total of `\(500,000\)` TORN Tokens.
 
 &lt;p align="right"&gt;
 
@@ -200,7 +200,7 @@ We chose the following market capitalizations:
 along with some other recent air drops: 
 &lt;b&gt; `$Badger2MCap`, `$MIR17MCap`, `$1Inch164MCap`, `$UNI734MCap` &lt;/b&gt;.
 
-For instance, to get &lt;b&gt; Val1MCap &lt;/b&gt;, we will need the price of the token to be $2 as we have `\(500000\)` tokens. 
+For instance, to get a market capitalization of `$1,000,000` (&lt;b&gt; Val1MCap &lt;/b&gt;), we will need the price of the token to be `$2` as we have `\(500,000\)` tokens. 
 
 ---
 
@@ -482,7 +482,7 @@ formattable(summary_t,
 ---
 ## Conclusion
 
-
+Speculating on the value of the future `\(TORN\)` token, the median airdrop recipient would get `$13,300.56` from their 66.54 tokens if the market capitalization of the protocol reaches a "modest" `$100 Million`. That's quite a few cups of coffee!
 
 &lt;p align="right"&gt;
 
