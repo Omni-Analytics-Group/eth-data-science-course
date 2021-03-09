@@ -1,4 +1,4 @@
-# Learning Data Science on the Ethereum Blockchain with [the Omniacs](https://twitter.com/OmniAnalytics)
+# Learning Data Science on the Ethereum Blockchain with the [Omniacs](https://twitter.com/OmniAnalytics)
 
 <p align="center">
 <img src="images/omnianalytics-Classroom_gif-optimized.gif">
