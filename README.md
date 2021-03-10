@@ -12,6 +12,8 @@ We aspire to create a modular online course to help new blockchain developers un
 
 Our ultimate vision is to spur and inspire the next generation of developers through interesting applications of data science to emerging blockchain technologies.
 
+Gitcoin Grant Link: https://gitcoin.co/grants/562/learning-data-science-on-the-ethereum-blockchain-
+
 ## Tentative Course Outline
 
 [Module 1 - Basic Data Structures and Munging](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%201)
