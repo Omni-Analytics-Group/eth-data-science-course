@@ -88,7 +88,7 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 
 ## Testimonials
 
-"This course is like a rain following a drought. It kindly walks you through the process starting from the use of R to introduction of graphs and machine learning concepts with interesting case studies. I strongly recommend it not only to researchers interested in Ethereum blockchain but also to any students or professionals that have interest in learning data analysis and science." - [Will Shin](https://www.linkedin.com/in/wooil-s-51308353/) ([Klaytn](https://www.klaytn.com) Principal Economist)
+"This course is like a rain following a drought. It kindly walks you through the process starting from the use of R to introduction of graphs and machine learning concepts with interesting case studies. I strongly recommend it not only to researchers interested in Ethereum blockchain but also to any students or professionals that have interest in learning data analysis and science." - [Will Shin](https://www.linkedin.com/in/wooil-s-51308353/) (Principal Economist at [Klaytn](https://www.klaytn.com))
 
 ## Featured Projects
 
