@@ -86,9 +86,14 @@ We'll initially focus on the statistical language R, but then expand to Python. 
 *Can I request a topic?*  
 Sure! Once we flesh out the initial course material. If funding persists, we'd be more than happy to take suggestions on case studies or topics.
 
+## Testimonials
+
+"This course is like a rain following a drought. It kindly walks you through the process starting from the use of R to introduction of graphs and machine learning concepts with interesting case studies. I strongly recommend it not only to researchers interested in Ethereum blockchain but also to any students or professionals that have interest in learning data analysis and science." - [Will Shin](https://www.linkedin.com/in/wooil-s-51308353/) ([Klaytn](https://www.klaytn.com) Principal Economist)
+
 ## Featured Projects
 
 * [CryptoPunks](https://www.larvalabs.com/cryptopunks)
 * [Crypto Art Pulse](https://cryptoartpulse.com/)
 * [Numerai](https://numer.ai/)
 * [Tornado Cash](https://tornado.cash/)
+
