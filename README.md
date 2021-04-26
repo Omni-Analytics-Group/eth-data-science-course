@@ -67,7 +67,7 @@ Change log
 For Round 9 we've doubled down on our "case study first" approach to teaching data science using projects on the Ethereum blockchain as examples. This update includes a look at NFTs, stable coins, market capitalization estimation, and an introduction to GraphQL.  We expanded two of our original case studies to include Python version, so if you are interested in learning more about that language you can check those out here and here.  This update also includes our first attempt at creating video lectures for the eager learners who would like to dive deeper into the concepts. We intend to use funding from this round to further expand out the set of case studies we produce and improve the quality of our video content.
 
 Change log
-* Major update to the course aesthatics
+* Major update to the course aesthetics
 * Module 1 updated
 * 5 New case studies (with 2 more to be published during the active grant round)
 * First video lecture published to Youtube
