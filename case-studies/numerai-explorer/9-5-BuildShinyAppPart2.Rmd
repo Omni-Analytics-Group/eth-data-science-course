@@ -1,7 +1,7 @@
 ---
 title: "Build Shiny App Part 2"
 output:
-  ioslides_presentation: 
+  ioslides_presentation:
     smaller: true
 ---
 
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 
 ## The era-table data
 
-Let's load the data and use the R shiny template provided in 9-2-ShinyStructure
+Let's load the data and use the R shiny template provided in 9-2-ShinyStructure.
 
 ```{r}
 era_table <- read.csv("data/era_table.csv", header=T)
@@ -20,11 +20,11 @@ ui <- fluidPage(
 
   # Application title
   titlePanel("Title"),
-  
+
   sidebarPanel(
     # Define some inputs here
   ),
-  
+
   mainPanel(
     # output (from the server) go here
   )
@@ -41,12 +41,12 @@ server <- function(input, output) {
 
 1. Change the title to "Era".
 2. In the sidebarPanel, create a <b> slideInput </b> so the user can pick an Era ranging from 1 to 120.
-3. In the mainPanel, display a line plot x is the first column and y is the second column using <b> ggplot2 </b>. 
+3. In the mainPanel, display a line plot, where, x is the first column and y is the second column using <b> ggplot2 </b>.
 
 
 ##
 
-### 1. 
+### 1.
 ```{r}
 titlePanel("Era")
 ```
@@ -75,8 +75,8 @@ output$eraplot <- renderPlot({
 ```
 
 
-##
-Lastly, we can add a textoutput telling us what the y-value is for each corresponding era the user picked in the slider. Note that, the y-value is actually the number of rows in each era in the training data. 
+## textOutput
+Lastly, we can add a textoutput telling us what the y-value is for each corresponding era the user picked in the slider. Note that, the y-value is actually the number of rows in each era in the training data.
 
 ```{r}
 #in UI
@@ -84,19 +84,12 @@ textOutput("erainfo1")
 
 #in Server
 output$erainfo1 <- renderText({
-        paste0("There are ", era_table$n[era_table$era==input$era1], 
+        paste0("There are ", era_table$n[era_table$era==input$era1],
                " rows corresponding to era", input$era1, ".")
   })  
 ```
 
 ## Second app done!
-You can download the code part2.R and make sure it is in the same directory of the folder dataforshiny. 
+You can download the code part2.R and make sure it is in the same directory as the folder dataforshiny. 
 
 <center><img src="images/part2.PNG" width=600px height=500px></center>
-
-
-
-
-
-
-
