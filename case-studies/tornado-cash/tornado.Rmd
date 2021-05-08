@@ -12,7 +12,7 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
-      
+
 ---
 
 ```{r setup, include=FALSE}
@@ -22,13 +22,13 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ## Tornado Cash
 
-Tornado.cash is a fully autonomous, decentralized transaction mixer that provides private value transfers on the Ethereum blockchain. On December 17th, a Decentralized Autonomous Organization was formed around the Tornado.Cash protocol, and its native token `$vTORN` was distributed to early adopters and users of the service.  As it stands, the `$vTRON` tokens have a 45 day lock up where transfers have been disabled until governance decides on the best way forward.  Having said that, it is quite common for tokens "airdropped" on to users to have some fair market trade value.
+Tornado.cash is a fully autonomous, decentralized transaction mixer that provides private value transfers on the Ethereum blockchain. On December 17th, a Decentralized Autonomous Organization was formed around the Tornado.Cash protocol, and its native token `$vTORN` was distributed to early adopters and users of the service.  As it stands, the `$vTRON` tokens have a 45 day lock up where transfers have been disabled until governance decides on the best way forward.  Having said that, it is quite common for tokens to be "airdropped" to users, which have some fair market trade value.
 
 ---
 
 ## Motivation
 
-This case study will be speculative in nature and involve the procurement of the data, transforming variables using a few common themes we've learned from other cryptocurrency analysis, and end with a set of estimates of the average expected dollar value of the tokens a recipient will gain.
+This case study will be speculative in nature and will involve the procurement of the data, the transformation of variables using a few common themes we've learned from other cryptocurrency analysis. The final step will be to calculate set of estimates of the average expected dollar value of the tokens a recipient will gain.
 
 We will be using the following libraries:
 
@@ -50,7 +50,7 @@ library(scales)
 ## The Data
 For data, we'll use the open sourced table of wallet addresses and the raw amounts supplied by the team within their announcement: https://github.com/tornadocash/airdrop/blob/master/airdrop.csv.
 
-We took the liberty and named the columns as `Wallet Address` and `Raw`. Below are the first few columns of the data:
+We named the columns `Wallet Address` and `Raw`. Below are the first few columns of the data:
 
 ```{r}
 torn <- read_csv("airdrop.csv")
@@ -62,14 +62,14 @@ torn %>%
 
 ---
 
-## Number Of Tokens 
-First, we can convert the `Raw` column to the number of TORN TOkens by simply dividing it by $10^{18}$. 
+## Number Of Tokens
+First, we can convert the `Raw` column to the number of TORN TOkens by simply dividing it by $10^{18}$.
 
 ```{r}
 torn <- torn %>% mutate(TORN = Raw/10^(18))
 torn %>% summarise( sum = sum(TORN))
 ```
-We can see that we have a total of $500,000$ TORN Tokens.
+We have a total of $500,000$ TORN Tokens.
 
 <p align="right">
 
@@ -85,18 +85,18 @@ Now let us look a the summary statistics of these TORN Tokens.
 ```{r}
 summary(torn$TORN)
 ```
-From the summary, we can see that the mean is slightly higher than the third quartile and the maximum is very big compared to the rest. 
+From the summary, we can see that the mean is slightly higher than the third quartile and the maximum is very large compared to the others.
 
 
 ---
 
 ## Distribution of TORN Tokens
 
-Let's take a look at the distribution of the TORN Tokens using `ggplot2` and `scales` packages. 
+Let's take a look at the distribution of the TORN Tokens using `ggplot2` and `scales` packages.
 
 ```{r, eval = FALSE}
 torn %>% ggplot(aes(x=TORN))+ geom_histogram(color="darkblue", fill="lightblue", boundary=0)+
-  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+ 
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
   scale_x_continuous(breaks = scales::pretty_breaks(n=20))+
   labs(title = "Distribution of TORN Tokens", x = "TORN Tokens")
 ```
@@ -110,7 +110,7 @@ torn %>% ggplot(aes(x=TORN))+ geom_histogram(color="darkblue", fill="lightblue",
 
 ```{r, echo = FALSE}
 torn %>% ggplot(aes(x=TORN))+ geom_histogram(color="darkblue", fill="lightblue", boundary=0)+
-  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+ 
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
   scale_x_continuous(breaks = scales::pretty_breaks(n=20))+
   labs(title = "Distribution of TORN Tokens", x = "TORN Tokens")
 ```
@@ -118,9 +118,9 @@ torn %>% ggplot(aes(x=TORN))+ geom_histogram(color="darkblue", fill="lightblue",
 ---
 
 ## Log transformation
-Since there are many huge values (outliers), we can use log transform the x-axis to have a better sense of the distribution via `scale_x_log10()`.
+Since there are many large values (outliers), we can log transform the x-axis to have a better sense of the distribution via `scale_x_log10()`.
 
-Also, note that we created `scaleFUN` to make sure it displays 2 decimals.
+Also, note that we created `scaleFUN` to make sure it displays with 2 decimals.
 
 ```{r, eval = FALSE}
 scaleFUN <- function(x) sprintf("%.2f", x)
@@ -154,20 +154,20 @@ torn %>% ggplot(aes(x=TORN))+
 
 The market capitalization of a token is simply: Number of Tokens * The price of the token. We will assume that the $500000$ tokens are the only tokens in existence.
 
-We chose the following market capitalizations: 
+We chose the following market capitalizations:
 <b> Val1MCap, Val2MCap, Val5MCap, Val10MCap, Val25MCap, Val50MCap, Val100MCap, Val250MCap, Val500MCap, Val1BCap </b>
 
-along with some other recent air drops: 
+Along with some other recent air drops:
 <b> `$Badger2MCap`, `$MIR17MCap`, `$1Inch164MCap`, `$UNI734MCap` </b>.
 
-For instance, to get a market capitalization of `$1,000,000` (<b> Val1MCap </b>), we will need the price of the token to be `$2` as we have $500,000$ tokens. 
+For example, to get a market capitalization of `$1,000,000` (<b> Val1MCap </b>), we will need the price of the token to be `$2` as we have $500,000$ tokens.
 
 ---
 
-Let's create these the table where we have the dollar value of each of `Wallet Address` based on the market capitalization. We Can simply multiply by the appropriate price of the token with the number of tokens for each row as follows:
+Let's create a table where we have the dollar value of each `Wallet Address` based on the market capitalization. We can simply multiply by the appropriate price of the token with the number of tokens for each row as follows:
 
 ```{r}
-cap <- torn %>% 
+cap <- torn %>%
   select(TORN) %>%
   mutate(Val1MCap = TORN*2,
          '$Badger2MCap' = TORN*4,
@@ -181,7 +181,7 @@ cap <- torn %>%
          Val250MCap = TORN*500,
          Val500MCap = TORN*1000,
          '$UNI734MCap' = TORN*1468,
-         Val1BCap = TORN*2000) 
+         Val1BCap = TORN*2000)
 ```
 
 ---
@@ -204,12 +204,12 @@ cap %>%
 
 For simplicity, we can use the following summary statistics to give an overview of what people can expect:
 
-<b> Maximum, 90th percentile, 75th percentile, Median, Mean, 25th percentile, 10th percentile, Minimum </b> 
+<b> Maximum, 90th percentile, 75th percentile, Median, Mean, 25th percentile, 10th percentile, Minimum </b>
 
-We will first use `gather()` to pivot the table into a long table so we can `group_by()` market capitalization.
+We will use `gather()` to pivot the table into a long table so we can `group_by()` market capitalization.
 
 ```{r}
-summary <- cap %>% 
+summary <- cap %>%
   gather() %>%
   group_by(key) %>%
   summarise(Max = max(value),
@@ -228,8 +228,8 @@ summary <- cap %>%
 summary
 ```
 
-## Readibility  
-For readibility, let's transpose the table, round the values to 2 decimals, and reorder the market capitalization as follows. 
+## Readability  
+For readability, let's transpose the table, round the values to 2 decimals, and reorder the market capitalization as follows:
 
 ```{r}
 summary_t <- t(summary)
@@ -252,7 +252,7 @@ summary_t <- as.data.frame(summary_t) %>%
          Val500MCap,
          '$UNI734MCap',
          Val1BCap)
-  
+
 ```
 
 ---
@@ -263,8 +263,8 @@ summary_t
 
 ---
 
-## Formattable 
-To make it prettier, we can use `formattable` to create colors based on the values as follows:
+## Formattable
+To make the plot more attractive, we can use `formattable` to create colors based on the values as follows:
 
 ```{r, eval = FALSE}
 colortile <- function(min.color = "lightpink", max.color = "lightgreen", fun = "currency") {
@@ -299,7 +299,7 @@ formattable(summary_t,
 ---
 ## Conclusion
 
-Speculating on the value of the future $TORN$ token, the median airdrop recipient would get `$13,300.56` from their 66.54 tokens if the market capitalization of the protocol reaches a "modest" `$100 Million`. That's quite a few cups of coffee!
+Speculating on the value of future $TORN$ tokens, the median airdrop recipient would get `$13,300.56` from their 66.54 tokens if the market capitalization of the protocol reaches a "modest" `$100 Million`. That's quite a few cups of coffee!
 
 <p align="right">
 
