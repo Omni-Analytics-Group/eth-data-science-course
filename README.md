@@ -44,7 +44,7 @@ Data Sources: *Numerai Tournament Data, UniSwap*
 Module 4 - Case Studies
 * [Clustering and segmenting Ethereum validator performance](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/case-studies/validators) ([R](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/#1), [Python](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/Validator%20Case%20Study.html), [Video](https://youtu.be/2JLRnKmlV8I))
 * [Visualizing slashings in the Ethereum Medalla testnet](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/case-studies/slashers) ([R](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/slashers/#1), [Python](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/Validator%20Case%20Study.html))
-* [Reconstructing the Crypto Sentiment Investment Curve in ggplot2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/investment-curve/#1) 
+* [Reconstructing the Crypto Sentiment Investment Curve in ggplot2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/investment-curve/#1)
 * [Interacting with and Analyzing Numerai Network Growth with GraphQL and ggplot2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-growth/#1)
 * [Tornado.Cash Initial Distribution Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/tornado-cash/#1)
 * [Stable Coin Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/stable-coins/#1)
@@ -64,7 +64,7 @@ Change log
 
 *Gitcoin Grant Round 9*
 
-For Round 9 we've doubled down on our "case study first" approach to teaching data science using projects on the Ethereum blockchain as examples. This update includes a look at NFTs, stable coins, market capitalization estimation, and an introduction to GraphQL.  We expanded two of our original case studies to include Python version, so if you are interested in learning more about that language you can check those out here and here.  This update also includes our first attempt at creating video lectures for the eager learners who would like to dive deeper into the concepts. We intend to use funding from this round to further expand out the set of case studies we produce and improve the quality of our video content.
+For Round 9 we've doubled down on our "case study first" approach to teaching data science using projects on the Ethereum blockchain as examples. This update includes a look at NFTs, stable coins, market capitalization estimation, and an introduction to GraphQL.  We expanded two of our original case studies to include Python version, so if you are interested in learning more about that language you can check those out here and here.  This update also includes our first attempt at creating video lectures for the eager learners who would like to dive deeper into the concepts. We intend to use funding from this round to further expand the set of case studies we produce and improve the quality of our video content.
 
 Change log
 * Major update to the course aesthetics
@@ -96,4 +96,3 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 * [Crypto Art Pulse](https://cryptoartpulse.com/)
 * [Numerai](https://numer.ai/)
 * [Tornado Cash](https://tornado.cash/)
-
