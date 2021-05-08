@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Stable Coins Analysis</title>
+    <title>Stable Coins Analysis          </title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
     <script src="libs/kePrint-0.0.1/kePrint.js"></script>
@@ -26,7 +27,7 @@ class: center, middle, inverse, title-slide
 
 Stablecoins are cryptocurrencies designed to minimize the volatility of the price of a crypto asset.  When functioning properly, the values of these coins do not fluctuate relative to some basket of assets. A stablecoin can be pegged to a cryptocurrency, fiat money, or to exchange-traded commodities (such as precious metals or industrial metals).
 
-The &lt;b&gt;denome&lt;/b&gt; created a youtube video: https://youtu.be/2vvHqQ0QCrQ, where he ranked some properties of the some stable coins as follows:
+The &lt;b&gt;denome&lt;/b&gt; created a YouTube video: https://youtu.be/2vvHqQ0QCrQ, where he ranked some properties of the some stablecoins as follows:
 
 &lt;p align="center"&gt;
 
@@ -55,7 +56,7 @@ library(stats)
 
 ## The Data
 
-Using the rankings from the youtube video, we have the following table:
+Using the rankings from the YouTube video, we have the following table:
 
 
 ```r
@@ -177,14 +178,14 @@ stab %&gt;%
 
 ## Dimensionality Reduction
 
-For better visualization of the ranking of these stable coins, we will perform Principal Component Analysis.
+For better visualization of the ranking of these stablecoins, we will perform Principal Component Analysis.
 
 
 ```r
 pc &lt;- prcomp(stab %&gt;% select(-Coin), scale = TRUE)
 ```
 
-Using the `factoextra` package, we can easily visualize the components. 
+Using the `factoextra` package, we can easily visualize the components.
 
 &lt;br&gt; &lt;br&gt;
 &lt;p align="left"&gt;
@@ -205,7 +206,7 @@ fviz_eig(pc)
 
 ---
 
-## Biplot 
+## Biplot
 
 
 ```r
@@ -220,7 +221,7 @@ fviz_pca_biplot(pc, repel = TRUE, # Avoid text overlapping
 
 ## Readibility
 
-Most of the time we read things from left to right (low to high) and down to up (low to high), so let's flip the signs of the principal components. 
+Most of the time we read things from left to right (low to high) and down to up (low to high), so let's flip the signs of the principal components.
 
 
 ```r
@@ -254,11 +255,11 @@ fviz_pca_biplot(pc, repel = TRUE, # Avoid text overlapping
 
 From the biplot, we see the following:
 
-* A stable coin being on the right side of the graph will have a higher score compared to being on the left side. 
+- A stablecoin being on the right side of the graph will have a higher score compared to being on the left side.
 
-* A stable coin being on the top side of the graph will have a higher score in terms of Transparency, Security, and Lawful compared to those on the bottom side. 
+- A stablecoin being at the top of the graph will have a higher score in terms of Transparency, Security, and Lawful compared to those at the bottom.
 
-* A stable coin being on the bottom side of the graph will have a higher score in terms of Yield, Liquidity and Price Stability compared to those on the top side. 
+- A stablecoin being at the bottom of the graph will have a higher score in terms of Yield, Liquidity and Price Stability compared to those at the top.
 
 &lt;p align="center"&gt;
 
@@ -269,7 +270,7 @@ From the biplot, we see the following:
 ---
 
 ## Plot 1
-We can use `geom_point()` from `ggplot2` to create a simple plot as well. 
+We can use `geom_point()` from `ggplot2` to create a simple plot as well.
 
 ```r
 pc$x %&gt;% as_tibble() %&gt;% ggplot(aes(x = PC1, y = PC2)) + geom_point()
@@ -280,9 +281,9 @@ pc$x %&gt;% as_tibble() %&gt;% ggplot(aes(x = PC1, y = PC2)) + geom_point()
 ---
 
 ## Coins' Symbols
-Let's show the coins' names and the coins' symbols in the plot as well! We have the coins' names in the `stab` table. We also have the coins' symbols in our images folder. They are downloaded from the CoinGecko website: https://www.coingecko.com/en. 
+Let's show the coins' names and symbols in the plot as well! We have the coins' names in the `stab` table. We also have the coins' symbols in our images folder. They are downloaded from the CoinGecko website: https://www.coingecko.com/en.
 
-We will create a table with the principal components, coins' names and the paths to the coins' symbols as follows: 
+We will create a table with the principal components, coins' names and the paths to the coins' symbols as follows:
 
 
 ```r
@@ -299,8 +300,8 @@ Using `geom_image()` and `geom_label()`, we have the following plot:
 
 
 ```r
-ggplot(data = mypc, aes(x = PC1, y = PC2)) + geom_point() + 
-  geom_image(aes(image = Path), size = 0.08) + 
+ggplot(data = mypc, aes(x = PC1, y = PC2)) + geom_point() +
+  geom_image(aes(image = Path), size = 0.08) +
   geom_label(aes(label = Coin), alpha = 0.8)
 ```
 
@@ -310,9 +311,9 @@ ggplot(data = mypc, aes(x = PC1, y = PC2)) + geom_point() +
 ## Plot 3
 To finalize the plot, we will do the following:
 
-* Add dividers at `\(x=0\)` and `\(y=0\)` using `geom_hline()` and `geom_vline()`
-* Add title and axis label using `labs()`
-* Include some interpretations in the plot using `scale_y_continuous` and `scale_x_continuous`
+- Add dividers at `\(x=0\)` and `\(y=0\)` using `geom_hline()` and `geom_vline()`
+- Add title and axis label using `labs()`
+- Include some interpretations in the plot using `scale_y_continuous` and `scale_x_continuous`
 
 
 ```r
@@ -344,7 +345,7 @@ p3
 
 ## Conclusion
 
-Utilizing denome's stable coin data we've been able to create a projection that places each asset along two composite dimensions. The vertical `Focus` axis differentiates coins according to whether they were designed to be secure or an accessible investment.  The horizontal axis looks at the overall values, assigning higher scores to the coins that scored high on each attribute. In the end we've used statistical techniques to make it easier for us to select a stable coin that's best aligned with our needs.
+Utilizing denome's stable coin data we've been able to create a projection that places each asset along two composite dimensions. The vertical `Focus` axis differentiates coins according to whether they were designed to be secure or an accessible investment.  The horizontal axis looks at the overall values, assigning higher scores to the coins that scored high on each attribute. In the end we've used statistical techniques to make it easier for us to select a stablecoin that's best aligned with our needs.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
