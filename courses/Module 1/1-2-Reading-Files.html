@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Reading Files</title>
+    <title>Reading Files      </title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="classroom.css" type="text/css" />
@@ -27,19 +28,19 @@ class: center, middle, inverse, title-slide
 
 ## Importing Data
 
-We often need to import in our own data rather than just using built-in datasets.
+We often need to import our own data rather than just using built-in datasets. The following steps are usually taken:
 
-- First need to tell R where the data is saved using `setwd()`
-- Data read in using R functions such as:
+- First we need to tell R where the data is saved using `setwd()`.
+- Data is then read in using R functions such as:
     - `read.table()` for reading in .txt files
     - `read.csv()` for reading in .csv files
-- Assign the data to new R object when reading in the file
+- Assign the data to a new R object when reading in the file.
 
 ---
 
 ## Importing Data Demo
 
-We first create a .csv file. We can use a text editor, excel... Then we load it in:
+We first create a .csv file. We can use a text editor, excel, etc. Then we load the file in:
 
 
 ```r
@@ -53,7 +54,7 @@ crypto_art &lt;- read.csv("crypto_art_pulse.csv")
 --
 
 ## Data in Excel
-Formats xls and csv - what's the difference? File extensions .xls or .xlsx are proprietary Excel formats, they are binary files .csv is the extension for comma separated value files. They are text files - and directly readable.
+Excel has file formats such as xls and csv - so what are the differences? File extensions .xls or .xlsx are proprietary Excel formats, they are binary files. .csv is the extension for comma separated value files. They are text files - and are directly readable.
 
 ---
 
@@ -82,9 +83,9 @@ Text files, usually comma separated or tabular separated (space) can both be rea
 read.csv(file, header = TRUE, sep = ",", quote = "\\"",
  dec = ".", fill = TRUE, comment.char = "", ...)
 ```
-For a comma separated file, we set `sep = ","` else for a tabular separated file use `sep = ""`
+For a comma separated file, we set `sep = ","` otherwise, for a tabular separated file we use `sep = ""`.
 
-&lt;br&gt; &lt;br&gt; 
+&lt;br&gt; &lt;br&gt;
 &lt;p align="left"&gt;
 
 &lt;img src="images/Cut_outs/Cut_out_08.png"  width="200px" height="150px"&gt;
@@ -92,8 +93,8 @@ For a comma separated file, we set `sep = ","` else for a tabular separated file
 &lt;/p&gt;
 ---
 
-## Reading .csv File
- 
+## Reading .csv Files
+
 
 ```r
 Punks &lt;- read.csv("punks.csv")
@@ -143,7 +144,7 @@ str(Punks)
 ---
 
 ## Reading Excel File
-Need another package: `readxl`
+We need to install another package to read excel files: `readxl`
 
 
 ```r
@@ -175,13 +176,13 @@ head(Punks2)
 ## Your Turn
 Using the crypto_art_pulse.csv file, do the following:
 
-1. Read the data into an object called crypto_art. 
+1. Read the data into an object called crypto_art.
 
 2. Use the `head()` function to display some rows.
 
 3. Use the `str()` function to see each variable type.
 
-&lt;br&gt; 
+&lt;br&gt;
 &lt;p align="right"&gt;
 
 &lt;img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="150px"&gt;
