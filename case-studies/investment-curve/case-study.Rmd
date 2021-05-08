@@ -12,7 +12,7 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
-      
+
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ## The Investment Curve
 
-As much as we love the technology, we can not escape the financial aspect of cryptocurrency.  When hype takes hold price movement, both up and down, come swiftly and boldly.  These movements aren't too foreign to the markets and have actually been well studied.  Dr. Jean-Paul Rodrigue of Hofstra University created the a diagram to depict the change in sentiment and interest of an asset which, according to his research, are the fundamental causes of the extreme volatility. As part of our R course, in this brief case study we'll walk you through the recreation of Dr. Rodrigue's famous graph using the ggplot2 library.
+As much as we love the technology, we can not escape the financial aspect of cryptocurrency.  When hype takes hold, price movements, both up and down, come swiftly and boldly.  These movements aren't too foreign to the markets and have actually been well studied.  Dr. Jean-Paul Rodrigue of Hofstra University created the a diagram to depict the change in sentiment and interest of an asset which, according to his research, are the fundamental causes of the extreme volatility. As part of our R course, in this brief case study we'll walk you through the recreation of Dr. Rodrigue's famous graph using the ggplot2 library.
 
 
 <p align="center">
@@ -35,7 +35,7 @@ As much as we love the technology, we can not escape the financial aspect of cry
 
 ## Motivation
 
-Because we were interested in making some enhancements to the original graph, we decided that we'd produce a version in `ggplot2`, slowly building up the individual layers of the graph, to best match the appearance of the original. This mean both generating data that matched the curvature of the plot itself, as well as utilizing the immense theme-ing and customization capabilities that the `ggplot2` platform provides. Let's get started! 
+Because we were interested in making some enhancements to the original graph, we decided that we'd produce a version in `ggplot2`, slowly building up the individual layers of the graph, to best match the appearance of the original. This mean both generating data that matched the curvature of the plot itself, as well as utilizing the immense theme-ing and customization capabilities that the `ggplot2` platform provides. Let's get started!
 
 We will be using the following libraries:
 
@@ -55,7 +55,7 @@ library(kableExtra)
 
 ## Process (Curve)
 
-To begin re-creating this in `ggplot2`, we used a data extraction tool which roughly approximates data in the X and Y plane matching the red line. This compromises 280 points in order to match the granularity of the original. The first few rows are shown below:
+To begin re-creating this in `ggplot2`, we used a data extraction tool which roughly approximates data in the X and Y plane matching the red line. This comprises 280 points to match the granularity of the original. The first few rows are shown below:
 
 ```{r}
 cv <- read_csv("data/Investment_Bubble_Cycle.csv") %>%
@@ -70,7 +70,7 @@ cv %>%
 
 ## Process (Linear Trend)
 
-The same procedure was done to extract data for the linear fit that runs on a positive slope through the plot. The first few rows of data are shown below:
+The same procedure was used to extract data for the linear fit that runs on a positive slope through the plot. The first few rows of data are shown below:
 
 ```{r}
 ln <- read_csv("data/Investment_Bubble_Cycle_Line.csv") %>%
@@ -86,13 +86,13 @@ ln %>%
 
 ## Initial plot <img src="stickers/pen1.png"  width="100px" height="100px">
 
-With the data at hand, we can produce our first plot to see how well the line approximates the curve. The `geom_line()` function handles both the straight dashed line, by specifying the linetype aesthetic, and the curvy colored red line. Remember that when you hard-code a value, such as "red", or "dashed", the aesthetic mapping should NOT be specified within the `aes()` call, but rather outside of it. Also, the `size = 1.5` is to increase the thickness of the red curve.
+With the data at hand, we can produce our first plot to see how well the line approximates the curve. The `geom_line()` function handles both the straight dashed line, by specifying the linetype aesthetic, and the curvy colored red line. Remember that when you hard-code a value, such as "red", or "dashed", the aesthetic mapping should NOT be specified within the `aes()` function call, but rather outside of it. Also, the `size = 1.5` is to increase the thickness of the red curve.
 
 
 ```{r}
 p1 <- ggplot(data = ln, aes(x = X, y = Y)) +
     geom_line(linetype = "dashed") +
-    geom_line(data = cv, colour = "red", size = 1.5) 
+    geom_line(data = cv, colour = "red", size = 1.5)
 
 ```
 
@@ -104,13 +104,13 @@ p1
 
 ---
 
-## Labeling
+## Labelling
 
 It's a start! Next let's go ahead and label the various portions of the curve as is done in the original image. Unfortunately, there are no real shortcuts here - We have to manually specify the X / Y position of the text labels to keep it consistent with the original as follows.
 
 1. Get the points where the labels are by using the indexes in the cv table.
-2. Create a `Label` column for the labels
-3. Using `ifelse()`, we adjust the position for each label as needed. 
+2. Create a `Label` column for the labels.
+3. Using `ifelse()`, we adjust the position for each label as needed.
 
 <p align="left">
 
@@ -148,10 +148,10 @@ mapping = tibble(
 
 ---
 
-Now that we have the `mapping` table, we will use `geom_text()` to show the labels on the plot. 
+Now that we have the `mapping` table, we will use `geom_text()` to show the labels on the plot.
 
 ```{r}
-p2 <- p1 + 
+p2 <- p1 +
     geom_text(data = mapping, aes(label = Label), vjust = -1.5, fontface = "bold", size = 3.5)
 p2
 ```
@@ -160,7 +160,7 @@ p2
 
 ## Plot Sections
 
-Now let's divide the plot into the Smart Money, Institutional Investors, and Public regions as per the original, as well as the different phases. First, we will need to create another table manually using cv table as follows:
+Now let's divide the plot into the Smart Money, Institutional Investors, and Public regions as per the original, as well as the different phases. First, we will need to create another table manually using the cv table as follows:
 
 ```{r}
 verticals <- tibble(
@@ -211,7 +211,7 @@ p4
 
 ## Final Steps
 
-Now the similarities are really starting to take shape. The primary component left is to stylize the axes and other elements of the theme. In particular, we remove axis ticks and labels using `element_blank()`, and modify the panel border to span the left and bottom edges, with an arrow at each end using `element_line()` and `element_text()`. This allows us to then move and place the Valuation and Time labels much like in the original chart.
+Now the graph is really starting to take shape. The last component requires styling the axes and other elements of the theme. In particular, we remove axis ticks and labels using `element_blank()`, and modify the panel border to span the left and bottom edges, with an arrow at each end using `element_line()` and `element_text()`. This allows us to then move and place the Valuation and Time labels much like in the original chart.
 
 <p align="right">
 
@@ -226,7 +226,7 @@ Now the similarities are really starting to take shape. The primary component le
 p5 <- p4 + theme(
     axis.ticks = element_blank(),
     axis.text = element_blank(),
-    panel.border = element_blank(), 
+    panel.border = element_blank(),
     axis.line = element_line(size = 1.5, colour = "grey55", arrow = grid::arrow(length = unit(0.3, "cm"))),
     axis.title = element_text(size = 16, face = "bold", hjust = 1),
     axis.title.y = element_text(angle = 0, margin = margin(l = 20, r = -80)),
