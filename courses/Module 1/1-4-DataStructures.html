@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Data Structures</title>
+    <title>Data Structures      </title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="classroom.css" type="text/css" />
@@ -22,13 +23,12 @@ class: center, middle, inverse, title-slide
 
 ## Data Frames
 
-- Data Frames are the work horse of R objects
-- Structured by rows and columns and can be indexed
-- Each column is a specified variable type
-- Columns names can be used to index a variable
-- Advice for naming variable applys to editing columns names
-- Can be specified by grouping vectors of equal length as columns
-
+- Data frames are the work horse of R objects.
+- They are structured by rows and columns and can be indexed.
+- Each column is a specified variable type.
+- Column names can be used to index a variable.
+- Advice for naming variables, stated earlier in the course, applies to editing column names.
+- Can be specified by grouping vectors of equal length as columns.
 
 &lt;br&gt; &lt;br&gt;
 &lt;p align="right"&gt;
@@ -40,25 +40,25 @@ class: center, middle, inverse, title-slide
 
 ## Data Frame Indexing
 
-- Elements indexed similar to a vector using `[` `]`
-- `df[i,j]` will select the element in the `\(i^{th}\)` row and `\(j^{th}\)` column
-- `df[ ,j]` will select the entire `\(j^{th}\)` column and treat it as a vector
-- `df[i ,]` will select the entire `\(i^{th}\)` row and treat it as a vector
-- Logical vectors can be used in place of i and j used to subset the row and columns
+- Elements indexed similar to a vector using `[` `]`.
+- `df[i,j]` will select the element in the `\(i^{th}\)` row and `\(j^{th}\)` column.
+- `df[ ,j]` will select the entire `\(j^{th}\)` column and treat it as a vector.
+- `df[i ,]` will select the entire `\(i^{th}\)` row and treat it as a vector.
+- Logical vectors can be used in place of i and j to subset the row and columns.
 
 --
 
 ## Adding a New Variable to a Data Frame
 
-- Create a new vector that is the same length as other columns
-- Append new column to the data frame using the `$` operator
-- The new data frame column will adopt the name of the vector
+- Create a new vector that is the same length as other columns.
+- Append the new column to the data frame using the `$` operator.
+- The new data frame column will adopt the name of the vector.
 
 ---
 
 ## Data Frame Demo
 
-Loading previously used Punks data set:
+Loading the previously used Punks data set:
 
 
 ```r
@@ -83,14 +83,14 @@ Punks[,c(6,10)]
 
 ## Demo (Continued)
 
-Select ID column with the `$` operator:
+Select the ID column with the `$` operator:
 
 
 ```r
 Punks$ID
 ```
 
-We now determine the row location, in our data, where the ID is 9117.
+We now determine the row location in our data where the ID is 9117.
 
 ```r
 punk_9126 &lt;- Punks$ID == 9126 # Creates vector of T/F values if the entry is 9999.
@@ -142,7 +142,7 @@ Creating our own data frame using the `data.frame()` function:
 
 
 ```r
-mydf &lt;- data.frame(NUMS = 1:5, 
+mydf &lt;- data.frame(NUMS = 1:5,
                    LETS = letters[1:5],
                    PUNK_TYPES = c("Male", "Female", "Alien", "Ape", "Zombie"))
 mydf
@@ -200,7 +200,7 @@ mydf
 
 ---
 
-## Your Turn 
+## Your Turn
 
 1. Construct a data frame where column 1 contains any 5 Punks and column 2 is their Slot number.
 2. Select only the rows where the Slot number is even.
@@ -222,7 +222,7 @@ mydf
 
 
 ```r
-mydf &lt;- data.frame(Punk = c(0,1,2,3,4), 
+mydf &lt;- data.frame(Punk = c(0,1,2,3,4),
                    Slot = c(3,2,1,3,4)
                    )
 mydf
@@ -257,7 +257,7 @@ mydf[c(2,5),]
 ### 3.
 
 ```r
-alien &lt;- Punks$Type == "Alien" 
+alien &lt;- Punks$Type == "Alien"
 which(alien == TRUE)
 ```
 
@@ -270,10 +270,10 @@ which(alien == TRUE)
 
 ## Lists
 
-- Lists are a structured collection of R objects
-- R objects in a list need not be the same type
-- Create lists using the `list` function
-- Lists indexed using double square brackets `[[ ]]` to select an object
+- Lists are a structured collection of R objects.
+- R objects in a list do not need to be the same type.
+- Create lists using the `list` function.
+- Lists are indexed using double square brackets `[[ ]]` to select an object.
 
 ---
 ## List Example
@@ -303,7 +303,7 @@ mylist
 
 ---
 ## List Example (Continued)
-Note that unlike data frames, list can contain elements of varying sizes and structures.
+Note that unlike data frames, lists can contain elements of varying sizes and structures.
 
 Use indexing to select the second list element:
 
@@ -317,10 +317,10 @@ mylist[[3]] # Selections third argument in mylist
 
 ---
 
-## Your Turn 
+## Your Turn
 
-1. Create a list containing `mydf` as well as a vector of length 7 containing different Punk Skins
-2. Use indexing to select mydf from your list
+1. Create a list containing `mydf` as well as a vector of length 7 containing different Punk Skins.
+2. Use indexing to select mydf from your list.
 
 
 &lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
@@ -366,7 +366,7 @@ mylist[[1]]
 - `tail(x)` - View bottom 6 rows of a data frame
 - `summary(x)` - Summary statistics   
 - `str(x)` - View structure of object  
-- `dim(x)` - View dimensions of object 
+- `dim(x)` - View dimensions of object
 - `length(x)` - Returns the length of a vector
 
 ---
@@ -391,7 +391,7 @@ head(Punks, n = 2) # n = 2 displays only the first two rows.
 
 ---
 ## Examining Objects Demo (Continued)
-What's its structure?
+What is Punks structure?
 
 
 ```r
@@ -416,10 +416,10 @@ str(Punks)
 
 ---
 
-## Your Turn 
+## Your Turn
 
-1. View the last 4 rows of Punks data
-2. How many rows are in Punks data set? (try finding this using dim or indexing + length)
+1. View the last 4 rows of the Punks data set.
+2. How many rows are in Punks data set? (try finding this using dim or indexing + length).
 
 
 &lt;br&gt; &lt;br&gt; &lt;br&gt;
@@ -476,17 +476,17 @@ dim(Punks)[1] #Picks first output element
 
 ## Working with Output from a Function
 
-- Can save output from a function as an object
-- An object is generally a list of output objects
-- Can pull off items from the output for further computing
-- Examine objects using functions like `str()`
+- You can save the output from a function as an object.
+- An object is generally a list of output objects.
+- You can extract items from the output for further computing.
+- Examine objects using functions like `str()`.
 
 --
 
 ## Saving Output Demo
 
-- Apply t-test using the Punks data set to see if the Sale Price in Crypto for punks with 1 slot and 7 slots are statistically different
-- `t.test()` can only handle two groups, so we subset out the every other slots.
+- Apply a t-test using the Punks data set to see if the Sale Price in Crypto for punks with 1 slot and 7 slots are statistically different
+- `t.test()` can only handle two groups, so we use a subset of the other slots.
 
 ---
 
@@ -513,7 +513,7 @@ tout
 ## mean in group 1 mean in group 7 
 ##        4.520519       37.633333
 ```
-An interpretation of this is that there is not a statistical difference in the average sale price in Crypto between the 1 and 7 slots Punks. 
+An interpretation of this is that there is not a statistical difference in the average sale price in Crypto between the 1 and 7 slot Punks.
 
 ---
 
@@ -571,7 +571,7 @@ tout[[3]]
 
 ## Your Turn
 
-1. Pull the p-value from t.test comparing the difference between Sale Price in USD from the 2 and 4 Slots.
+1. Return the p-value from t.test comparing the difference between Sale Price in USD from the 2 and 4 Slots.
 2. What does this p-value imply?
 
 &lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
@@ -608,7 +608,7 @@ tout
 ---
 
 ### 2.
-Since p = 0.5839 &gt; 0.05, there is no significant difference in the means of the two groups. From this we can claim that the Punks with 2 slots and 4 slots are sold at similar price.
+Since p = 0.5839 &gt; 0.05, there is no significant difference in the means of the two groups. From this we can claim that the Punks with 2 slots and 4 slots were sold at similar price.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
