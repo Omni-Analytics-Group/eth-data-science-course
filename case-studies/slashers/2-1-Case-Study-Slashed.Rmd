@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, cache = FAL
 options(htmltools.dir.version = FALSE)
 ```
 
-## Case study 
+## Case study
 
 - Explore and perform analysis on a real dataset using R
 - Goal: get good understanding of using R for data management, exploration, and analysis
@@ -28,9 +28,9 @@ options(htmltools.dir.version = FALSE)
 
 ## What is Ethereum?
 
-Ethereum is a technology that lets you send cryptocurrency to anyone for a small fee. It also powers applications that everyone can use and no one can take down. It's the world's programmable blockchain and a marketplace of financial services, games and apps that can't steal your data or censor you. 
+Ethereum is a technology that lets you send cryptocurrency to anyone for a small fee. It also powers applications that everyone can use and no one can take down. It's the world's programmable blockchain and a marketplace of financial services, games and apps that can't steal your data or censor you.
 
-Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/. 
+Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/.
 
 <p align="center">
 
@@ -41,7 +41,7 @@ Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Che
 
 ## Slot-Slashed Dataset
 
-This dataset is obtained from the Beacon Scan block explorer, where it provides the information on 1751 slashed validators. Being slashed means that a significant part of the validator’s stake is removed: up to the whole stake of 32 ETH in the worst case. Validator software and staking providers will have built-in protection against getting slashed accidentally. Slashing should only affect validators who misbehave deliberately. For more info, please visit https://codefi.consensys.net/blog/rewards-and-penalties-on-ethereum-20-phase-0. 
+This dataset is obtained from the Beacon Scan block explorer, where it provides the information on 1751 slashed validators. Being slashed means that a significant part of the validator’s stake is removed: up to the whole stake of 32 ETH in the worst case. Validator software and staking providers will have built-in protection against getting slashed accidentally. Slashing should only affect validators who misbehave deliberately. For more info, please visit https://codefi.consensys.net/blog/rewards-and-penalties-on-ethereum-20-phase-0.
 
 ## Why do validators get slashed?
 
@@ -63,7 +63,7 @@ Let's load the data and look at the first few rows. Here, we will use the <b> ti
 #load library
 library(tidyverse)
 #Load data
-df_slashed <- read.csv("slot-slashed.csv") 
+df_slashed <- read_csv("slot-slashed.csv")
 #Show 5 random rows of the data
 sample_n(df_slashed,5)
 ```
@@ -72,7 +72,7 @@ sample_n(df_slashed,5)
 ---
 
 
-## The variables 
+## The variables
 
 The 7 variables are:
 
@@ -85,7 +85,7 @@ The 7 variables are:
 * `reason` - The reason why the validator was slashed.
 
 ---
-We begin our analysis with some high level statistics. Let's summarize the data using the <b> skim() </b> function from the <b> skimr </b> package. This command produces a simple summary table of centrality and spread statistics of our collected features. 
+We begin our analysis with some high level statistics. Let's summarize the data using the <b> skim() </b> function from the <b> skimr </b> package. This command produces a simple summary table of centrality and spread statistics of our collected features.
 
 
 ```{r, eval = FALSE}
@@ -99,9 +99,9 @@ skim(df_slashed)
 
 ---
 
-We see that the data consists of 1751 rows, 2 character columns and 5 numeric columns. 
+We see that the data consists of 1751 rows, 2 character columns and 5 numeric columns.
 
-Let's get the numbers of unique values in each column via <b> summarise_all() </b> and <b> n_distinct </b>. 
+Let's get the numbers of unique values in each column via <b> summarise_all() </b> and <b> n_distinct </b>.
 
 --
 
@@ -110,20 +110,20 @@ df_slashed %>% summarise_all(n_distinct)
 ```
 
 --
-Thus, we have 1647 unique validators that were slashed and they were slashed by 771 unique validators for only 2 reasons. 
+Thus, we have 1647 unique validators that were slashed and they were slashed by 771 unique validators for only 2 reasons.
 
 ---
 
 ## Time series
 
-Let's find out how many validators are slashed over time. 
+Let's find out how many validators are slashed over time.
 
-1. Sort the data by 'epoch' using <b> arrange() </b> 
+1. Sort the data by 'epoch' using <b> arrange() </b>.
 2. Count the number of each 'epoch' group using <b> group_by() </b> and <b> summarise(n()) </b>
 
 
 ```{r}
-num_slashed <- df_slashed %>% 
+num_slashed <- df_slashed %>%
   arrange(epoch) %>%
   group_by(epoch) %>%  
   summarise(count = n())
@@ -133,7 +133,7 @@ head(num_slashed)
 
 ---
 
-We can plot a time series using <b> geom_line </b> from the <b> ggplot2 </b> package to see how the number changes over time. 
+We can plot a time series using <b> geom_line </b> from the <b> ggplot2 </b> package to see how the number changes over time.
 
 --
 
@@ -188,18 +188,18 @@ The first large spike in slashings occurs around epoch 3000 and another smaller 
 
 Next, we can investigate how often a slash occurs. We need to take a few steps:
 
-1. Create 'previousepoch' which is simply a 'epoch' shifted one row up 
-2. Create 'epochelapsed' by subtracting 'previousepoch' from 'epoch'
-3. Remove the rows where 'epochelapsed' is 0 by using <b> filter() </b> just to exclude slashings that occur within the same epoch.
-4. Compute summary statistics
+1. Create 'previousepoch' which is simply a 'epoch' shifted one row up.
+2. Create 'epochelapsed' by subtracting 'previousepoch' from 'epoch'.
+3. Remove the rows where, 'epochelapsed' is 0 by using <b> filter() </b> just to exclude slashings that occur within the same epoch.
+4. Compute summary statistics.
 
 --
 
 ```{r}
-Epochelapsed <- df_slashed %>% 
+Epochelapsed <- df_slashed %>%
   mutate(previousepoch = c(tail(epoch,-1),0)) %>%
   mutate(epochelapsed = epoch - previousepoch) %>%
-  filter(epochelapsed !=0) 
+  filter(epochelapsed !=0)
 
 Epochelapsed %>%
   summarise(
@@ -211,7 +211,7 @@ Epochelapsed %>%
 
 ---
 
-From the summary, we can see that approximately 40 epochs elapse between slashings on average, excluding slashings that occur in the same epoch. Let's plot the histogram so we can investigate further. 
+From the summary, we can see that approximately 40 epochs elapse between slashings on average, excluding slashings that occur in the same epoch. Let's plot the histogram so we can investigate further.
 
 .pull-left[
 ```{r p3, eval=FALSE}
@@ -237,7 +237,7 @@ We can see that it is very common that less than 25 epochs will elapse between s
 
 We can find out more about the epoch elapsed between slashings.
 
-1. Verify the fact that about 41% of the 'epochelapsed' is 1. 
+1. Verify the fact that about 41% of the 'epochelapsed' is 1.
 2. Draw a red timeseries of 'epochelapsed' using 'previousepoch' and give it a title.  
 
 <br> <br>
@@ -252,9 +252,9 @@ We can find out more about the epoch elapsed between slashings.
 
 ### 1.
 ```{r}
-Epochelapsed %>% 
+Epochelapsed %>%
   group_by(epochelapsed) %>%
-  summarise(n = n()) %>% 
+  summarise(n = n()) %>%
   mutate(percentage = n / sum(n)*100)
 ```
 
@@ -281,9 +281,9 @@ Epochelapsed %>%
 
 ## Why are the validators slashed?
 
-Of the three ways a validator can violate consensus rules, there are only two such categories of offenses: attestation rule and proposer rule violations. Let's create a histogram that shows the percentage of each reason why a validator was slashed. 
+Of the three ways a validator can violate consensus rules, there are only two such categories of offenses: attestation and proposer rule violations. Let's create a histogram that shows the percentage of each reason why a validator was slashed.
 
-One way to do it is similar to what we have been doing. we use <b> group_by </b> and <b> summarise(n()) </b> to get the data. Here, we can use <b> geom_col() </b> as we want to plot a bar chart as it is. 
+One method is similar to what we have been doing. We use <b> group_by </b> and <b> summarise(n()) </b> to get the data. Here, we can use <b> geom_col() </b> to plot a bar chart as is.
 
 .pull-left[
 ```{r p5, eval=FALSE}
@@ -294,7 +294,7 @@ df_slashed %>%
   scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
   labs(title="Number of slashes per reason")
 ```
-We can also adjust the width and color as you can see here.]
+We can also adjust the width and color.
 
 
 .pull-right[
@@ -304,14 +304,14 @@ We can also adjust the width and color as you can see here.]
 
 ---
 
-We can do it another way by only using <b> ggplot2 </b> package. 
+Another method is to use the <b> ggplot2 </b> package.
 
-W will use <b> geom_bar() </b> here and we can use <b> ..count.. </b> for counting. Let's also add a label that shows the percentage of each reason using <b> geom_text() </b> and <b> scales::percent() </b>. 
+We will use <b> geom_bar() </b> here and <b> ..count.. </b> for counting. Let's also add a label that shows the percentage of each reason using <b> geom_text() </b> and <b> scales::percent() </b>.
 
 --
 .pull-left[
 ```{r p6, eval=FALSE}
-ggplot(df_slashed, aes(x= reason)) + 
+ggplot(df_slashed, aes(x= reason)) +
   geom_bar(aes(y = ..count..),width=0.5, fill="steelblue") +
   geom_text(aes(label= scales::percent(..count../sum(..count..))), stat= "count", vjust = -0.25)+
   scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
@@ -333,9 +333,9 @@ The distribution is skewed heavily towards attestation rule violations as they e
 
 Interestingly, this distribution has not been constant over time. Let's find out exactly how it changes over time. To do so, we can do the following:
 
-1. Convert 'reason' to factor
-2. Group by 'epoch' and 'reason' 
-3. Count each group using <b> tally() </b> (alternative function to <b> summarise(n()) </b>)
+1. Convert 'reason' to a factor.
+2. Group by 'epoch' and 'reason'.
+3. Count each group using <b> tally() </b> (alternative function to <b> summarise(n()) </b>).
 
 --
 
@@ -347,7 +347,7 @@ num_slashed_over_epoch_reason <- df_slashed %>%
   tally()
 head(num_slashed_over_epoch_reason)
 ```
-Notice that it is necessary for us to convert 'reason' to factor so that we can have 0 in our count, and to keep the 0, '.drop = FALSE' is needed. 
+Notice that it is necessary for us to convert 'reason' to a factor so that we can have 0 in our count. To keep the 0, '.drop = FALSE' is needed.
 ]
 
 
@@ -359,7 +359,7 @@ Notice that it is necessary for us to convert 'reason' to factor so that we can 
 
 ---
 
-Now that we have the table, we can easily produce a time series of showing the numbers of the reason over time. Let's also use the <b> facet_wrap() </b> function to separate the time series by reason.
+Now that we have the table, we can easily produce a time series showing the numbers of reasons over time. Let's also use the <b> facet_wrap() </b> function to separate the time series by reason.
 
 --
 
@@ -381,7 +381,7 @@ num_slashed_over_epoch_reason %>%
 ]
 
 ---
-The plot is great but we can barely see the graph on the right as the frequency is dominated by the graph on the left. Let's fix that by using <b> scales="free_y" </b> so that each graph has its own y-scale. 
+The plot is great but we can barely see the graph on the right as the frequency is dominated by the graph on the left. Let's fix that by using <b> scales="free_y" </b> so that each graph has its own y-scale.
 
 --
 
@@ -396,7 +396,7 @@ ggplot(data=num_slashed_over_epoch_reason, aes(x=epoch, y=n, group = reason, col
   scale_x_continuous(breaks = scales::pretty_breaks(n=10))+
   scale_y_continuous(breaks = scales::pretty_breaks(n=15))
 ```
-Despite the proposer rule offenses being rare throughout all epochs it was, interestingly enough, the very first offense committed by a validator on the network. Overtime proposer violations have becoming more frequent as shown in the subsequent time series graphs.]
+Despite the proposer rule offenses being rare throughout all epochs, it was interestingly enough, the very first offense committed by a validator on the network. Overtime proposer violations have becoming more frequent as shown in the subsequent time series graphs.
 
 
 .pull-right[
@@ -408,12 +408,12 @@ Despite the proposer rule offenses being rare throughout all epochs it was, inte
 
 ## Your Turn
 
-Create a time series of the cumulative number of the reason similar to the previous slide
+1. Create a time series of the cumulative number of reasons similar to the previous example.
 
-Hint: you will need to use <b> group_by() </b> twice here. 
+Hint: you will need to use <b> group_by() </b> twice here.
 
 
-<br> <br> <br> <br> 
+<br> <br> <br> <br>
 <p align="right">
 
 <img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px">
@@ -451,16 +451,16 @@ cumul_num_slashed_over_epoch_reason %>%
 
 
 ---
-## Slashed or Be Slashed
+## Slash or Be Slashed
 
 Let's turn our attention to the distribution of number of slashings received and the number of slashings performed.
 
 .pull-left[
 ```{r, echo = FALSE, fig.height=6}
-df_slashed %>% 
+df_slashed %>%
   group_by(slashedBy) %>%
   summarise(Freq = n()) %>%
-  ggplot(aes(x=Freq)) + 
+  ggplot(aes(x=Freq)) +
   geom_histogram(color="darkblue", fill="lightblue",boundary=0)+
   labs(title="Distribution of the Number of Slashings Performed by a Validator", x="Number of slashings", y="Frequency", subtitle = "For Validators with at least one slashing")+
   scale_x_continuous(breaks = seq(0, 100, by = 5))+
@@ -470,10 +470,10 @@ df_slashed %>%
 
 .pull-right[
 ```{r, echo = FALSE, fig.height=6}
-df_slashed %>% 
+df_slashed %>%
   group_by(validatorSlashed) %>%
   summarise(Freq = n()) %>%
-  ggplot(aes(x=Freq)) + 
+  ggplot(aes(x=Freq)) +
   geom_bar(color="darkblue", fill="lightblue")+
   labs(title="Distribution of the Number of Slashings Received by a Validator", y="Frequency",subtitle = "For Validators with at least one slashing")+
   scale_x_continuous(breaks = seq(1, 7, by = 1))+
@@ -484,10 +484,10 @@ df_slashed %>%
 ---
 ## Your Turn
 
-We can see that, of the validators that have slashed, most have only done slashings once or twice. Similarly, most validators, who have been slashed, have received only one or two lashings, and only a handful of them have been slashed more than 2 times. 
+We can see that, of the validators that have slashed, most have only done slashings once or twice. Similarly, most validators, who have been slashed, have received only one or two slashings, and only a handful of them have been slashed more than 2 times.
 
 
-Recreate those two plots on your own! 
+1. Recreate those two plots on your own!
 
 Hint: One uses <b> geom_hist() </b> and the other uses <b> geom_bar() </b>.
 
@@ -497,9 +497,9 @@ Hint: One uses <b> geom_hist() </b> and the other uses <b> geom_bar() </b>.
 
 FIrst plot:
 ```{r, eval = FALSE}
-df_slashed %>% 
+df_slashed %>%
   group_by(slashedBy) %>% summarise(Freq = n()) %>%
-  ggplot(aes(x=Freq)) + 
+  ggplot(aes(x=Freq)) +
   geom_histogram(color="darkblue", fill="lightblue",boundary=0)+
   labs(title="Distribution of the Number of Slashings Performed by a Validator", x="Number of slashings", y="Frequency", subtitle = "For Validators with at least one slashing")+
   scale_x_continuous(breaks = seq(0, 100, by = 5))+
@@ -509,9 +509,9 @@ df_slashed %>%
 
 Second plot:
 ```{r, eval = FALSE}
-df_slashed %>% 
+df_slashed %>%
   group_by(validatorSlashed) %>% summarise(Freq = n()) %>%
-  ggplot(aes(x=Freq)) + 
+  ggplot(aes(x=Freq)) +
   geom_bar(color="darkblue", fill="lightblue")+
   labs(title="Distribution of the Number of Slashings Received by a Validator", y="Frequency",subtitle = "For Validators with at least one slashing")+
   scale_x_continuous(breaks = seq(1, 7, by = 1))+
@@ -521,9 +521,9 @@ df_slashed %>%
 
 ---
 
-## Validator Data 
+## Validator Data
 
-To learn more about the validators, we will bring in a second dataset that is also obtained from the Beacon Scan block explorer. To learn more about the data set, you can read our case study on it as well. In short, this data set provides the following information on any given validator:
+To learn more about the validators, we will bring in a second dataset that was also obtained from the Beacon Scan block explorer. To learn more about the data set, you can read our case study. In short, this data set provides the following information about any given validator:
 
 * `X` - The row index of the validator.
 * `publickey` - The public key identifying the validator.
@@ -539,17 +539,17 @@ To learn more about the validators, we will bring in a second dataset that is al
 
 ---
 
-## How long before a validator get slashed or slash others?
+## How long before a validator gets slashed or slashes others?
 
-We have the 'epoch' when a validator was slashed and also their 'activationEpoch'. Thus, the difference will answer how long before a validator get slashed. However, we have some validators who was slashed more than once, we will need to get the rows where the first slashing occurs for each unique validator, i.e. the minimum difference.
+We have the 'epoch' when a validator was slashed and also their 'activationEpoch'. Thus, the difference will answer how long before a validator gets slashed. However, we have some validators who were slashed more than once . Therefore, we will need to get the rows where the first slashing occurs for each unique validator, i.e. the minimum difference.
 
-However, 'epoch' and 'activationEpoch' are in different data set. Thus, we need to first combine these two datasets using the validator index. Since we want the 'activationEpoch' of the validator that was slashed, we will join the two tables on 'validatorSlashed' and 'index' via <b> inner_join() </b>. 
+However, 'epoch' and 'activationEpoch' are in different data sets. Thus, we need to first combine these two datasets using the validator index. Since we want the 'activationEpoch' of the validator that was slashed, therefore, we will join the two tables on 'validatorSlashed' and 'index' via <b> inner_join() </b>.
 
-Also, we need to convert 'activationEpoch' to numeric values. 
+Also, we need to convert 'activationEpoch' to numeric values.
 
 ```{r}
-df_validator <- read.csv("validator_data.csv", header=T)
-df_join_slashed <- df_slashed %>% 
+df_validator <- read_csv("validator_data.csv", header=T) %>%
+df_join_slashed <- df_slashed %>%
   inner_join(df_validator, by = c("validatorSlashed"="index")) %>%
   mutate(SlashedActivation = as.numeric(ifelse(activationEpoch == "genesis", 0, activationEpoch)))
 
@@ -558,12 +558,12 @@ df_join_slashed <- df_slashed %>%
 
 ---
 
-To find out how long before a validator get slashed, we will do the following:
+To find out how long before a validator gets slashed, we will do the following:
 
-1. Create 'timetoslashed' by subtracting 'SlashedActivation' from 'epoch' using <b> mutate() </b>
-2. Get the mininimum 'timetoslashed' of each group <b> group_by </b> and <b> slice(which.min()) </b>
-3. Use <b> ungroup() </b> to ungroup the data so we can compute summary statistics
-4. Compute summary statistics using <b> summarise() </b>
+1. Create 'timetoslashed' by subtracting 'SlashedActivation' from 'epoch' using <b> mutate() </b>.
+2. Get the mininimum 'timetoslashed' of each group using <b> group_by </b> and <b> slice(which.min()) </b>.
+3. Use <b> ungroup() </b> to ungroup the data so we can compute summary statistics.
+4. Compute summary statistics using <b> summarise() </b>.
 
 --
 
@@ -591,12 +591,12 @@ df_join_slashed %>%
 
 Thus, on average, validators are slashed after 3919 epoch. Note that this average accounts for only validators who are slashed at least once. Similarly, we can compute 'timetoslash' to find out how long before a validator slashes others.
 
-All we need to do is change a few things from the code in previous two slides. Take a few minutes to figure out the code!
+All we need to do is change a few things in the code in the previous two slides. Take a few minutes to figure out the code!
 
 --
 
 ```{r}
-df_join_slasher <- df_slashed %>% 
+df_join_slasher <- df_slashed %>%
   inner_join(df_validator, by = c("slashedBy"="index")) %>%
   mutate(SlasherActivation = as.numeric(ifelse(activationEpoch == "genesis", 0, activationEpoch)))
 ```
@@ -620,20 +620,20 @@ df_join_slasher %>%
 .pull-right[
 ```{r t3-out, ref.label="t3", echo=FALSE}
 ```
-On average, a validator marks their first slash in the initial 3409 epochs after activation. The fastest first slash was found to occur only 4 epochs after activation, while the slowest first slash was 14892 epochs after activation.]
+On average, a validator marks their first slash in the initial 3409 epochs after activation. The fastest first slash was only 4 epochs after activation, while the slowest first slash was 14892 epochs after activation.
 
 ---
 
 ## Top Slashers
 
-In previous slide, we looked at the  Distribution of the Number of Slashings Performed by a Validator. There was a validator that has slashed others more than 90 times. We are interested to see who these frequent slashers are. 
+In the previous slide, we looked at the  Distribution of the Number of Slashings Performed by a Validator. There was a validator that has slashed by others more than 90 times. We are interested to see who these frequent slashers are.
 
-Since we have the data 'df_joined_slasher', we can easily get the information of these frequent slashers simply group by 'slashedBy' and arrange them according to their slashing frequency. 
+Since we have the data 'df_joined_slasher', we can easily get the information for these frequent slashers by simply grouping by 'slashedBy' and arranging them according to their slashing frequency.
 
 --
 
 ```{r, eval = FALSE}
-df_join_slasher %>% 
+df_join_slasher %>%
   group_by(slashedBy) %>%
   mutate(SlashingFrequency=n()) %>%
   select(slashedBy, currentBalance, effectiveBalance, proposed, activationEpoch, SlashingFrequency) %>%
@@ -646,27 +646,27 @@ df_join_slasher %>%
 
 .center[![table1](images/table1.PNG)]
 
-The table shows the top 10 validators that have done the most slashings. These slashers have similar current balance and effective balance. Most of them were also active for a long period of time. According to the tier system we created on the Case Study we did on validator data, 8 out of these top 10 slashers reside in tier 3 where validators' performance becomes noticeably worse.
+The table shows the top 10 validators that have done the most slashings. These slashers have similar current and effective balances. Most of them were also active for a long period of time. According to the tier system we created on the case study we did on validator data, 8 out of these top 10 slashers reside in tier 3 where validator performance becomes noticeably worse.
 
 
 ---
 
 ## Visualizing the Slashings
 
-Due to the sink-source structure of the 'slashedBy' and 'validatorSlashed' columns, it allows us to treat the various slashes as directed edges in a directed graph. A directed graph consists of a set of nodes and directed edges, where the directed edges represent some relationship between the nodes. The nodes in this instance are the individual validators, and a directed edge exists between two nodes if one node has slashed the other. 
+Due to the sink-source structure of the 'slashedBy' and 'validatorSlashed' columns, it allows us to treat the various slashes as directed edges in a directed graph. A directed graph consists of a set of nodes and directed edges, where the directed edges represent some relationship between the nodes. The nodes in this instance are the individual validators, and a directed edge exists between two nodes if one node has slashed the other.
 
-We will use the <b> igraph </b> package to draw the directed graph. We first need to get a dataframe using 'slashedBy' and 'validatorSlashed'. Then, we use <b>graph_from_data_frame() </b> to get a network object that we can then plot.
+We will use the <b> igraph </b> package to draw the directed graph. We first need to get a dataframe with both 'slashedBy' and 'validatorSlashed'. Then, we use <b>graph_from_data_frame() </b> to get a network object that we can then plot.
 
 --
 
 ```{r p10, eval=FALSE}
 library(igraph)
 networkData <- data.frame(df_slashed$slashedBy,df_slashed$validatorSlashed)
-network <- graph_from_data_frame(networkData) 
+network <- graph_from_data_frame(networkData)
 plot(network,layout=layout.sphere(network),vertex.size=2, edge.arrow.size=0.01, vertex.label=NA, main="Whole network")
 ```
 
-Note that the order matters when we created the dataframe as we want the directed edge to point at 'validatorSlashed'. As you can see, we can customize how the graph looks with various parameters. 
+Note that the order matters when we created the dataframe as we want the directed edge to point at 'validatorSlashed'. As you can see, we can customize how the graph looks with various parameters.
 
 
 ---
@@ -679,7 +679,7 @@ Note that the order matters when we created the dataframe as we want the directe
 
 ---
 
-Since the whole network comprised of many vertices, we can decompose the network to all its connected subgraphs to have a better understanding using <b> decompose.graph() </b>. 
+Since the whole network is comprised of many vertices, we can decompose the network to all its connected subgraphs, to have a better understanding using <b> decompose.graph() </b>.
 
 .pull-left[
 ```{r t4, eval=FALSE}
@@ -693,7 +693,7 @@ length(dnetwork)
 ```
 ]
 
-We see that there are a total of 660 connected subgraphs. 
+We see that there are a total of 660 connected subgraphs.
 
 ---
 
@@ -718,11 +718,11 @@ for (i in 1:length(dnetwork)){
 
 which.max(num_vertices)
 max(num_vertices)
-  
+
 ```
 --
 
-Thus, the 86th subgraph has the 415 vertices, the highest number of vertices. 
+Thus, the 86th subgraph has 415 vertices, the highest number of vertices.
 
 ---
 
@@ -741,7 +741,7 @@ plot(dnetwork[[86]],layout=layout.davidson.harel(dnetwork[[86]]),vertex.size=5, 
 
 .pull-right[
 
-we can see 8 validators that have done a high number of slashes and each of them have a star structure as they never slash the same validator twice. 
+We can see 8 validators that have done a high number of slashes and each of them have a star structure as they never slash the same validator twice.
 
 ]
 
@@ -750,7 +750,7 @@ we can see 8 validators that have done a high number of slashes and each of them
 ## Your turn
 
 1. Find the second largest connected subgraph and its number of vertices.
-2. Plot the second largest connected subgraph
+2. Plot the second largest connected subgraph.
 
 Hint: use <b> sort() </b> and <b> which() </b>
 
@@ -783,13 +783,13 @@ plot(dnetwork[[70]],layout=layout.davidson.harel(dnetwork[[70]]),vertex.size=5, 
 
 ## Interesting observations
 
-There were two interesting observations about the slashing behavior that were particularly important to understanding the nature of the network visualizations. 
+There were two interesting observations about the slashing behavior that were particularly important in understanding the nature of the network visualizations.
 
-The first was that there was not one validator that had been slashed by the same validator twice. 
+The first was that there was not one validator that had been slashed by the same validator twice.
 
-The second observation we discovered was that there were no instances of "revenge slashing" in which a validator slashed a second validator, and then the second validator eventually slashed the first in return. 
+The second observation was that there were no instances of "revenge slashing" in which a validator slashed a second validator, and then the second validator eventually slashed the first in return.
 
-When you combine these two facts, it explains why all of the networks we produced were only simple directed graphs (i.e. it has no loops or multiple edges).
+When you combine these two facts, it explains why all of the networks we produced, were only simple directed graphs (i.e. it has no loops or multiple edges).
 
 ---
 
@@ -798,12 +798,12 @@ Through our analysis of ETH2's security mechanism for blockchain security known 
 
 * Less than 1% of the validators have been slashed or slashed someone else.
 * The number of attestation offenses vastly outweighed the number of proposer rule violations.
-* Slashings take place at a rate of only 6.3 per 100 epochs.
-* We identified presence of "super-slashers" who, despite their prevalence for slashing other validators, typically  didn't have the best performance themselves.
-* There was no evidence of "revenge" slashing, where a validator who was slashed reciprocated one.
+* Slashings takes place at a rate of only 6.3 per 100 epochs.
+* We identified the presence of "super-slashers" who, despite their prevalence for slashing other validators, typically  didn't have the best performance themselves.
+* There was no evidence of "revenge" slashing, where a validator who was slashed reciprocated.
 * No two pairs of slasher and slashed appeared twice in the data.
-* Slashing patterns in the network induce a simple star like structure when graphing the nodes and edges,
-* Complexity in the graphs come in the form of single link or multi link connections that expand with the number of slashings.
+* Slashing patterns in the network induce a simple star like structure when graphing the nodes and edges.
+* Complexity in the graphs comes in the form of single link or multi link connections that expand with the number of slashings.
 
 As the network of interconnected violators continues to grow, we expect the number of interesting sub-graphs to grow with it and represent some interesting dynamics in terms of the interaction between validators as it pertains to slashing.
 
@@ -819,17 +819,3 @@ As the network of interconnected violators continues to grow, we expect the numb
 * Breaking Down ETH 2.0 - Sharding Explained [https://academy.ivanontech.com/blog/breaking-down-eth-2-0-sharding-explained]
 * Rewards and Penalties on Ethereum 2.0 [Phase 0] [https://codefi.consensys.net/blog/rewards-and-penalties-on-ethereum-20-phase-0]
 * Ethereum 2.0 Explained | Part II | Phase 0 and the Beacon Chain [https://youtu.be/-qwSAFcicg8]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
