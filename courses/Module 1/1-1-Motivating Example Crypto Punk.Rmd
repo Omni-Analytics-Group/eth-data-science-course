@@ -21,15 +21,15 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ## Motivating Example
 
-- Explore a real data set using R
-- Goal: get good understanding of using R for data management and exploration 
-- Dont worry about understanding all coding right away
-- We will go back and explain how it all works in detail
- 
+- Explore a real data set using R.
+- The goal is to have a good understanding of using R for data management and exploration.
+- Don't worry about understanding all of the coding right away.
+- We will go back and explain how it all works in detail.
 
-## CryptoPunks 
 
-The CryptoPunks are 10,000 uniquely generated characters and each one of them are officially owned by a single person on the Ethereum blockchain. Originally, they were all claimed by for free. Now, you can buy, bid on, and offer punks for sale via the marketplace that's also embedded in the blockchain. 
+## CryptoPunks
+
+The CryptoPunks are 10,000 uniquely generated characters. Each of them is officially owned by a single person on the Ethereum blockchain. Initially, they were all claimed for free. Now, you can buy, bid on, and offer punks for sale via a marketplace that is also embedded in the blockchain.
 
 <p align="center">
 
@@ -40,13 +40,13 @@ The CryptoPunks are 10,000 uniquely generated characters and each one of them ar
 
 ## CryptoPunks Dataset
 
-- Shows sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020. 
-- Several pieces of info are accounted for
-  * Details of each sales
+- Shows sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020.
+- The dataset includes the following:
+  * Details of sales
   * Details of the Punk
   * Rarity Rank of the Punk
 
-Note that the data may not be 100 percent accurate!
+Note that the data may not be 100% accurate!
 
 #### Let's get started!
 
@@ -64,7 +64,7 @@ Punks <- read.csv("punks.csv")
 
 ## First look at data in R
 
-Let's use R to look at the top few rows of the Punks data set. The `head()` function allows you to look at first 6 rows of the data and `tail()` allows you to look at last 6 rows
+Let's use R to look at the top few rows of the Punks data set. The `head()` function allows you to look at first 6 rows of the data and `tail()` allows you to look at last 6 rows.
 
 ```{r}
 head(Punks)
@@ -78,7 +78,7 @@ The command `str()`, short for structure, gives us a summary of each variable al
 ```{r, fig.height=4, fig.width=7}
 str(Punks)
 ```
-As we can see the Punks data frame has 17554 observations (rows) and 12 variables (columns).
+The Punks data frame has 17554 observations (rows) and 12 variables (columns).
 
 ---
 
@@ -106,7 +106,7 @@ summary(Punks)
 
 ## Scatterplots
 
-Let's look at the relationship between Crypto and USD  First, we need to install and load ggplot2, a special package for plotting.
+Let's look at the relationship between Crypto and USD.  First, we need to install and load ggplot2, a special package for plotting and visualizations.
 
 ```{r, eval = F}
 install.packages("ggplot2")
@@ -118,7 +118,7 @@ library(ggplot2)
 
 Using the `qplot()` command we can create a simple scatter plot.
 
-Do not let the `qplot()` command or any of the parameters confuse you. We will discuss in detail this function in later lessons.
+Do not let the `qplot()` command or any of the parameters confuse you. We will discuss this function in detail in later lessons.
 ---
 
 ## Scatter Plot
@@ -152,7 +152,7 @@ We will make a new variable in the Punks data set to account for ratio between C
 
 ```{r}
 # Creates new column Ratio.of.Currency in Punks data
-Punks$Ratio.of.Currency <- Punks$USD / Punks$Crypto 
+Punks$Ratio.of.Currency <- Punks$USD / Punks$Crypto
 ```
 Notice that we had to place periods between words. R does not allow users to separate phrases with spaces.
 
@@ -163,12 +163,12 @@ Notice that we had to place periods between words. R does not allow users to sep
 </p>
 ---
 
-## Summary 
+## Summary
 ```{r}
 summary(Punks$Ratio.of.Currency)
 ```
 
-One way we can interpret this is to say that on average, 1 ETH is worth $328.00.
+One way we can interpret this as 1 ETH is worth $328.00 (at the time of writing).
 
 ## Column Names
 ```{r}
@@ -179,7 +179,7 @@ names(Punks) # Provides the name of each column
 
 ## Crypto Histogram
 
-We now plot a histogram of the Crypto to see its distribution.
+We now plot a histogram of Crypto to see its distribution.
 
 ```{r, fig.height = 5}
 qplot(Crypto, data = Punks, binwidth = 2.5, main = "Histogram of Crypto") # binwidth is the length of each rectangular bar
@@ -189,11 +189,11 @@ qplot(Crypto, data = Punks, binwidth = 2.5, main = "Histogram of Crypto") # binw
 
 ## Most expensive Punk that was last sold in the sample data
 
-We can look at the most expensive Punk that was last sold using `which.max()`. 
+We can look at the most expensive Punk that was last sold using `which.max()`.
 ```{r}
 Punks[which.max(Punks$Crypto),]
 ```
-Thus, the most expensive Punk is <b> Punk 3306 </b> sold at 189.99 ETH on December 30, 2020. 
+Thus, the most expensive Punk is <b> Punk 3306 </b> sold at 189.99 ETH on December 30, 2020.
 
 --
 ## Wait a minute!
@@ -203,13 +203,13 @@ Thus, the most expensive Punk is <b> Punk 3306 </b> sold at 189.99 ETH on Decemb
 Did you fact check this by visiting the official CryptoPunks website? Did you notice something strange when you looked up <b> Punk 3306 </b>?
 
 --
-It turns out that it's <b> Punk 3307 </b> sold at 189.99 ETH on December 30, 2020. This is a common 'off by one' mistake made in the data science world and it is something we need to be aware of as we learn more about the data. 
+It turns out that it's <b> Punk 3307 </b> that sold at 189.99 ETH on December 30, 2020. This is a common 'off by one' mistake made in the data science world and it is something we need to be aware of as we learn more about the data.
 
 
 ---
 ## Average Slots By Sex
 
-Looking at the average number of slots, we noticed that <b> Girl </b> and <b> Guy </b> punks have similar number of slots.  
+Looking at the average number of slots, we noticed that <b> Girl </b> and <b> Guy </b> punks have a similar number of slots.  
 
 ```{r}
 mean((Punks$Slots)[Punks$Sex == "Girl"])
@@ -218,15 +218,15 @@ mean((Punks$Slots)[Punks$Sex == "Guy"])
 
 As a breakdown:
 
-- `mean()` - provides mean of argument
-- `Punks$Slots` - selects the column in the nba data set named Minutes.Per.Game
+- `mean()` - provides the mean of argument
+- `Punks$Slots` - selects the Slots column in the Punks dataset
 - `[Punks$Sex == "XX"]` - subsets the column with the chosen Sex XX
 
 ---
 
 ## Combine Types
 
-We can label Alien, Ape and Zombie as non_humans, and similarly we can label Female and Male as humans.
+We can label Alien, Ape and Zombie as non_human, and similarly we can label Female and Male as human.
 
 This code works by creating new columns **non_human** and **human** by selecting the rows that contain `c("Alien", "Ape", "Zombie")` and `c("Female", "Male")` in the Position column, respectfully
 
@@ -248,7 +248,7 @@ Finding the mean of each based on the newly created Types
 mean(Punks$Slots[non_human])
 mean(Punks$Slots[human])
 ```
-We can see that on average, **human** type punks have more slots than **non_human** type punks. 
+We can see that, **human** type punks have more slots than **non_human** type punks.
 
 ---
 
@@ -266,11 +266,11 @@ qplot(Type, Slots, geom = "boxplot", data = Punks, main = "Box Plot of Slots by 
 
 Try playing with chunks of code from this session to further investigate the Punks data:
 
-1. Get a summary of the Crypto values.
+1. Summarize the Crypto values.
 2. Make a boxplot comparing Crypto for different Skins.
 3. Find the average slots for the pale (Alien, Albino, Light) and dark (Dark, Mid).
 
-<br> <br> 
+<br> <br>
 <p align="left">
 
 <img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="150px">
@@ -280,7 +280,7 @@ Try playing with chunks of code from this session to further investigate the Pun
 
 ## Answers
 
-### 1 
+### 1
 ```{r}
 summary(Punks$Crypto)
 ```

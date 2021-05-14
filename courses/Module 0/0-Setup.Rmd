@@ -1,7 +1,7 @@
 ---
 title: "Setup"
 output:
-  ioslides_presentation: 
+  ioslides_presentation:
     smaller: true
     css: css/styles.css
 ---
@@ -12,9 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Your Background
 
-What do you know already?
+What is your current knowledge of Data Science tools?
 
-- Excel, Numbers, Some sort of spreadsheet software
+- Excel, Numbers, A spreadsheet software
 - SAS, SPSS, Minitab
 - Any other programming language
 - R
@@ -22,15 +22,15 @@ What do you know already?
 
 ## Installing R
 
-Hopefully this is done already. Otherwise for Windows or OSX:
+Hopefully this has been completed already. Otherwise for Windows or OSX:
 
 - Go to http://www.r-project.org/
-- From CRAN, pick a download site 
-- Choose link based on your Operation System (OS)
+- From CRAN, pick a download site
+- Choose a link based on your Operation System (OS)
 - Choose the "base" subdirectory to install R.
   - "contrib" is useful for installing packages on computers without internet access
   - "Rtools" is needed for package development
-  
+
 
 ## Interacting With R
 
@@ -40,16 +40,9 @@ Hopefully this is done already. Otherwise for Windows or OSX:
 - Emacs + ESS
 - Eclipse + StatET
 
-## Get Use to RStudio
+## Learn RStudio
 
 We will be using Rstudio for the duration of this course. However, you are free to use any IDE of your choice.
 
 
 <center><img src="images/Rstudio.png" width="600px"></center>
-
-
-
-
-
-
-

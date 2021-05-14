@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>R Basics</title>
+    <title>R Basics      </title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="classroom.css" type="text/css" />
@@ -21,7 +22,7 @@ class: center, middle, inverse, title-slide
 
 
 ## Loading CryptoPunks Data set
-This data set displays the sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020. 
+This data set displays the sales of CryptoPunks since June 23rd, 2017 to December 30th, 2020.
 
 
 
@@ -68,7 +69,7 @@ head(Punks)
 ## Some Computations
 
 ### Addition and Subtraction
-How much more in ETH did Punk 3830 last sell for compared to Punk 1?
+How much more did Punk 3830 last sell for compared to Punk 1 in ETH?
 
 ```r
 99.99-60.00
@@ -127,13 +128,13 @@ What is the average sale price in ETH for Punk 0?
 
 ## Even More Functions
 
-- Exponentiation 
+- Exponentiation
   * `exp(x)`
-  
+
 - Logarithms
   * `log(x)`
   * `log(x, base = 10)`
-  
+
 - Trigonometric functions
   * `sin(x)`
   * `asin(x)`
@@ -145,14 +146,14 @@ What is the average sale price in ETH for Punk 0?
 ## Creating Variables
 
 We can create variables using the assignment operator `&lt;-`:
-  
+
 
 ```r
 alien.punk &lt;- 13
 ```
 
 We can then perform any of the functions on the variables:
-  
+
 
 ```r
 # Logarithm
@@ -185,13 +186,13 @@ alien.punk^2
 
 ## Rules for Variable Creation
 
-- Variable names can't start with a number
-- Variables in R are case-sensitive
+- Variable names can't start with a number.
+- Variables in R are case-sensitive.
 - Some common letters are used internally by R and should be avoided as variable names:
   * c, q, t, C, D, F, T, I
-- There are reserved words that R won't let you use for variable names e.g. 
+- There are reserved words that R won't let you use for variable names:
   * for, in, while, if, else, repeat, break, next
-- R will let you use the name of a predefined function. Try not to overwrite those though! 
+- R will let you use the name of a predefined function. Try not to overwrite those though!
 
 &lt;br&gt; &lt;br&gt;
 &lt;p align="center"&gt;
@@ -204,17 +205,17 @@ alien.punk^2
 ---
 
 ## Vectors
-  
+
 A variable does not need to be a single value. We can create a **vector** using the `c()` (combine) function:
-  
-What are the top 5 highest sales in ETH? 
+
+What are the top 5 highest sales in ETH?
 
 
 ```r
-y &lt;- c(189.99, 185, 150, 140, 100)  # Creates vector of top 5 highest sales
+y &lt;- c(189.99, 185, 150, 140, 100)  # Creates a vector of top 5 highest sales
 ```
 
-Operations will then be done element-wise. For example, We can do divide the vector by 5:
+Operations will then be done element-wise. For example, we can divide the vector by 5:
 
 
 ```r
@@ -229,11 +230,11 @@ y / 5
 
 ## Getting Help
 
-We will talk MUCH more about vectors in a later, but for now, let's talk about a couple ways to get help. The primary function to use is the `help` function. Just pass in the name of the function you need help with:
+We will talk MUCH more about vectors later, but for now, let's talk about a couple ways to get help. The primary function to use is the `help` function. Just pass in the name of the function you need help with:
 
 
 ```r
-help(head) 
+help(head)
 ```
 
 The `?` function also works:
@@ -243,13 +244,13 @@ The `?` function also works:
 ?head
 ```
 
-Googling for help is a bit hard. You might need to search for R + CRAN + (your query) to get good results
+Googling for help is a bit difficult. You may need to search for R + CRAN + (your query) to get good results.
 
 ---
 
 ## R Reference Card
 
-You can download and R reference card from:
+You can download and an R reference card from:
 
 http://cran.r-project.org/doc/contrib/Short-refcard.pdf
 
@@ -257,12 +258,12 @@ Having this open or printed off and near you while working is helpful until you 
 
 ---
 
-## Your Turn 
+## Your Turn
 
 Using the R Reference Card (and the Help pages, if needed), do the following:
 
-1. Find out how many rows and columns the CryptoPunks data set has using at least 2 ways.
-2. Create a vector with the number of slots for the top 5 sales in ETH.
+1. Find out how many rows and columns the CryptoPunks data set has using at least 2 methods.
+2. Create a vector with the top 5 sales in ETH.
 
 &lt;br&gt; &lt;br&gt; &lt;br&gt;
 
@@ -342,8 +343,8 @@ sum(top5) # Calculates the sum of the vector elements
 ## Data Frames Introduction
 
 - `Punks` is a data frame.
-- Data frames hold data sets
-- Not every column need be the same type - like an Excel spreadsheet
+- Data frames hold data sets.
+- Not every column needs be the same type - like an Excel spreadsheet.
 - Each column in a data frame is a vector - so each column needs to have values that are all the same type.
 - We can access different columns using the `$` operator.
 
@@ -370,7 +371,7 @@ a
 ## [1] 10 11 12 13 14 15
 ```
 
-We can extract the specific elements of the vector like so:
+We can extract the specific elements of the vector as follows:
 
 
 ```r
@@ -415,27 +416,27 @@ type[1:6] # Selects the 1st through 6th type
 
 ---
 
-## Logical Values
+## Logical Statements
 
-- R has built in support for logical values
-- TRUE and FALSE are built in.  T (for TRUE) and F (for FALSE) are supported but can be modified
-- Logicals can result from a comparison using
+- R has built in support for logical statements.
+- TRUE and FALSE are built in.  T (for TRUE) and F (for FALSE) are supported but can be modified.
+- Logical statements can result from a comparison using:
     - `\(&lt;\)`
     - `\(&gt;\)`
     - `\(&lt;=\)`
     - `\(&gt;=\)`
     - `\(==\)`
     - `\(!=\)`
-    
+
 ---
 
-## Indexing with Logicals
+## Indexing with Logical Statements
 
-We can index vectors using logical values as well:
+We can index vectors using logical statements as well:
 
 ```r
-x &lt;- slots[1:5] #Pulls the total points for first 5 players
-x &gt; 3 # Which of the first 5 slots are greater than 3
+x &lt;- slots[1:5] #Pulls the total points for the first 5 players
+x &gt; 3 # Returns which of the first 5 slots are greater than 3
 ```
 
 ```
@@ -443,7 +444,7 @@ x &gt; 3 # Which of the first 5 slots are greater than 3
 ```
 
 ```r
-x[x &lt; 3] # Which is less than 3
+x[x &lt; 3] # returns which is less than 3
 ```
 
 ```
@@ -454,11 +455,11 @@ x[x &lt; 3] # Which is less than 3
 
 ## Logical Examples
 
-We gather the ID of Punks that are Alien Type. 
+In this example, we gather the ID of Alien Type Punks.
 
 
 ```r
-alien_ID &lt;- (Punks$ID[Punks$Type == "Alien"]) 
+alien_ID &lt;- (Punks$ID[Punks$Type == "Alien"])
 # creates variable, alien_ID, the ID of Punks that are Alien Type
 str(alien_ID)
 ```
@@ -467,10 +468,10 @@ str(alien_ID)
 ##  int [1:15] 635 2890 3100 3443 3443 5822 5822 5905 5905 6089 ...
 ```
 
-We see which ID are less than 5000 to find certain punks which are labeled `little`.
+We see which IDs are less than 5000 to find certain punks which are labeled `little`.
 
 ```r
-little &lt;- alien_ID &lt; 5000 # Finds players that play less than 8000 minutes
+little &lt;- alien_ID &lt; 5000 # Finds punks with an ID of less than 5000
 alien_ID[little]
 ```
 
@@ -480,7 +481,7 @@ alien_ID[little]
 
 ---
 
-This code locates the Punks ID that correspond to those slots
+This code locates the Punks ID that correspond to those slots.
 
 ```r
 (Punks$ID[little][Punks$Type == "Alien"])
@@ -516,7 +517,7 @@ c(T, T, F, F) | c(T, F, T, F)
 
 ---
 
-## Your Turn 
+## Your Turn
 
 1. When was **Punk 9976** last sold? Note: There are many ways to answer this. Some are faster than others.
 
@@ -619,10 +620,10 @@ head(x)
 
 ## Data Types in R
 
-- Can use `mode()` or `class()` to find out information about variables
-- `str()` is useful to find information about the structure of your data
-- Many data types: numeric, integer, character, date, and factor most common
-    
+- You can use `mode()` or `class()` to find information about variables.
+- `str()` is useful to find information about the structure of your data.
+- There are many data types but numeric, integer, character, date, and factor are most common.
+
 
 ```r
 str(Punks)
@@ -648,7 +649,7 @@ str(Punks)
 
 ## Vector Elements
 
-Elements of a vector must all be the same type:
+Elements of a vector must all be the same type.
 
 
 ```r
@@ -685,7 +686,7 @@ str(claims)
 ##  chr [1:17554] ":-(" ":-(" ":-(" "TRUE" ":-(" ":-(" ":-(" "TRUE" "TRUE" ...
 ```
 
-By changing one value to character, all values are now character instead of logical.
+By changing one value to character, all values are now character types instead of logical types.
 
 ---
 
@@ -695,7 +696,7 @@ We can convert between different types using the `as` series of functions:
 
 
 ```r
-ids &lt;- head(Punks$ID) # Creates vector of first 6 rows 
+ids &lt;- head(Punks$ID) # Creates vector of first 6 rows
 ids
 ```
 
@@ -712,19 +713,19 @@ as.character(ids) # Converts to character
 ```
 
 ```r
-as.numeric("2") 
+as.numeric("2")
 ```
 
 ```
 ## [1] 2
 ```
-Notice that in one instance there are quotation marks and in the other there is not. Hence one is a character and the other is numeric.
+Notice that in one instance there are quotation marks and in the other there is not. ids is being converted from a numeric type to a character, while "2" is a character being converted to a numeric type.
 
 ---
 
 ## Statistical Functions
 
-Using the basic functions we have learned, it would not be hard to compute some basic statistics.
+Using the basic functions we have learned, it would not be difficult to compute some basic statistics.
 
 
 ```r
@@ -744,20 +745,19 @@ Using the basic functions we have learned, it would not be hard to compute some 
 ```
 
 ```r
-# Calculates standard deviation by usual formula
-(standdev &lt;- sqrt(sum((slots - meanslots)^2) / (n - 1))) 
+(standdev &lt;- sqrt(sum((slots - meanslots)^2) / (n - 1))) # Calculates standard deviation by usual formula
 ```
 
 ```
 ## [1] 0.7992775
 ```
 
-This is fairly easy, that is, if you know the formulas!
+This is fairly easy, that is, if you know the formulae!
 
 ---
 
 ## Built-in Statistical Functions
-We don't need to memorize formulas. R does the work for us!
+We don't need to memorize every formula. R does the work for us!
 
 ```r
 mean(slots) # Calculates mean
@@ -825,11 +825,11 @@ Just Punk 1963, 3105, 5426, 5944, 9909!
 
 ---
 
-## Your Turn 
-  
-1. Determine which Punk has sold more than 100 ETH or has 7 slot.
-2. Which Punk was sold first? Punk 1111 or Punk 3773? 
-  
+## Your Turn
+
+1. Determine which Punk has sold for more than 100 ETH or has 7 slots.
+2. Which Punk was sold first? Punk 1111 or Punk 3773?
+
 &lt;br&gt; &lt;br&gt; &lt;br&gt;
 
 &lt;p align="left"&gt;
@@ -841,7 +841,7 @@ Just Punk 1963, 3105, 5426, 5944, 9909!
 ---
 
 ## Answers
-  
+
 ### 1.
 
 ```r
@@ -891,7 +891,7 @@ Punk3773[length(Punk3773)]
 ```r
 #We can also compare the dates using logic
 
-Punk1111[length(Punk1111)] &lt; Punk3773[length(Punk3773)] 
+Punk1111[length(Punk1111)] &lt; Punk3773[length(Punk3773)]
 ```
 
 ```

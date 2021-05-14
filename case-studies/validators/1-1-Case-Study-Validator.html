@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>A Ranking and Segmentation Study   of Validator Behavior</title>
+    <title>A Ranking and Segmentation Study   of Validator Behavior          </title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="classroom.css" type="text/css" />
@@ -21,18 +22,18 @@ class: center, middle, inverse, title-slide
 
 
 
-## Case study 
+## Case study
 
-- Explore and perform analysis on a real dataset using R
-- Goal: get good understanding of using R for data management, exploration, and analysis
+- Explore and perform analysis on a real dataset using R.
+- The goal is to gain an understanding of R for data management, exploration, and analysis.
 
 --
 
 ## What is Ethereum?
 
-Ethereum is a technology that lets you send cryptocurrency to anyone for a small fee. It also powers applications that everyone can use and no one can take down. It's the world's programmable blockchain and a marketplace of financial services, games and apps that can't steal your data or censor you. 
+Ethereum is a technology that lets you send cryptocurrency to anyone for a small fee. It also powers applications that everyone can use and no one can take down. It's the world's programmable blockchain and a marketplace for financial services, games and apps that can't steal your data or censor you.
 
-Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/. 
+Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Check out more about Ethereum and ETH on https://ethereum.org/.
 
 &lt;p align="center"&gt;
 
@@ -43,13 +44,13 @@ Ethereum also has its own cryptocurrency, namely 'ETHER' or 'ETH' for short. Che
 
 ## Validator Dataset
 
-This dataset is obtained from the Beacon Scan block explorer, where it captured and characterized a validator's "journey" as a validator joins the Ethereum 2.0 Medalla testnet. 
+This dataset is obtained from the Beacon Scan block explorer, where it captured and characterized a validator's "journey" as a validator joins the Ethereum 2.0 Medalla testnet.
 
 --
 
 ### More on this "journey"
 
-To participate as a validator, Ethereum 1.0 holders will transfer 32 ETH into a deposit contract that creates an equivalent 32 bETH credit on Ethereum 2.0’s Beacon Chain. This places the validator into an activation queue. Before blockchain activation there is an eligibility period where the queued validator must wait until the first epoch it is eligible to be activated. At any point after the eligibility epoch has passed, the validator may complete the setup of the beacon chain client and join the network. Once online, the validator’s activation epoch is logged and it may begin being assigned to propose blocks or participate in block attestations. For the validators who can no longer commit to their responsibilities, after a set duration of time, it is possible to exit the network. Beacon clients that exit have a time stamp logged of the epoch their client was disabled and when their funds are withdrawn. 
+To participate as a validator, Ethereum 1.0 holders will transfer 32 ETH into a deposit contract that creates an equivalent 32 bETH credit on Ethereum 2.0’s Beacon Chain. This places the validator into an activation queue. Before blockchain activation there is an eligibility period where the queued validator must wait until the first epoch it is eligible to be activated. At any point after the eligibility epoch has passed, the validator may complete the setup of the beacon chain client and join the network. Once online, the validator’s activation epoch is logged and it may begin being assigned to propose blocks or participate in block attestations. For the validators who can no longer commit to their responsibilities, after a set duration of time, it is possible to exit the network. Beacon clients that exit have a time stamp logged of the epoch their client was disabled and when their funds are withdrawn.
 ---
 
 ## Explore the data in R
@@ -63,20 +64,20 @@ Let's load the data and look at the first few rows. Here we will use the &lt;b&g
 #load library
 library(tidyverse)
 #Load data
-valid_raw &lt;- read_csv("validator_data.csv") 
+valid_raw &lt;- read_csv("validator_data.csv")
 #Show 5 random rows of the data
 sample_n(valid_raw,5)
 ```
 
 ```
 ## # A tibble: 5 x 11
-##      X1 publickey index currentBalance effectiveBalance proposed
-##   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;   
-## 1  4910 0xa3f265~ 38299 32.39865 ETH   32 ETH           "4 \xa0~
-## 2 83704 0xa8c412~  2843 20.45477 ETH   20 ETH           "11 \xa~
-## 3 12927 0x890c3f~ 44761 32.31266 ETH   32 ETH           "5 \xa0~
-## 4  2709 0xa55d5a~ 32995 32.44281 ETH   32 ETH           "7 \xa0~
-## 5 71784 0xa30e07~ 21266 31.3375 ETH    31 ETH           "9 \xa0~
+##      X1 publickey        index currentBalance effectiveBalance proposed         
+##   &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;            
+## 1   833 0x91f485....269~ 52737 63.76265 ETH   32 ETH           "5 \xa0|1 \xa0|\~
+## 2 27469 0xb35845....04e~ 65107 32.12314 ETH   32 ETH           "4 \xa0|4 \xa0|\~
+## 3 52755 0x883927....084~ 16776 31.90015 ETH   31 ETH           "11 \xa0|10 \xa0~
+## 4 60492 0xad0ee8....6d8~ 48439 31.74062 ETH   31 ETH           "2 \xa0|1 \xa0|\~
+## 5 60162 0x980270....6f6~ 33153 31.7487 ETH    31 ETH           "6 \xa0|0 \xa0|\~
 ## # ... with 5 more variables: eligibilityEpoch &lt;chr&gt;, activationEpoch &lt;chr&gt;,
 ## #   exitEpoch &lt;chr&gt;, withEpoch &lt;chr&gt;, slashed &lt;lgl&gt;
 ```
@@ -84,7 +85,7 @@ sample_n(valid_raw,5)
 
 ---
 
-## The variables 
+## The variables
 
 The 11 variables are:
 
@@ -104,13 +105,13 @@ The 11 variables are:
 
 ## Data manipulation
 
-To be suitable for analysis, this data required some minor data manipulation of its fields. We will utilize the &lt;b&gt; stringi &lt;/b&gt; package to assist with string processing. Here is what we do:
+To be suitable for analysis, this data required some minor data manipulation. We will utilize the &lt;b&gt; stringi &lt;/b&gt; package to assist with string processing. The steps are as follows:
 
-1. Remove 'X1' using &lt;b&gt; select(-X1) &lt;/b&gt;
-2. Convert 'proposed' to ASCII using &lt;b&gt; mutate() &lt;/b&gt; and &lt;b&gt; stri_trans_general() &lt;/b&gt;. 
-3. Separate 'proposed' to three separate columns 'assigned', 'executed', and 'skipped' using &lt;b&gt; separate() &lt;/b&gt;
-4. Parse the 'assigned', 'executed', 'skipped''currentBalance' and 'effectiveBalance' using &lt;b&gt; parse_number() &lt;/b&gt; so that they become numeric variables
-5. Convert 'eligibilityEpoch', 'activationEpoch', 'exitEpoch' and 'withEpoch' to numeric
+1. Remove 'X1' using &lt;b&gt; select(-X1) &lt;/b&gt;.
+2. Convert 'proposed' to ASCII using &lt;b&gt; mutate() &lt;/b&gt; and &lt;b&gt; stri_trans_general() &lt;/b&gt;.
+3. Separate 'proposed' to three separate columns 'assigned', 'executed', and 'skipped' using &lt;b&gt; separate() &lt;/b&gt;.
+4. Parse the 'assigned', 'executed', 'skipped''currentBalance' and 'effectiveBalance' using &lt;b&gt; parse_number() &lt;/b&gt; so that they become numeric variables.
+5. Convert 'eligibilityEpoch', 'activationEpoch', 'exitEpoch' and 'withEpoch' to numeric.
 
 --
 
@@ -130,7 +131,7 @@ valid &lt;- valid_raw %&gt;%
 
 ---
 
-Let's take a look at the data after all the manipulation we did.
+Let's take a look at the data after all the manipulation.
 
 
 ```r
@@ -139,22 +140,22 @@ sample_n(valid,5)
 
 ```
 ## # A tibble: 5 x 12
-##   publickey index currentBalance effectiveBalance assigned executed skipped
-##   &lt;chr&gt;     &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
-## 1 0xb91015~ 73495           32.0               32        0        0       0
-## 2 0xa463f8~ 73611           32.0               32        0        0       0
-## 3 0xb7168b~  7445           31.8               31       12       10       2
-## 4 0xa2f152~  2326           20.3               20        4        0       4
-## 5 0xa0e4a7~ 63489           32.1               32        3        3       0
+##   publickey      index currentBalance effectiveBalance assigned executed skipped
+##   &lt;chr&gt;          &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+## 1 0xa4ec45....6~ 40938           32.4               32        8        8       0
+## 2 0xb08ccf....7~ 44845           32.3               32        6        6       0
+## 3 0x82f9e0....6~ 34116           32.0               32        4        2       2
+## 4 0x869d85....c~ 35293           32.4               32        9        9       0
+## 5 0xb27417....1~ 67830           32.0               32        3        2       1
 ## # ... with 5 more variables: eligibilityEpoch &lt;dbl&gt;, activationEpoch &lt;dbl&gt;,
 ## #   exitEpoch &lt;dbl&gt;, withEpoch &lt;dbl&gt;, slashed &lt;lgl&gt;
 ```
 
-It looks great! All the columns are now in the correct format. 
+It looks great! All the columns are now in the correct format.
 
 ---
 
-Let's summarize the data using the &lt;b&gt; skim() &lt;/b&gt; function from the &lt;b&gt; skimr &lt;/b&gt; package. This command produces a simple summary table of centrality and spread statistics of our collected features. 
+Let's summarize the data using the &lt;b&gt; skim() &lt;/b&gt; function from the &lt;b&gt; skimr &lt;/b&gt; package. This command produces a simple summary table of centrality and spread statistics of our collected features.
 
 ```r
 library(skimr)
@@ -167,21 +168,21 @@ skim(valid)
 
 ---
 
- 
- 
- 
+
+
+
 .center[![summary1_2](images/summary1_2.PNG)]
 
-We see that the data consists of 80392 rows and 12 columns (1 character, 1 logical, and 10 numeric), along with various summary statistics. Note that we do have missing data in some of the columns. 
+We see that the data consists of 80392 rows and 12 columns (1 character, 1 logical, and 10 numeric), along with various summary statistics. Note that we do have missing data in some of the columns.
 
 ---
 
 ## Activation
 
-Activation is the first step towards compliance for any node attempting to join the active validator set. Let's find out how many validators are activated over time. 
+Activation is the first step towards compliance for any node attempting to join the active validator set. Let's find out how many validators are activated over time.
 
-1. Sort the data by 'activationEpoch' using &lt;b&gt; arrange() &lt;/b&gt; 
-2. Count the number of each 'activationEpoch' group using &lt;b&gt; group_by() &lt;/b&gt; and &lt;b&gt; summarise(n()) &lt;/b&gt;
+1. Sort the data by 'activationEpoch' using &lt;b&gt; arrange() &lt;/b&gt;.
+2. Count the number of each 'activationEpoch' group using &lt;b&gt; group_by() &lt;/b&gt; and &lt;b&gt; summarise(n()) &lt;/b&gt;.
 
 --
 
@@ -213,14 +214,14 @@ head(num_activated)
 ```
 ]
 ---
-We can plot a scatterplot using &lt;b&gt; geom_point &lt;/b&gt; from the &lt;b&gt; ggplot2 &lt;/b&gt; package to see how the number changes over time. We will exclude activationEpoch 0 using &lt;b&gt; filter() &lt;/b&gt; function for the purpose of getting a better graph. 
+We can plot a scatterplot using &lt;b&gt; geom_point &lt;/b&gt; from the &lt;b&gt; ggplot2 &lt;/b&gt; package to see how the number changes over time. We will exclude activationEpoch 0 using the &lt;b&gt; filter() &lt;/b&gt; function for the purpose of getting a better graph.
 
 --
 
 .pull-left[
 
 ```r
-num_activated %&gt;% 
+num_activated %&gt;%
   filter(activationEpoch&gt;0) %&gt;%
   ggplot(aes(x=activationEpoch, y=count))+
   geom_point(size=0.5)+
@@ -233,7 +234,7 @@ num_activated %&gt;%
     )
 ```
 
-From the graph, we see that 4 is a very common number of activated validators over time. 
+From the graph, we see that 4 is a very common number of activated validators over time.
 
 ]
 
@@ -244,12 +245,12 @@ From the graph, we see that 4 is a very common number of activated validators ov
 
 
 ---
-Let's take a look at the time series of its cumulative number over time by using the &lt;b&gt; cumsum() &lt;/b&gt; and the &lt;b&gt; geom_line() &lt;/b&gt; functions. 
+Let's take a look at the time series of the cumulative number over time by using the &lt;b&gt; cumsum() &lt;/b&gt; and the &lt;b&gt; geom_line() &lt;/b&gt; functions.
 
 .pull-left[
 
 ```r
-num_activated %&gt;% 
+num_activated %&gt;%
     mutate(cume_count = cumsum(count)) %&gt;%
     ggplot(aes(x = activationEpoch, y = cume_count)) +
     geom_line() +
@@ -261,7 +262,7 @@ num_activated %&gt;%
         y = "Cumulative Number of Activated Validators"
     )
 ```
-A close inspection of the graph reveals two visible anomalies; one between Epoch 3238 and 3440, and the other, between 14189 and 14311. In both instances no new validators were activated on the blockchain for over 150 epochs which suggests there was some fault in the network’s activation functionality. 
+A close inspection of the graph reveals two visible anomalies; one between Epoch 3238 and 3440, and the other, between 14189 and 14311. In both instances no new validators were activated on the blockchain for over 150 epochs which suggests there was some fault in the network’s activation functionality.
 ]
 
 
@@ -274,17 +275,15 @@ A close inspection of the graph reveals two visible anomalies; one between Epoch
 
 ## Exit
 
- 
-
-For validators attempting to leave the network, there is a mandatory lock-in period that is enforced. It is only after this time frame is a staker are allowed to withdraw their funds and leave the network. This process is a two step procedure where the node client software is first shut down and the bETH is withdrawn from the network. Let's find the distribution of the time from activation to exit. First, we create a temporary variable: 'timetoExit' using the formula:
+For validators attempting to leave the network, there is a mandatory lock-in period that is enforced. It is only after this time frame that a staker is allowed to withdraw their funds and leave the network. This process is a two step procedure where the node client software is first shut down and the bETH is withdrawn from the network. Let's find the distribution of the time from activation to exit. First, we create a temporary variable: 'timetoExit' using the formula:
 
 $$ \frac{6.4}{60} * (\text{exitEpoch} - \text{activationEpoch}) $$
-, where the `\(6.4\)` is the conversion from Epoch to minute and `\(60\)` is the conversion from minute to hour. Then, we can plot a histogram using &lt;b&gt; geom_histogram &lt;/b&gt;. 
+, where the `\(6.4\)` is the conversion from Epoch to minute and `\(60\)` is the conversion from minute to hour. Then, we can plot a histogram using &lt;b&gt; geom_histogram &lt;/b&gt;.
 
 
 ---
 
- 
+
 
 .pull-left[
 
@@ -299,7 +298,7 @@ valid %&gt;%
         x = "Time to Exit (Hours)"
     )
 ```
-The histogram looks great! We can dive in to the table to see exactly how many validators exited as well as other summary statistics. We will simply use the same formula as mentioned and filter out the rows where 'timeToExit' is empty using &lt;b&gt; is.na() &lt;/b&gt;. ]
+The histogram looks great! We can visualize the table to see exactly how many validators exited as well as other summary statistics. We will simply use the same formula as mentioned and filter out the rows where 'timeToExit' is empty using &lt;b&gt; is.na() &lt;/b&gt;.
 
 .pull-right[
 ![](1-1-Case-Study-Validator_files/figure-html/p3-out-1.png)&lt;!-- --&gt;
@@ -318,16 +317,16 @@ skim(exit_time$timeToExit)
 
 .center[![summary2](images/summary2.PNG)]
 
-We see that a total of 6304 validators have exited with an average of 363 hours or around 15.1 days. Also, the fastest exit time is actually less than 1 hour. 
+We see that a total of 6304 validators have exited with an average of 363 hours or around 15.1 days. Also, the fastest exit time is actually less than 1 hour.
 
 ---
 
 ## Your turn
 
-We can better observe these trends over time with both a traditional time series plot and a cumulative count graph that tracks the number of validators exiting throughout the epochs. 
+We can better observe these trends over time with both a traditional time series plot and a cumulative count graph that tracks the number of validators exiting throughout the epochs.
 
 1. Get the data (i.e. count the exitEpoch and also obtain the cumulative sum) and display 3 random rows of the data.
-2. Get the summary of the count. 
+2. Get the summary of the count.
 3. Plot a time series of the count and color the line blue.
 4. Plot a time series of the cumulative sum.
 
@@ -356,15 +355,15 @@ sample_n(exits,3)
 ## # A tibble: 3 x 3
 ##   exitEpoch count count_cume
 ##       &lt;dbl&gt; &lt;int&gt;      &lt;int&gt;
-## 1      2496     4        748
-## 2      3429     4       2164
-## 3      4041     4       4612
+## 1      3337     4       1796
+## 2      2601     4       1168
+## 3      4161     4       5092
 ```
 
 
 ---
 
-### 2. 
+### 2.
 
 ```r
 skim(exits$count)
@@ -374,7 +373,7 @@ skim(exits$count)
 
 ---
 
-### 3. 
+### 3.
 .pull-left[
 
 ```r
@@ -420,7 +419,7 @@ ggplot(data = exits, aes(x = exitEpoch, y = count_cume)) +
 ---
 
 ## Investigation into the Block Proposal Process
-To start, we will look at the distribution of the numbers of blocks 'assigned', 'executed' and 'skipped.' One way to do it is simply create a plot for each column, which we already know how to do. For instance, we can do the following:
+To start, we will look at the distribution of the numbers of blocks 'assigned', 'executed' and 'skipped.' One way to do this is to simply create a plot for each column, which we already know how to do. For example, we can do the following:
 
 --
 
@@ -429,8 +428,8 @@ To start, we will look at the distribution of the numbers of blocks 'assigned', 
 ```r
 valid %&gt;%
   group_by(assigned) %&gt;%
-  ggplot(aes(x=assigned)) + 
-  geom_bar() + 
+  ggplot(aes(x=assigned)) +
+  geom_bar() +
   labs(title = "Distribution of Assigned")
 ```
 ]
@@ -444,12 +443,12 @@ valid %&gt;%
 
 Let's do it a different way and plot all three variables using the &lt;b&gt; facet_wrap() &lt;/b&gt; function. Here are the steps:
 
-1. Subset the 'assigned', 'executed' and 'skipped' columns using &lt;b&gt; select() &lt;/b&gt;
-2. Collapse the subset into a long form with two columns: 'variable' and 'value' using &lt;b&gt; gather() &lt;/b&gt;
-3. Group by the variable and value using &lt;b&gt; group_by &lt;/b&gt;
-4. Add &lt;b&gt; facet_wrap(~variable) &lt;/b&gt; to create plot for each variable
+1. Subset the 'assigned', 'executed' and 'skipped' columns using &lt;b&gt; select() &lt;/b&gt;.
+2. Collapse the subset into long form with two columns: 'variable' and 'value' using &lt;b&gt; gather() &lt;/b&gt;.
+3. Group by the variable and value using &lt;b&gt; group_by &lt;/b&gt;.
+4. Add &lt;b&gt; facet_wrap(~variable) &lt;/b&gt; to create a plot for each variable.
 
-Note that we use &lt;b&gt; fill = variable &lt;/b&gt; and &lt;b&gt; scale_fill_brewer(palette = "Dark2") &lt;/b&gt; to customize the colors on each plot. Lastly, since the legend is not needed, we add &lt;b&gt;theme(legend.position = "off") &lt;/b&gt;
+Note that we use &lt;b&gt; fill = variable &lt;/b&gt; and &lt;b&gt; scale_fill_brewer(palette = "Dark2") &lt;/b&gt; to customize the colors on each plot. Lastly, since the legend is not needed, we add &lt;b&gt;theme(legend.position = "off") &lt;/b&gt;.
 
 --
 .pull-left[
@@ -479,13 +478,13 @@ valid %&gt;%
 
 ---
 
-From the barcharts, we observe that each validator status is distributed exponentially where most nodes have not had any assignments, executed blocks or skipped assignments. Globally however, the average validator has been assigned to 6 slots, has successfully proposed 4 blocks and has missed 2 slot assignments. 
+From the barcharts, we observe that each validator status is distributed exponentially where most nodes have not had any assignments, executed blocks or skipped assignments. Globally however, the average validator has been assigned to 6 slots, has successfully proposed 4 blocks and has missed 2 slot assignments.
 
-A quick exercise for you: How would you get the averages mentioned in one shot? Take a few minutes to try it out! 
+A quick exercise for you: How would you obtain the averages mentioned in one try? Take a few minutes to try it out!
 
 --
 
-Here is one way:
+Here is one method:
 
 ```r
 valid %&gt;%
@@ -510,7 +509,7 @@ valid %&gt;%
 
 By treating the executions and assignments skipped as proportions, we can visualize the distributions of both execution success and skipped slot as rates. To do so we define each variable by taking the number of executed or skipped blocks, and dividing them by the total number of assigned blocks.
 
-* Create two histogram plots that show the distribution of 'Execution Rate' and 'Skipped Rate'. Give clear titles and different colors for these two plots. 
+* Create two histogram plots that show the distribution of 'Execution Rate' and 'Skipped Rate'. Give clear titles and different colors for these two plots.
 
 &lt;br&gt;&lt;br&gt;
 
@@ -521,7 +520,7 @@ By treating the executions and assignments skipped as proportions, we can visual
 &lt;/p&gt;
 ---
 
-## Answers 
+## Answers
 ### First plot
 
 .pull-left[
@@ -538,7 +537,7 @@ valid %&gt;%
     )
 ```
 
-One thing to note is that since there is a space in our variable name, we need to use single quote when creating this temporary variable. Also, we can use &lt;b&gt; function(.) scales::percent(., accuracy = 1) &lt;/b&gt; to show percentage instead of decimals.
+One thing to note is that since there is a space in our variable name, we need to use single quotes when creating this temporary variable. Also, we can use &lt;b&gt; function(.) scales::percent(., accuracy = 1) &lt;/b&gt; to show percentage instead of decimals.
 ]
 
 
@@ -579,23 +578,23 @@ valid %&gt;%
 ![](1-1-Case-Study-Validator_files/figure-html/p9-out-1.png)&lt;!-- --&gt;
 ]
 
-Surprisingly, the rate of successful block executions and the proportion of skipped slots appear to follow reflected Beta distributions where most of the probability mass rests at the edges of the support range. Most nodes have had only success executing on their block proposals; however a significant portion of the validators have not had any success. Likewise, most validators have not skipped any slot assignments, but a substantial portion of them have skipped all of their block proposals. This result suggests that there will likely be a clear demarcation between the behaviors of certain validators on the network.
+Surprisingly, the rate of successful block executions and the proportion of skipped slots appear to follow reflected Beta distributions, where most of the probability mass rests at the edges of the support range. Most nodes have only had success executing their block proposals. However, a significant portion of the validators have not had any success. Likewise, most validators have not skipped any slot assignments, but a substantial portion of them have skipped all of their block proposals. This result suggests that there will likely be a clear demarcation between the behaviors of certain validators on the network.
 
 ---
 
 ## Slashing
 
-Slashing on the Ethereum 2.0 network is the act of punishing validators for violations of the consensus rules by either improperly proposing a block or failing to properly attest to a block while in an assigned committee. To better understand the slashing behavior within our dataset, we will investigate the number of slashed validators over exitEpoch. To do so, we simply filter the data based on 'slashed' being TRUE and group_by exitEpoch. Then, we use the &lt;b&gt; cumsum() &lt;/b&gt; function just like before. 
+Slashing on the Ethereum 2.0 network is the act of punishing validators for violations of the consensus rules by either improperly proposing a block or failing to properly attest to a block while in an assigned committee. To better understand the slashing behavior within our dataset, we will investigate the number of slashed validators over exitEpoch. To do so, we simply filter the data based on 'slashed' being TRUE and group_by exitEpoch. Then, we use the &lt;b&gt; cumsum() &lt;/b&gt; function just like before.
 
 --
 
 .pull-left[
 
 ```r
-valid %&gt;% 
-  filter(slashed == TRUE) %&gt;% 
-  group_by(exitEpoch) %&gt;% 
-  summarise(slashed = n()) %&gt;% 
+valid %&gt;%
+  filter(slashed == TRUE) %&gt;%
+  group_by(exitEpoch) %&gt;%
+  summarise(slashed = n()) %&gt;%
   mutate(cume_slashed = cumsum(slashed)) %&gt;%
   ggplot(aes(x = exitEpoch, y = cume_slashed)) +
   geom_line() +
@@ -617,29 +616,23 @@ valid %&gt;%
 
 ---
 
- 
- 
- 
- 
- 
-
 From the graph, we notice that between epochs 2000 and 4000, the slashed validators rose from 0 to 5000. Since epoch 4000, the growth has been much slower, barely creeping up towards 5500 through epoch 15000. The spike in slashings during epochs 2000 and 4000 correspond directly with the large exodus of validators that we observed previously. When punished with a slashing, a portion of the validators stake is removed. If the effective balance of the validator drops too low, it could be subject to removal from the network.
 
 --
 
-From our macro analysis, we’ve shown that analytical techniques applied to Medalla’s testnet data can help us develop a foundational understanding of the network. Our tracking of validator activations, execution rates, and exit patterns, among other metrics, cast the first form an picture of network health as a whole that we can then recast and project onto individual validators. Our next section will further develop this idea as we focus specifically on understanding the actions of Ethereum 2.0’s stakers.
+From our macro analysis, we’ve shown that analytical techniques applied to Medalla’s testnet data can help us develop a foundational understanding of the network. Our tracking of validator activations, execution rates, and exit patterns, among other metrics, help us visualize network health as a whole. We can then recast and project this onto individual validators. Our next section will further develop this idea as we focus specifically on understanding the actions of Ethereum 2.0’s stakers.
 
 ---
 
 ## Behavioral based Validator Rankings
 
-It is our goal at this junction to develop a categorization method that can codify patterns in validator behavior, characterize it and discern the difference between constructive and destructive network actions. To facilitate the discovery of these behavioral patterns and fulfill the aforementioned objectives, we will employ a weighted linear rank scoring algorithm. This is a simple, yet powerful sorting technique that maps a validator’s characteristics on to a single ranked score that can be compared.
+It is our goal to develop a categorization method that can codify patterns in validator behavior, characterize it and discern the difference between constructive and destructive network actions. To facilitate the discovery of these behavioral patterns and fulfill the aforementioned objectives, we will employ a weighted linear rank scoring algorithm. This is a simple, yet powerful sorting technique that maps a validator’s characteristics on to a single ranked score that can be compared.
 
 --
 
-As inputs into the scoring function we’ll use the current balance, number of successful executions, the active status of the validator, how long the node has been active, the number of skipped assignments and a binary indicator for whether the node has been slashed. 
+As inputs into the scoring function we’ll use the current balance, number of successful executions, the active status of the validator, how long the node has been active, the number of skipped assignments and a binary indicator for whether the node has been slashed.
 
-OUt of the 6 variables, 'currentBalance', 'executed', 'skipped', and 'slashed' are readily available in the dataset. We can use 'exitEpoch' to get the active status of the validator, and lastly, how long the node has been active is the same as the 'timetoExit' variable we computed in previous slide, where we use this formula: `$$\frac{6.4}{60}*(\text{exitEpoch} - \text{activationEpoch}).$$` 
+Of the 6 variables, 'currentBalance', 'executed', 'skipped', and 'slashed' are readily available in the dataset. We can use 'exitEpoch' to get the active status of the validator, and lastly, how long the node has been active is the same as the 'timetoExit' variable we computed in the previous slide, where we use this formula: `$$\frac{6.4}{60}*(\text{exitEpoch} - \text{activationEpoch}).$$`
 
 --
 
@@ -647,18 +640,15 @@ The polarities of each of these variables are unambiguous. Of the six, the only 
 
 ---
 
- 
- 
+Here is what we need to do to get all the variables ready:
+1. Create variable 'active' that indicates the active status using &lt;b&gt; is.na(exitEpoch) &lt;/b&gt;.
+2. Modify 'exitEpoch' so that it shows 15579 instead of 'NA'. Note that 15579 is the latest epoch that the data was obtained. We can do so by using &lt;b&gt; ifelse() &lt;/b&gt;.
+3. Using this new 'exitEpoch', we create the variable 'active_time'.
+4. Rename 'executed' to 'executions'.
+5. Flip the 'slashed' indicator to have negative weighting.
+6. Create variable 'skips' as the negative version of 'skipped'.
 
-Here is what we need to do in order to get all the variables ready in one place:
-1. Create variable 'active' that indicates the active status using &lt;b&gt; is.na(exitEpoch) &lt;/b&gt;
-2. Modify 'exitEpoch' so that it shows 15579 instead of 'NA'. Note that 15579 is the latest epoch when the data was obtained. We can do so by using &lt;b&gt; ifelse() &lt;/b&gt;
-3. Using this new 'exitEpoch', we create variable 'active_time'
-4. Rename 'executed' to 'executions'
-5. Flip the 'slashed' indicator to have negative weighting
-6. Create variable 'skips' as the negative version of 'skipped'
-
-Note that the last two steps are done to account for negative behavior as mentioned. 
+Note that the last two steps are done to account for negative behavior as mentioned.
 
 --
 
@@ -678,7 +668,7 @@ valid_stats &lt;- valid %&gt;%
 
 ## Weighted Linear Rank Scoring Algorithm
 
-Now that we have all the variables we need, we can now try to implement the algorithm. The following explains briefly on what we need to do.
+Now that we have all the variables we need, we can now try to implement the algorithm. The following explains briefly what we need to do.
 
 Let `\(x_1 =\)` currentBalance, `\(x_2 =\)` executions, `\(x_3 =\)` skips, `\(x_4 =\)` slashed,  `\(x_5 =\)` active, and  `\(x_6 =\)` active_time. For any specific validator, the ordered rankings of its respective values can be represented as `\(r_i\)`. We use weights, `\(w_i\)`, to correspond to emphasis placed on variable `\(x_i\)` in the scoring function `\(S\)`. The weight vector satisfies the following constraint: `\(w_1+w_2+w_3+...+w_6 = 1\)`.  The score, S, is then computed as the scalar product of the ranks and weights.
 
@@ -686,16 +676,13 @@ $$S =\sum_{i=1}^6 w_ir_i $$
 
 ---
 
- 
- 
-
 Now that we have a general idea, let's code!
 
-1. Get the ranks of each of the 6 variables we discussed using &lt;b&gt; across(,rank) &lt;/b&gt;
-2. Collapse the data into a long form with three columns: 'publickey', 'Variable' and 'Rank' using &lt;b&gt; gather() &lt;/b&gt;
-3. Create variable 'Score' that give the sum of the rank group by 'publickey' using &lt;b&gt; group_by &lt;/b&gt; and &lt;b&gt; sum() &lt;/b&gt; 
-4. Replace 'Rank' with the rank of the Score (higher the score translate to lower rank) using &lt;b&gt; rank() &lt;/b&gt;
-5. Sort the table according the 'Rank' using &lt;b&gt; arrange() &lt;/b&gt;
+1. Get the ranks of each of the 6 variables we discussed using &lt;b&gt; across(,rank) &lt;/b&gt;.
+2. Collapse the data into long form with three columns: 'publickey', 'Variable' and 'Rank' using &lt;b&gt; gather() &lt;/b&gt;.
+3. Create the variable 'Score' that gives the sum of the rank group by 'publickey' using &lt;b&gt; group_by &lt;/b&gt; and &lt;b&gt; sum() &lt;/b&gt;.
+4. Replace 'Rank' with the rank of the Score (a higher the score translates to a lower rank) using &lt;b&gt; rank() &lt;/b&gt;.
+5. Sort the table according to the 'Rank' using &lt;b&gt; arrange() &lt;/b&gt;.
 
 --
 
@@ -711,17 +698,11 @@ valid_ranks &lt;- valid_stats %&gt;%
     arrange(Rank)
 ```
 
-Note that we divided 'active_time' by 4 to reduce the weighting as we do not want to punish new validators too much.
+Note that we divided 'active_time' by 4 to reduce the weighting as we do not want to punish new validators.
 
 ---
 
- 
- 
- 
- 
-
-
-Now that we have their 'Score' and 'Rank', we will put add the them back to the 'valid_stats' dataframe. To do so, we simply use &lt;b&gt; left_join() &lt;/b&gt;. Also, we revert 'slashed' and 'skips' to its original value before the negative weighting. 
+Now that we have their 'Score' and 'Rank', we will add them back to the 'valid_stats' dataframe. To do so, we simply use &lt;b&gt; left_join() &lt;/b&gt;. Also, we revert 'slashed' and 'skips' to its original value before the negative weighting.
 
 
 ```r
@@ -733,13 +714,13 @@ valid_all &lt;- valid_stats %&gt;% left_join(valid_ranks) %&gt;%
 
 ---
 
-To better highlight the rate of change of the 'Score', we sort the 'Score' and plot it. We also use &lt;b&gt;     scale_color_gradientn(colors = rainbow(2), labels = scales::comma) &lt;/b&gt; to change the color. Note that &lt;b&gt; scales::comma &lt;/b&gt; is using &lt;b&gt; comma &lt;/b&gt; function from the &lt;b&gt; scales &lt;/b&gt; package and it changes how numbers show. 
+To better highlight the rate of change of the 'Score', we sort the 'Score' and plot it. We also use &lt;b&gt;     scale_color_gradientn(colors = rainbow(2), labels = scales::comma) &lt;/b&gt; to change the color. Note that &lt;b&gt; scales::comma &lt;/b&gt; is using &lt;b&gt; comma &lt;/b&gt; function from the &lt;b&gt; scales &lt;/b&gt; package and it changes how numbers show.
 
 .pull-left[
 
 ```r
-valid_all %&gt;% 
-  arrange(Score) %&gt;% 
+valid_all %&gt;%
+  arrange(Score) %&gt;%
   mutate(Index = 1:nrow(.)) %&gt;%
   ggplot(aes(x = Index, y = Score, color = Score)) +
     geom_point() +
@@ -761,7 +742,7 @@ valid_all %&gt;%
 
 ---
 
-While the validator score curve does show there is differentiation between the scores, it fails to give any indication of clear heterogeneity within the node’s behaviors. Let's plot the distribution of the 'Score'. 
+While the validator score curve does show there is differentiation between the scores, it fails to give any indication of clear heterogeneity within the node’s behaviors. Let's plot the distribution of the 'Score'.
 
 .pull-left[
 
@@ -775,7 +756,6 @@ ggplot(valid_all, aes(x = Score, fill = Score)) +
 ```
 
 The histogram of the score values is multimodal, which is the first encouraging sign that our scoring function has successfully captured and encoded a significant portion of the variance in validator behavior.
-]
 
 
 .pull-right[
@@ -785,7 +765,7 @@ The histogram of the score values is multimodal, which is the first encouraging 
 ---
 
 ## Segmentation Study of Validator Behavior
-As with many unsupervised tasks, the transition from scores to a finite segmentation is often tricky, particularly when there is no well established subject matter context for the selection of cut-offs, nor one agreed upon cluster validation method in the literature to appeal to. With a mixture of investigation, intuition and mathematical hand waving, we settled on the selection of seven score tiers to differentiate network behavior as follows. 
+As with many unsupervised tasks, the transition from scores to a finite segmentation is often tricky, particularly when there is no well established subject matter context for the selection of cut-offs, nor one agreed upon cluster validation method in the literature. With a mixture of investigation, intuition and mathematical hand waving, we settled on the selection of seven score tiers to differentiate network behavior as follows:
 --
 
 `$$\begin{align}
@@ -800,8 +780,8 @@ As with many unsupervised tasks, the transition from scores to a finite segmenta
 
 
 ```r
-valid_tiers &lt;- valid_all %&gt;% mutate(Tier = ifelse(Rank &lt;= 2489, 1, ifelse(Rank &lt;= 6942, 2, 
-                                ifelse(Rank &lt;= 38396, 3, ifelse(Rank &lt;= 56534, 4, 
+valid_tiers &lt;- valid_all %&gt;% mutate(Tier = ifelse(Rank &lt;= 2489, 1, ifelse(Rank &lt;= 6942, 2,
+                                ifelse(Rank &lt;= 38396, 3, ifelse(Rank &lt;= 56534, 4,
                                 ifelse(Rank &lt;= 67877, 5, ifelse(Rank &lt;= 75644,6,7)))))))
 ```
 
@@ -809,22 +789,22 @@ valid_tiers &lt;- valid_all %&gt;% mutate(Tier = ifelse(Rank &lt;= 2489, 1, ifel
 
 ## Your turn
 
-Recreate the Scores vs Rank plot. However, this time make sure that the color will show different tiers. An example output is shown below.
+Recreate the Scores vs Rank plot. However, this time make sure that the color will show different tiers. An example output is shown below:
 
 
 .center[
 ![](1-1-Case-Study-Validator_files/figure-html/p13-out-1.png)&lt;!-- --&gt;
 ]
 
-Hint: To reverse color, simply use &lt;b&gt; rev() &lt;/b&gt;. 
+Hint: To reverse color, simply use &lt;b&gt; rev() &lt;/b&gt;.
 ---
 
 ## Answer
 
 
 ```r
-valid_tiers %&gt;% 
-    arrange(Score) %&gt;% 
+valid_tiers %&gt;%
+    arrange(Score) %&gt;%
     mutate(Index = 1:nrow(.)) %&gt;%
     ggplot(aes(x = Index, y = Score, color = Tier)) +
     geom_point() +
@@ -839,10 +819,7 @@ valid_tiers %&gt;%
 
 ---
 
- 
- 
-
-Let's now try to create this plot together! 
+Let's now try to create this plot together!
 
 
 
@@ -852,16 +829,11 @@ Let's now try to create this plot together!
 
 ---
 
- 
- 
- 
- 
+To create this plot, we used &lt;b&gt; geom_rect() &lt;/b&gt; to create the color blocks. For these color blocks to fill the graph beautifully, we first need to modify the valid_tiers dataframe as follows:
 
-To create this plot, we use &lt;b&gt; geom_rect() &lt;/b&gt; to create those color blocks. For these color blocks to fill the graph beautifully, we first need to modify the valid_tiers dataframe as follows.
-
-1. Subset the 'Tier' and 'Score' columns using &lt;b&gt; select() &lt;/b&gt;
-2. Add a row that where 'Tier' = 7 and 'Score' = `\(-\infty\)` using &lt;b&gt; rbind() &lt;/b&gt;
-3. Add a column named 'HighScore', which is simply the 'Score' column shifted down one row. Fill in the first row with `\(\infty\)`. 
+1. Subset the 'Tier' and 'Score' columns using &lt;b&gt; select() &lt;/b&gt;.
+2. Add a row where 'Tier' = 7 and 'Score' = `\(-\infty\)` using &lt;b&gt; rbind() &lt;/b&gt;.
+3. Add a column named 'HighScore', which is simply the 'Score' column shifted down one row. Fill in the first row with `\(\infty\)`.
 
 --
 
@@ -880,8 +852,8 @@ One way to get the plot we want is to use &lt;b&gt; scale_fill_manual() &lt;/b&g
 
 
 ```r
-valid_tiers %&gt;% 
-  arrange(Score) %&gt;% 
+valid_tiers %&gt;%
+  arrange(Score) %&gt;%
   mutate(Index = 1:nrow(.)) %&gt;%
   ggplot(aes(x = Index, y = Score)) +
     geom_point() +
@@ -897,7 +869,7 @@ valid_tiers %&gt;%
     )
 ```
 
-Note that we used two dataframes and thus, we included the &lt;b&gt; inherit.aes = FALSE &lt;/b&gt; argument. 
+Note that we used two dataframes and thus, we included the &lt;b&gt; inherit.aes = FALSE &lt;/b&gt; argument.
 
 ---
 
@@ -947,12 +919,12 @@ labs(
 
 ---
 
-An investigation into validator performance can now begin on the tier level as a we compare how they each interact with the network. To categorize the behaviors of the tiers succinctly, we can look at the mean of the `\(6\)` variables used for our 'Score' by Tier. 
+An investigation into validator performance can now begin on the tier level as a we compare how they each interact with the network. To categorize the behaviors of the tiers succinctly, we can look at the mean of the `\(6\)` variables used for our 'Score' by Tier.
 
 
 ```r
-summary_table &lt;- valid_tiers %&gt;% 
-  group_by(Tier) %&gt;% 
+summary_table &lt;- valid_tiers %&gt;%
+  group_by(Tier) %&gt;%
   add_count(Tier) %&gt;%
   summarise(across(c(n, active_time, currentBalance, executions, skips, slashed, active, Score),mean)) %&gt;%
   mutate(slashed = slashed*100, active = active*100) %&gt;%
@@ -963,23 +935,23 @@ summary_table
 
 ```
 ## # A tibble: 7 x 9
-##    Tier Count `Time Active` `Current Balanc~ `Successful Blo~ `Skipped Blocks`
-##   &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
-## 1     1  2489         1189.             33.0            9.70            0     
-## 2     2  4453         1094.             32.8            6.91            0.0341
-## 3     3 31454         1028.             32.7            5.91            0.478 
-## 4     4 18138          806.             32.5            3.64            1.17  
-## 5     5 11343          917.             32.8            2.55            3.13  
-## 6     6  7767         1208.             30.8            0.983           7.24  
-## 7     7  4748          356.             20.5            2.61            1.23  
-## # ... with 3 more variables: `Proportion Slashed` &lt;dbl&gt;, `Proportion
-## #   Active` &lt;dbl&gt;, Score &lt;dbl&gt;
+##    Tier Count `Time Active` `Current Balance` `Successful Bloc~ `Skipped Blocks`
+##   &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;             &lt;dbl&gt;            &lt;dbl&gt;
+## 1     1  2489         1189.              33.0             9.70            0     
+## 2     2  4453         1094.              32.8             6.91            0.0341
+## 3     3 31454         1028.              32.7             5.91            0.478 
+## 4     4 18138          806.              32.5             3.64            1.17  
+## 5     5 11343          917.              32.8             2.55            3.13  
+## 6     6  7767         1208.              30.8             0.983           7.24  
+## 7     7  4748          356.              20.5             2.61            1.23  
+## # ... with 3 more variables: Proportion Slashed &lt;dbl&gt;, Proportion Active &lt;dbl&gt;,
+## #   Score &lt;dbl&gt;
 ```
 
 
 ---
 
-We can present the table using &lt;b&gt; formattable &lt;/b&gt; package.
+We can present the table using the &lt;b&gt; formattable &lt;/b&gt; package.
 
 --
 
@@ -998,13 +970,13 @@ It looks so much better!
 
 ---
 
-We can also add color to each column to show how it changes across different Tiers like a heatmap. Here, we simply use &lt;b&gt; color_tile() &lt;/b&gt; that takes two colors as input. 
+We can also add color to each column to show how it changes across different Tiers like a heatmap. Here, we simply use &lt;b&gt; color_tile() &lt;/b&gt; which takes two colors as input.
 
 --
 
 
 ```r
-formattable(summary_table, list( 
+formattable(summary_table, list(
   `Time Active`= color_tile('red', 'lightgreen'),
   `Current Balance`= color_tile('red', 'lightgreen'),
   `Successful Blocks`= color_tile('red', 'lightgreen'),
@@ -1030,30 +1002,23 @@ formattable(summary_table, list(
 
 --
 
-&lt;span style="color: #33B5FF "&gt;Tier 3&lt;/span&gt; (Ranks 6943 – 38396): While validators in this tier are still healthy overall, they do have more skipped blocks and slightly fewer successful block proposals.  This group has a lower average active time than tiers 1 and 2. It is in this tier do we see the first set of exited validators appear.
+&lt;span style="color: #33B5FF "&gt;Tier 3&lt;/span&gt; (Ranks 6943 – 38396): While validators in this tier are still healthy overall, they do have more skipped blocks and slightly fewer successful block proposals.  This group has a lower average active time than tiers 1 and 2. The first set of exited validators appears in this tier.
 
 --
 
-&lt;span style="color: #33FFA8 "&gt;Tier 4&lt;/span&gt; (Ranks 38397 – 56534): This is the tier where validators with more serious performance issues begin to exist more prevalently.  Those the majority are active and have not been slashe there, are some who have. This tier is unique because it also houses many of the newer validator nodes who are just now trying to move up the ranks.  Many have not even had their first assignment. 
+&lt;span style="color: #33FFA8 "&gt;Tier 4&lt;/span&gt; (Ranks 38397 – 56534): This is the tier where validators with more serious performance issues begin to be more prevalently.  Though the majority are active and have not been slashed, there are some who have. This tier is unique because it also houses many of the newer validator nodes who are trying to move up the ranks.  Many have not even had their first assignment.
 
 ---
 
- 
- 
- 
- 
- 
- 
-
-&lt;span style="color: #3CFF33 "&gt;Tier 5&lt;/span&gt; (Ranks 56535– 67877): -  Tier 5 is the first of the truly unhealthy groups where the the ratio of skipped blocks to successful proposals is skewed negatively towards missed assignment. In this tier, more validators have experienced a slashing and the number of inactive nodes continues to increase.
+&lt;span style="color: #3CFF33 "&gt;Tier 5&lt;/span&gt; (Ranks 56535– 67877): -  Tier 5 is the first of the truly unhealthy groups where the ratio of skipped blocks to successful proposals is skewed negatively towards missed assignments. In this tier, more validators have experienced a slashing and the number of inactive nodes continues to increase.
 
 --
 
-&lt;span style="color: #FFDD33 "&gt;Tier 6&lt;/span&gt; (Ranks 67878 – 75644):  Validators in this tier have skipped more block assignments than they successfully proposed.  These nodes are in danger of being removed from the network due to current balances below the 32 ETH threshold. 
+&lt;span style="color: #FFDD33 "&gt;Tier 6&lt;/span&gt; (Ranks 67878 – 75644):  Validators in this tier have skipped more block assignments than they successfully proposed.  These nodes are in danger of being removed from the network due to current balances below the 32 ETH threshold.
 
 --
 
-&lt;span style="color: #FF4233 "&gt;Tier 7&lt;/span&gt; (Ranks 75645 – 80392):  The vast majority of validators in this bottom tier are all inactive and have had their proposals slashed at least once.  There are also a few that left due to an insufficient balance as a result of a disproportionate number of skipped blocks. This group has the lowest current balance 
+&lt;span style="color: #FF4233 "&gt;Tier 7&lt;/span&gt; (Ranks 75645 – 80392):  The vast majority of validators in this bottom tier are all inactive and have had their proposals slashed at least once.  There are also a few that left due to an insufficient balance as a result of a disproportionate number of skipped blocks. This group has the lowest current balance
 
 &lt;br&gt; &lt;br&gt;
 
@@ -1066,7 +1031,7 @@ formattable(summary_table, list(
 
 ## Princpal Component Analysis
 
-Our tiers all possess distinct behavioral characteristics useful for discriminating between them; however, there is also a deeper level of heterogeneity that exists within the tiers themselves. This result can be found by applying a dimension reduction technique and plotting the component scores against one another. We use &lt;b&gt; prcomp() &lt;/b&gt; to perform the principal component analysis on the `\(6\)` variables used in scoring. 
+Our tiers all possess distinct behavioral characteristics useful for discriminating between them; however, there is also a deeper level of heterogeneity that exists within the tiers themselves. This result can be found by applying a dimension reduction technique and plotting the component scores against one another. We use &lt;b&gt; prcomp() &lt;/b&gt; to perform the principal component analysis on the `\(6\)` variables used in scoring.
 
 --
 
@@ -1095,7 +1060,7 @@ str(pca)
 
 ---
 
-After some investigation, we managed to get one representation of the score "surface" when labeled by tier. Across the landscape, the scores within most tiers coalesce around one another, forming  localized regions. Though this is true for some groups, Tiers 4 through 7 all have multiple regions where validator scores rest. This is an indication that there is further behavior to be distinguished between the nodes within the same segment.    
+After some investigation, we managed to get one representation of the score "surface" when labeled by tier. Across the landscape, the scores within most tiers coalesce around one another, forming  localized regions. Though this is true for some groups, Tiers 4 through 7 all have multiple regions where validator scores are located. This is an indication that there is further behavior to be distinguished between the nodes within the same segment.    
 
 .pull-left[
 
@@ -1129,19 +1094,19 @@ Here, we show the representative sample of the most common validator profiles wi
 
 ---
 
-### What does these representative sample tell us?
+### What does this representative sample tell us?
 
-Starting with Tier 1, we have our Perfect Proposers, validators who exhibit the best combination of behaviors we track. These validators have the highest number of successful blocks to go along with their longer than average active time on the network. 
+Starting with Tier 1, we have our Perfect Proposers, validators who exhibit the best combination of behaviors we track. These validators have the highest number of successful blocks to go along with their longer than average active time on the network.
 
-Next we have the Tier 2 validators. Though they have similar characteristics as the Tier 1, particularly perfect proposal rates, they have been active for a slightly shorter time and have proposed fewer blocks. 
+Next we have the Tier 2 validators. Though they have similar characteristics as Tier 1, particularly perfect proposal rates, they have been active for a slightly shorter time and have proposed fewer blocks.
 
-In Tier 3, we see the trend continue where they've been on the network a shorter and shorter period of time. 
+In Tier 3, we see the trend continue where they've been on the network a shorter period of time.
 
-Tier 4 is where poor performance begins to manifest itself in actual skipped blocks. We can see new validators and those who have skipped one or more block proposals in this Tier. 
+Tier 4 is where poor performance begins to manifest itself in actual skipped blocks. We can see new validators and those who have skipped one or more block proposals in this Tier.
 
-Then, In Tier 5 and Tier 6, we start to see more and more skipped blocks and lower current balance. In particular, validators in Tier 6 have skipped more block assignments than they have successfully proposed, yet have managed to be stay on the network for the longest period of time. 
+Then, in Tier 5 and Tier 6, we start to see more and more skipped blocks and lower current balance. In particular, validators in Tier 6 have skipped more block assignments than they have successfully proposed, yet have managed to stay on the network for the longest period of time.
 
-Lastly, we see new validators who have been slashed, regardless whether they have skipped a block in Tier 7. 
+Lastly, we see new validators who have been slashed, regardless whether they have skipped a block in Tier 7.
 
 
 ---
@@ -1149,11 +1114,11 @@ Lastly, we see new validators who have been slashed, regardless whether they hav
 ## Conclusion
 
 
-Our key takeaway from this analysis is that, when performing our ranking procedure across the nearly dozen of variables and over 80,000 validators, true "tiers" of validators do in fact exist. At the top of the list, Tier 1 validators execute 100% of their assignments, maintain a high effective balance, have not been slashed and have been active from very early on. On the bottom end are validators who were slashed, and failed to execute their assignments. Distributionally, as expected, most validators fall somewhere in between these two extremes. It will be quite interesting to see how the scores that make up the backbone of the tier-based ranking system evolve as time goes on.
+Our key takeaway from this analysis is that, when performing our ranking procedure across the nearly dozen of variables and over 80,000 validators, true "tiers" of validators do in fact exist. At the top of the list, Tier 1 validators execute 100% of their assignments, maintain a high effective balance, have not been slashed and have been active from very early on. On the bottom end are validators who were slashed, and failed to execute their assignments. As expected, most validators fall somewhere in between these two extremes. It will be quite interesting to see how the scores that make up the backbone of the tier-based ranking system evolve as time goes on.
 
 Among other interesting findings, we found:
 
-* Nearly every epoch, 4 validators are activated, except for two periods between Epoch 3238 and 3440, and the other, between 14189 and 14311
+* Nearly every epoch, 4 validators are activated, except for two periods between Epoch 3238 and 3440, and the other, between 14189 and 14311. 
 * A large spike in exiting validators was observed between the 3000th and 4000th epoch.
 * The aforementioned spike corresponds to a large increase in the number of slashed validators.
 * The average validator has been assigned 6 slots.

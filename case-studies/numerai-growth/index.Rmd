@@ -32,9 +32,9 @@ Numerai is a modern-day hedge fund where a large pool of anonymous data scientis
 
 Numerai's API uses GraphQL as a backend, which is a structured query language much like SQL itself.
 
-- Developed initially as an internal project by Facebook
-- Provides a method for development of APIs much like REST
-- Flexible and rich compared to REST and therefore may be less suitable for more simple web APIs
+- Developed initially as an internal project by Facebook.
+- Provides a method for development of APIs much like REST.
+- Flexible and rich compared to REST and therefore may be less suitable for more simple web APIs.
 - Where REST APIs are organized as a collection of endpoints, GraphQL is organized as a collection of types and fields with their associated datatype specification.
 
 Let's take a look at how to interact with GraphQL in R...
@@ -47,8 +47,8 @@ Let's take a look at how to interact with GraphQL in R...
 
 There are two primary methods of accessing the Numerai data:
 
-- Directly, using the `ghql` R package
-- Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R
+- Directly, using the `ghql` R package.
+- Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R.
 
 We will use `ghql` to keep the steps reproducible.
 
@@ -82,7 +82,7 @@ This connection object maintains the GraphQL client connection to the Numerai AP
 
 ---
 
-## Making a Leaderboard Query 
+## Making a Leaderboard Query
 
 We can perform a query with the following:
 
@@ -99,13 +99,13 @@ qry$query('leaderboard', '{
   }
 }')
 
-result <- con$exec(qry$queries$leaderboard) #execute query 
+result <- con$exec(qry$queries$leaderboard) #execute query
 ```
 
 Note that we begin with the initialization of a new instance of the R6 `Query` class, and then call the `query()` method, passing in two arguments:
 
-- The name of the resulting object 
-- The raw GraphQL query that is to be executed
+- The name of the resulting object.
+- The raw GraphQL query that is to be executed.
 
 Here 'leaderboard' indicates the name of the query.
 
@@ -121,7 +121,7 @@ library(kableExtra)
 library(ggplot2)
 ```
 
-A quick peak at the raw return value shows JSON data that we need to parse using the `fromJSON()` function, in order to retrieve a data frame:
+A quick peak at the raw values returned shows JSON data that we need to parse using the `fromJSON()` function, in order to create a data frame:
 
 ```{r}
 print(paste0(substring(result, 1, 50), "..."))
@@ -140,7 +140,7 @@ head(nmr, 3) %>%
 
 ## 52 Week Returns
 
-Now we can use `ggplot()` in order to visualize aspects of the data!
+Now we can use `ggplot()` to visualize aspects of the data!
 
 ```{r, message=FALSE, fig.height=5, warning=FALSE}
 ggplot(data = nmr, aes(x = return_52Weeks)) +
@@ -150,9 +150,9 @@ ggplot(data = nmr, aes(x = return_52Weeks)) +
 
 ---
 
-## 13 Week Returns
+## 13 Weekly Returns
 
-Now we can use `ggplot()` in order to visualize aspects of the data!
+We can use `ggplot()` to visualize weekly returns.
 
 ```{r, message=FALSE, fig.height=5, warning=FALSE}
 ggplot(data = nmr, aes(x = return_13Weeks)) +
@@ -201,4 +201,3 @@ Try it yourself!
 <img src="Cut_outs/Cut_out_16f.png"  width="200px" height="200px">
 
 </p>
-

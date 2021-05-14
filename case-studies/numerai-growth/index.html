@@ -4,6 +4,7 @@
     <title>Interacting with and Analyzing   Numerai Network Growth</title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="classroom.css" type="text/css" />
@@ -33,9 +34,9 @@ Numerai is a modern-day hedge fund where a large pool of anonymous data scientis
 
 Numerai's API uses GraphQL as a backend, which is a structured query language much like SQL itself.
 
-- Developed initially as an internal project by Facebook
-- Provides a method for development of APIs much like REST
-- Flexible and rich compared to REST and therefore may be less suitable for more simple web APIs
+- Developed initially as an internal project by Facebook.
+- Provides a method for development of APIs much like REST.
+- Flexible and rich compared to REST and therefore may be less suitable for more simple web APIs.
 - Where REST APIs are organized as a collection of endpoints, GraphQL is organized as a collection of types and fields with their associated datatype specification.
 
 Let's take a look at how to interact with GraphQL in R...
@@ -48,8 +49,8 @@ Let's take a look at how to interact with GraphQL in R...
 
 There are two primary methods of accessing the Numerai data:
 
-- Directly, using the `ghql` R package
-- Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R
+- Directly, using the `ghql` R package.
+- Indirectly, by downloading the parsed JSON data from the Numerai API and reading it into R.
 
 We will use `ghql` to keep the steps reproducible.
 
@@ -85,7 +86,7 @@ This connection object maintains the GraphQL client connection to the Numerai AP
 
 ---
 
-## Making a Leaderboard Query 
+## Making a Leaderboard Query
 
 We can perform a query with the following:
 
@@ -103,13 +104,13 @@ qry$query('leaderboard', '{
   }
 }')
 
-result &lt;- con$exec(qry$queries$leaderboard) #execute query 
+result &lt;- con$exec(qry$queries$leaderboard) #execute query
 ```
 
 Note that we begin with the initialization of a new instance of the R6 `Query` class, and then call the `query()` method, passing in two arguments:
 
-- The name of the resulting object 
-- The raw GraphQL query that is to be executed
+- The name of the resulting object.
+- The raw GraphQL query that is to be executed.
 
 Here 'leaderboard' indicates the name of the query.
 
@@ -119,7 +120,7 @@ Here 'leaderboard' indicates the name of the query.
 
 
 
-A quick peak at the raw return value shows JSON data that we need to parse using the `fromJSON()` function, in order to retrieve a data frame:
+A quick peak at the raw values returned shows JSON data that we need to parse using the `fromJSON()` function, in order to create a data frame:
 
 
 ```r
@@ -127,7 +128,7 @@ print(paste0(substring(result, 1, 50), "..."))
 ```
 
 ```
-## [1] "{\"data\":{\"v2Leaderboard\":[{\"corrRep\":0.05131718502..."
+## [1] "{\"data\":{\"v2Leaderboard\":[{\"corrRep\":0.06688481132..."
 ```
 
 And the parsed data:
@@ -152,25 +153,25 @@ head(nmr, 3) %&gt;%
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0513172 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0235345 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 154.67672 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0668848 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0269104 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99.52905 &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; quantyquant &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; mdl3 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0493736 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0224515 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 161.39390 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 519.6086 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0651065 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0270910 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 101.81269 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 430.3838 &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; benben11 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:right;"&gt; 0.0469501 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.0190929 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 49.33033 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 204.3398 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; labrat &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0631207 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0194339 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; anna13 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
@@ -179,7 +180,7 @@ head(nmr, 3) %&gt;%
 
 ## 52 Week Returns
 
-Now we can use `ggplot()` in order to visualize aspects of the data!
+Now we can use `ggplot()` to visualize aspects of the data!
 
 
 ```r
@@ -192,9 +193,9 @@ ggplot(data = nmr, aes(x = return_52Weeks)) +
 
 ---
 
-## 13 Week Returns
+## 13 Weekly Returns
 
-Now we can use `ggplot()` in order to visualize aspects of the data!
+We can use `ggplot()` to visualize weekly returns.
 
 
 ```r
