@@ -84,14 +84,14 @@ Select the ID column with the `$` operator:
 Punks$ID
 ```
 
-We now determine the row location in our data where the ID is 9117.
+We now determine the row location in our data where the ID is 9126.
 ```{r}
-punk_9126 <- Punks$ID == 9126 # Creates vector of T/F values if the entry is 9999.
+punk_9126 <- Punks$ID == 9126 # Creates vector of T/F values if the entry is 9126.
 head(punk_9126)
 ```
 This output doesn't show much. It would be much easier if we could see which positions are `TRUE`!
 ```{r}
-which(punk_9126 == TRUE) # Tells row number where the ID is 9999
+which(punk_9126 == TRUE) # Tells row number where the ID is 9126
 ```
 
 ---
