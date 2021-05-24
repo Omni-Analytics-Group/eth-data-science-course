@@ -97,7 +97,7 @@ which(punk_9126 == TRUE) # Tells row number where the ID is 9126
 ---
 
 ## Demo (Continued)
-Displaying part of the Punks data set where the ID is 9998 by subsetting rows.
+Displaying part of the Punks data set where the ID is 9126 by subsetting rows.
 ```{r}
 Punks[Punks$ID == 9126, ] #or Punks[punk_9126, ]
 ```
