@@ -290,7 +290,7 @@ type[1:6] # Selects the 1st through 6th type
 We can index vectors using logical statements as well:
 ```{r}
 
-x <- slots[1:5] #Pulls the total points for the first 5 slots
+x <- slots[1:5] #Pulls the first 5 slots
 x > 3 # Returns which of the first 5 slots are greater than 3
 x[x < 3] # returns which is less than 3
 ```
