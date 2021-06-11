@@ -435,7 +435,7 @@ type[1:6] # Selects the 1st through 6th type
 We can index vectors using logical statements as well:
 
 ```r
-x &lt;- slots[1:5] #Pulls the total points for the first 5 players
+x &lt;- slots[1:5] #Pulls the first 5 slots
 x &gt; 3 # Returns which of the first 5 slots are greater than 3
 ```
 
@@ -565,7 +565,7 @@ sum(sold)
 
 
 ```r
-# Finds the minutes for those players
+# Finds the transactions that are more than 1 ETH
 sales_1_ETH &lt;- Punks$Crypto[sold] &gt;= 1.00
 sum(sales_1_ETH)
 ```
