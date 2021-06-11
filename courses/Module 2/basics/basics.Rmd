@@ -1,0 +1,983 @@
+---
+title: "Data Visualization and Design"
+subtitle: "Using ggplot2 <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+```{r}
+library(ggplot2)
+library(ggsci)
+library(ggthemes)
+library(gridExtra)
+library(grid)
+
+grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, position = c("bottom", "right")) {
+
+  plots <- list(...)
+  position <- match.arg(position)
+  g <- ggplotGrob(plots[[1]] + theme(legend.position = position))$grobs
+  legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+  lheight <- sum(legend$height)
+  lwidth <- sum(legend$width)
+  gl <- lapply(plots, function(x) x + theme(legend.position="none"))
+  gl <- c(gl, ncol = ncol, nrow = nrow)
+
+  combined <- switch(position,
+                     "bottom" = arrangeGrob(do.call(arrangeGrob, gl),
+                                            legend,
+                                            ncol = 1,
+                                            heights = unit.c(unit(1, "npc") - lheight, lheight)),
+                     "right" = arrangeGrob(do.call(arrangeGrob, gl),
+                                           legend,
+                                           ncol = 2,
+                                           widths = unit.c(unit(1, "npc") - lwidth, lwidth)))
+  
+  grid.newpage()
+  grid.draw(combined)
+
+  # return gtable invisibly
+  invisible(combined)
+
+}
+
+```
+
+class: center, middle
+
+# BASICS
+
+---
+
+# Why is data visualization important?
+<br/>
+
+- Exploratory Data Analysis (EDA)
+
+<br/><br/>
+
+Examples:  
+
+- Anscombe's Quartet Exercise
+
+- The Deception of Model Accuracy
+
+---
+
+# Anscombe's Quartet
+
+-  4 datasets that have nearly identical simple statistical properties that appear very different when graphed
+
+- demonstrate both the importance of graphing data before analyzing it and the effect of outliers on statistical properties
+
+- 11 (x,y) points
+
+- the same mean, median, standard deviation, and correlation coefficient between x and y
+---
+
+# Anscombe's Quartet: data
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-j2zy{background-color:#FCFBE3;vertical-align:top}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-jyax{background-color:#FCFBE3;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+.tg .tg-yw4l{vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-amwm" colspan="2">I</th>
+    <th class="tg-amwm" colspan="2">II</th>
+    <th class="tg-amwm" colspan="2">III</th>
+    <th class="tg-amwm" colspan="2">IV</th>
+  </tr>
+  <tr>
+    <td class="tg-amwm">x</td>
+    <td class="tg-jyax">y</td>
+    <td class="tg-amwm">x</td>
+    <td class="tg-jyax">y</td>
+    <td class="tg-amwm">x</td>
+    <td class="tg-jyax">y</td>
+    <td class="tg-amwm">x</td>
+    <td class="tg-jyax">y</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">10.0</td>
+    <td class="tg-yq6s">8.04</td>
+    <td class="tg-baqh">10.0</td>
+    <td class="tg-yq6s">9.14</td>
+    <td class="tg-baqh">10.0</td>
+    <td class="tg-yq6s">7.46</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">6.58</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">6.95</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">8.14</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">6.77</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">5.76</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">13.0</td>
+    <td class="tg-yq6s">7.58</td>
+    <td class="tg-baqh">13.0</td>
+    <td class="tg-yq6s">8.74</td>
+    <td class="tg-baqh">13.0</td>
+    <td class="tg-yq6s">12.74</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">7.71</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">9.0</td>
+    <td class="tg-yq6s">8.81</td>
+    <td class="tg-baqh">9.0</td>
+    <td class="tg-yq6s">8.77</td>
+    <td class="tg-baqh">9.0</td>
+    <td class="tg-yq6s">7.11</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">8.84</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">11.0</td>
+    <td class="tg-yq6s">8.33</td>
+    <td class="tg-baqh">11.0</td>
+    <td class="tg-yq6s">9.26</td>
+    <td class="tg-baqh">11.0</td>
+    <td class="tg-yq6s">7.81</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">8.47</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">14.0</td>
+    <td class="tg-yq6s">9.96</td>
+    <td class="tg-baqh">14.0</td>
+    <td class="tg-yq6s">8.10</td>
+    <td class="tg-baqh">14.0</td>
+    <td class="tg-yq6s">8.84</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">7.04</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">6.0</td>
+    <td class="tg-yq6s">7.24</td>
+    <td class="tg-baqh">6.0</td>
+    <td class="tg-yq6s">6.13</td>
+    <td class="tg-baqh">6.0</td>
+    <td class="tg-yq6s">6.08</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">5.25</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">4.0</td>
+    <td class="tg-yq6s">4.26</td>
+    <td class="tg-baqh">4.0</td>
+    <td class="tg-yq6s">3.10</td>
+    <td class="tg-baqh">4.0</td>
+    <td class="tg-yq6s">5.39</td>
+    <td class="tg-baqh">19.0</td>
+    <td class="tg-yq6s">12.50</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">12.0</td>
+    <td class="tg-yq6s">10.84</td>
+    <td class="tg-baqh">12.0</td>
+    <td class="tg-yq6s">9.13</td>
+    <td class="tg-baqh">12.0</td>
+    <td class="tg-yq6s">8.15</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">5.56</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">7.0</td>
+    <td class="tg-yq6s">4.82</td>
+    <td class="tg-baqh">7.0</td>
+    <td class="tg-yq6s">7.26</td>
+    <td class="tg-baqh">7.0</td>
+    <td class="tg-yq6s">6.42</td>
+    <td class="tg-baqh">8.0</td>
+    <td class="tg-yq6s">7.91</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">5.0</td>
+    <td class="tg-j2zy">5.68</td>
+    <td class="tg-yw4l">5.0</td>
+    <td class="tg-j2zy">4.74</td>
+    <td class="tg-yw4l">5.0</td>
+    <td class="tg-j2zy">5.73</td>
+    <td class="tg-yw4l">8.0</td>
+    <td class="tg-j2zy">6.89</td>
+  </tr>
+</table>
+
+---
+
+# Anscombe's Quartet: summary statistics
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;border:none;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-2od3{background-color:#FCFBE3;font-weight:bold;text-align:right}
+.tg .tg-axdc{background-color:#FCFBE3;font-weight:bold;text-align:right;vertical-align:top}
+.tg .tg-lyaj{background-color:#FCFBE3;text-align:center}
+.tg .tg-hgcj{font-weight:bold;text-align:center}
+.tg .tg-34fq{font-weight:bold;text-align:right}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-031e"></th>
+    <th class="tg-hgcj">I</th>
+    <th class="tg-hgcj">II</th>
+    <th class="tg-hgcj">III</th>
+    <th class="tg-hgcj">IV</th>
+  </tr>
+  <tr>
+    <td class="tg-2od3">mean(x)</td>
+    <td class="tg-lyaj">9</td>
+    <td class="tg-lyaj">9</td>
+    <td class="tg-lyaj">9</td>
+    <td class="tg-lyaj">9</td>
+  </tr>
+  <tr>
+    <td class="tg-34fq">sd(x)</td>
+    <td class="tg-s6z2">3.32</td>
+    <td class="tg-s6z2">3.32</td>
+    <td class="tg-s6z2">3.32</td>
+    <td class="tg-s6z2">3.32</td>
+  </tr>
+  <tr>
+    <td class="tg-2od3">mean(y)</td>
+    <td class="tg-lyaj">7.5</td>
+    <td class="tg-lyaj">7.5</td>
+    <td class="tg-lyaj">7.5</td>
+    <td class="tg-lyaj">7.5</td>
+  </tr>
+  <tr>
+    <td class="tg-34fq">sd(y)</td>
+    <td class="tg-s6z2">2.03</td>
+    <td class="tg-s6z2">2.03</td>
+    <td class="tg-s6z2">2.03</td>
+    <td class="tg-s6z2">2.03</td>
+  </tr>
+  <tr>
+    <td class="tg-axdc">corr(x,y)</td>
+    <td class="tg-yq6s">0.816</td>
+    <td class="tg-yq6s">0.816</td>
+    <td class="tg-yq6s">0.816</td>
+    <td class="tg-yq6s">0.816</td>
+  </tr>
+</table>
+
+```{r}
+library(Tmisc)
+library(tidyverse)
+data(quartet)
+# quartet %>%
+#   group_by(set) %>%
+#   summarize(mean(x), sd(x), mean(y), sd(y), cor(x,y))
+```
+???
+
+each dataset has the same mean, median, standard deviation, and correlation coefficient between x and y.
+ 
+ 
+---
+
+# Anscombe's Quartet: plots
+
+```{r, fig.align = "center"}
+
+ggplot(quartet, aes(x, y)) + geom_point(colour = "darkorange1", size = 2) + geom_smooth(method = lm, se = FALSE, colour = "grey19", alpha = .5) + facet_wrap(~set)
+
+
+```
+
+
+???
+
+plot y versus x for each set with a linear regression trendline displayed on each plot:
+
+This classic example really illustrates the importance of looking at your data, not just the summary statistics and model parameters you compute from it.
+
+---
+
+# The Deception of Model Accuracy
+
+```{r, fig.align="center", fig.height=5, fig.width=6}
+xdata <- runif(5000, 0, 100)
+ydata <- runif(5000, 0, 100)
+
+dat <- data_frame(x = xdata, y=ydata)
+dat$class2 <- ifelse(dat$x<= 25, "Blue", ifelse(dat$x<=75, "Red", "Green"))
+xshort <- xdata[2501:4500]
+class_short <- ifelse(xshort<= 25, "Blue", ifelse(xshort<=75, "Red", "Green"))
+xlast <- xdata[4501:5000]
+class_last <- ifelse(xlast<= 50, "Blue", "Green")
+
+dat$class1 <- c(rep("Red", 2500), class_short, class_last)
+dat$class3 <- rep("Red", 5000)
+                
+cols <- c("dodgerblue3", "green3", "firebrick2")
+
+p1 <- ggplot(dat)+geom_point(aes(x=x, y=y, colour = class1), size = 1) + scale_colour_manual(values=cols, name = "Class") + labs(title = "Original Data", x = "Generic X", y = "Generic Y")
+
+p2 <- ggplot(dat)+geom_point(aes(x=x, y=y, colour = class2), size = 1) + scale_colour_manual(values=cols, name = "Class") + labs(title = "Blue<=25<=Red<=75<= Green Model", x = "Generic X", y = "Generic Y")
+
+p3 <-ggplot(dat)+geom_point(aes(x=x, y=y, colour = class3), size = 1)+ scale_colour_manual(values=cols[3], name = "Class") + labs(title = "All Red Model", x = "Generic X", y = "Generic Y")
+
+p1
+
+```
+
+---
+
+# The Deception of Model Accuracy
+
+Two models
+
+```{r, fig.align="center", fig.height=6, fig.width=14}
+
+grid.arrange(p3, p2, ncol = 2, nrow = 1)
+
+```
+
+
+---
+
+# The Deception of Model Accuracy
+
+
+
+
+```{r, fig.align="center", fig.height=3, fig.width=8}
+
+grid.arrange(p2, p3, ncol = 2, nrow = 1)
+
+```
+
+.pull-left[
+```{r, fig.align="center", fig.height=3, fig.width=4}
+p1
+```
+
+
+```{r, fig.height=6, fig.width=21}
+
+#grid.arrange(p1, p2, p3, ncol = 3, nrow = 1)
+
+```
+]
+.pull-right[
+- Both models have the same level of accuracy (62.5%) but they divide the data space differently
+
+- The class balance accuracy for the all red and class partitioned models are 20.8% and 50% respectfully
+]
+
+---
+class: center, middle
+
+# Data Types, Formats, and Structures
+
+---
+
+# Data
+
+Before it’s possible to talk about a graphical grammar, it’s important to know the type and format of the data you’re working with.  
+  
+<br/>
+
+--
+Why?
+--
+
+- the data contains all of the information you’re trying to convey
+
+- the appropriate graphical techniques depend on the kind of data that you are working with
+
+- Working with R and ggplot is much easier if the data you use is in the right shape.
+
+---
+
+# Data: levels of measurement
+
+.pull-left[
+**Quantitative**:
+
+- Continuous
+  - e.g. height, weight
+  
+- Discrete  
+  - e.g. age in years  
+]
+.pull-right[
+**Qualitative**:
+
+- Nominal
+  - categories have no meaningful order  
+  
+  - e.g. colors
+  
+- Ordinal
+  - categories have order but no meaningful distance between categories
+  
+  - e.g. five star ratings
+]
+
+---
+
+# Data: Dimensionality, Form, and Type
+
+.pull-left[
+**Dimensions**
+
+- Univariate  
+  - 1 variable
+
+- Bivariate  
+  - 2 variables
+
+- Multivariate
+  - 2+ variables
+
+**Forms**
+
+- Traditional  
+
+- Aggregated
+]
+.pull-right[
+**Types**
+
+- Count  
+
+  - Word Frequency  
+
+  - Sports Statistics  
+
+- Time Series  
+
+- Spatial  
+
+- Time to Event  
+
+  - Survival  
+  
+  - Reliability  
+  
+- Categorical 
+
+]
+---
+
+# Exploring Relationships
+
+- Continuous vs. Continuous  
+  - scatter plot, line plot
+  
+- Continuous vs. Categorical  
+  - boxplots, dotcharts, multiple density plots, violin plots
+
+- Categorical vs. Categorical  
+  - mosaicplots, side-by-side barplots
+  
+- Multidimensional
+
+
+
+---
+class: center, middle 
+
+# Formating your data: 
+
+## A tidy data discussion
+
+---
+
+# Data format 
+
+- Working with R and ggplot is much easier if the data you use is in the right shape.
+
+- Unlike base graphics, ggplot works with dataframes and not individual vectors. 
+
+- All the data needed to make the plot is typically contained within the dataframe 
+
+- ggplot expects your data to be in a particular sort of shape - "tidy data"
+
+
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_26.png"  width="200px" height="250px">
+
+</p>
+---
+
+# Same data, different layouts
+
+.pull-left[
+**Option 1:**
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-gmsq{background-color:#FCFBE3;font-style:italic;text-align:center}
+.tg .tg-lyaj{background-color:#FCFBE3;text-align:center}
+.tg .tg-hgcj{font-weight:bold;text-align:center}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-hgcj">Name</th>
+    <th class="tg-hgcj">Treatment A</th>
+    <th class="tg-hgcj">Treatment B</th>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">John Smith</td>
+    <td class="tg-gmsq">NA</td>
+    <td class="tg-s6z2">18</td>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">Jane Doe</td>
+    <td class="tg-lyaj">4</td>
+    <td class="tg-s6z2">1</td>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">Mary Johnson</td>
+    <td class="tg-lyaj">6</td>
+    <td class="tg-s6z2">7</td>
+  </tr>
+</table>
+
+<br/>
+
+**Option 2:**
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-amwm">Treatment</th>
+    <th class="tg-amwm">John Smith</th>
+    <th class="tg-amwm">Jane Doe</th>
+    <th class="tg-amwm">Mary Johnson</th>
+  </tr>
+  <tr>
+    <td class="tg-yq6s">A</td>
+    <td class="tg-yq6s">NA</td>
+    <td class="tg-yq6s">4</td>
+    <td class="tg-yq6s">6</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">18</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">7</td>
+  </tr>
+</table>
+]
+.pull-right[
+**Option 3:**
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-hgcj{font-weight:bold;text-align:center}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-hgcj">Name</th>
+    <th class="tg-hgcj">Treatment</th>
+    <th class="tg-hgcj">Measurement</th>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">John Smith</td>
+    <td class="tg-s6z2">A</td>
+    <td class="tg-s6z2">NA</td>
+  </tr>
+  <tr>
+    <td class="tg-s6z2">Jane Doe</td>
+    <td class="tg-s6z2">A</td>
+    <td class="tg-s6z2">4</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Mary Johnson</td>
+    <td class="tg-baqh">A</td>
+    <td class="tg-baqh">6</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">John Smith</td>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">18</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Jane Doe</td>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">1</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Mary Johnson</td>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">7</td>
+  </tr>
+</table>
+]
+
+```{r, eval = FALSE}
+preg <- read.csv("data/preg.csv", stringsAsFactors = FALSE)
+preg
+knitr::kable(preg, format = 'html')
+preg2 <- read.csv("data/preg2.csv", stringsAsFactors = FALSE)
+preg2
+knitr::kable(preg2, format = 'html')
+
+preg3 <- preg %>% gather(treatment, measurement, -name)
+preg3
+
+```
+
+
+
+???
+
+The data is the same, but the layout is different. Our vocabulary of rows and columns is simply not rich enough to describe why the two tables represent the same data. In addition to appearance, we need a way to describe the underlying semantics, or meaning, of the values displayed in the table
+
+---
+
+
+# Wide Format vs. Long Format
+
+.pull-left[
+**Wide format**
+
+- some variables are spread out across columns.
+
+- typically uses less space to display
+
+- how you would typically choose to present your data
+
+- far less repetition of labels and row elements
+
+
+![](images/tablewide2.png)
+
+]
+.pull-right[
+
+**Long format**
+
+- each variable is a column
+
+- each observation is a row
+
+- is likely not the data's most compact form
+
+
+```{r fig.width=3, fig.height=3.7,echo=FALSE, fig.align="center"}
+library(png)
+library(grid)
+img <- readPNG("images/tablelong2.png")
+ grid.raster(img)
+```
+
+]
+
+---
+
+# Tidy Data
+
+
+- Each variable is a column
+
+- Each observation is a row
+
+- Each type of observational unit forms a table
+
+<br/>
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-amwm">Name</th>
+    <th class="tg-amwm">Treatment</th>
+    <th class="tg-amwm">Measurement</th>
+  </tr>
+  <tr>
+    <td class="tg-baqh">John Smith</td>
+    <td class="tg-baqh">A</td>
+    <td class="tg-baqh">NA</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">John Smith</td>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">18</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Jane Doe</td>
+    <td class="tg-baqh">A</td>
+    <td class="tg-baqh">4</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Jane Doe</td>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">1</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Mary Johnson</td>
+    <td class="tg-baqh">A</td>
+    <td class="tg-baqh">6</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">Mary Johnson</td>
+    <td class="tg-baqh">B</td>
+    <td class="tg-baqh">7</td>
+  </tr>
+</table>
+
+
+---
+
+# Messy data
+
+ *Happy families are all alike; every unhappy family is unhappy in its own way. - Leo Tolstoy*  
+<br/>
+--
+
+**Five main ways tables of data tend not to be tidy:**
+
+1. Column headers are values, not variable names.
+
+2. Multiple variables are stored in one column.
+
+3. Variables are stored in both rows and columns.
+
+4. Multiple types of observational units are stored in the same table.
+
+5. A single observational unit is stored in multiple tables.
+
+
+---
+
+# Tidy your data
+
+
+```{r, eval=FALSE, echo=TRUE}
+data(french_fries, package="reshape2")
+head(french_fries)
+
+```
+
+**Wide Format:**
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-amwm">time</th>
+    <th class="tg-amwm">treatment</th>
+    <th class="tg-amwm">subject</th>
+    <th class="tg-amwm">rep</th>
+    <th class="tg-amwm">potato</th>
+    <th class="tg-amwm">buttery</th>
+    <th class="tg-amwm">grassy</th>
+    <th class="tg-amwm">rancid</th>
+    <th class="tg-amwm">painty</th>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">2.9</td>
+    <td class="tg-yq6s">0.0</td>
+    <td class="tg-baqh">0.0</td>
+    <td class="tg-yq6s">0.0</td>
+    <td class="tg-baqh">5.5</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-yq6s">2</td>
+    <td class="tg-baqh">14.0</td>
+    <td class="tg-yq6s">0.0</td>
+    <td class="tg-baqh">0.0</td>
+    <td class="tg-yq6s">1.1</td>
+    <td class="tg-baqh">0.0</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">10</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">11.0</td>
+    <td class="tg-yq6s">6.4</td>
+    <td class="tg-baqh">0.0</td>
+    <td class="tg-yq6s">0.0</td>
+    <td class="tg-baqh">0.0</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">10</td>
+    <td class="tg-yq6s">2</td>
+    <td class="tg-baqh">9.9</td>
+    <td class="tg-yq6s">5.9</td>
+    <td class="tg-baqh">2.9</td>
+    <td class="tg-yq6s">2.2</td>
+    <td class="tg-baqh">0.0</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">15</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">1.2</td>
+    <td class="tg-yq6s">0.1</td>
+    <td class="tg-baqh">0.0</td>
+    <td class="tg-yq6s">1.1</td>
+    <td class="tg-baqh">5.1</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-yq6s">1</td>
+    <td class="tg-baqh">15</td>
+    <td class="tg-yq6s">2</td>
+    <td class="tg-baqh">8.8</td>
+    <td class="tg-yq6s">3.0</td>
+    <td class="tg-baqh">3.6</td>
+    <td class="tg-yq6s">1.5</td>
+    <td class="tg-baqh">2.3</td>
+  </tr>
+</table>
+
+---
+
+# Tidy your data
+
+```{r, eval=FALSE, echo=TRUE}
+
+french_fries_long <- french_fries %>% 
+  gather(key = variable, value = rating, potato:painty)
+head(french_fries_long)
+
+```
+
+
+
+** Tidy (long) format:**
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-amwm">time</th>
+    <th class="tg-amwm">treatment</th>
+    <th class="tg-amwm">subject</th>
+    <th class="tg-amwm">rep</th>
+    <th class="tg-amwm">variable</th>
+    <th class="tg-amwm">rating</th>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">potato</td>
+    <td class="tg-baqh">2.9</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">3</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">potato</td>
+    <td class="tg-baqh">14.0</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">10</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">potato</td>
+    <td class="tg-baqh">11.0</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">10</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">potato</td>
+    <td class="tg-baqh">9.9</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">15</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">potato</td>
+    <td class="tg-baqh">1.2</td>
+  </tr>
+  <tr>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">1</td>
+    <td class="tg-baqh">15</td>
+    <td class="tg-baqh">2</td>
+    <td class="tg-baqh">potato</td>
+    <td class="tg-baqh">8.8</td>
+  </tr>
+</table>
+
+
+

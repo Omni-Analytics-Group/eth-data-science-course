@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Visualization and Design</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Visualization and Design
+## Using ggplot2 <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+
+
+class: center, middle
+
+# BUILDING PLOTS
+
+---
+class:  center, middle
+
+# Underlying theory
+
+---
+
+# What is a graphic?
+
+ggplot2 uses the idea that you can build every graph from the same components:
+
+  1. a **data** set
+  
+  2. a **coordinate system**
+  
+  3. **geoms** - visual marks that represent data
+  
+- to display values, map variables in the data to visual properties of the geom (**aesthetics**) like **size**, **color**, and **x** and **y** locations
+
+![](images/build1.png)![](images/build2.png)
+
+---
+# How to build a graph
+
+Complete the template below to build a graph
+
+.pull-left[
+![](images/ggplot2-notation.png)
+]
+
+.pull-right[
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_05.png"  width="200px" height="160px"&gt;
+
+&lt;/p&gt;
+]
+---
+# How to build a graph
+
+`ggplot(cryptoart, aes(x = Platform, y = End.Price))`
+
+- This will begin a plot that you can finish by adding layers to.
+
+- You can add one geom per layer
+
+
+&lt;img src="building-plots_files/figure-html/plots-4-1.png"  /&gt;
+
+---
+
+
+# What is a geom?
+
+In ggplot2, we use a geom function to represent data points, and use the geom's aesthetic properties to represent variables.
+
+
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-2-1.png"  /&gt;
+
+Once our data is formatted and we know what type of variables we are working with, we can select the correct geom for our visualization. 
+
+---
+# Available geoms 
+
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+# What is a layer?
+
+- it determines the physical representation of the data
+
+- Together, the data, mappings, statistical transformation, and geometric object form a layer
+
+- A plot may have multiple layers
+ 
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-4-1.png"  /&gt;
+
+---
+# Alternative method of building layers: Stats
+
+A stat builds a new variable to plot (e.g., count and proportion)
+.pull-left[
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-5-1.png"  /&gt;
+]
+.pull-right[
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-6-1.png"  /&gt;
+]
+
+
+---
+
+# Faceting
+
+A way to extract subsets of data and place them side-by-side in graphics
+
+
+```r
+ggplot(cryptoart, aes(x = Start.Price, y = End.Price, colour = Platform))+ geom_point()
+
+ggplot(cryptoart, aes(x = Start.Price, y = End.Price, colour = Platform)) + geom_point() +facet_grid(.~Platform)
+```
+
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Faceting Options
+
+- `facet_grid(. ~ b)`:facet into columns based on b 
+- `facet_grid(a ~ .)`:facet into columns based on a 
+- `facet_grid(a ~ b)`:facet into both rows and columns
+- `facet_wrap( ~ fl)`:wrap facets into a rectangular layout
+
+You can set scales to let axis limits vary across facets:
+
+- `facet_grid(y ~ x, scales = "free")`: x and y axis limits adjust to individual facets
+- "free_x" - x axis limits adjust
+- "free_y" - y axis limits adjust
+
+You can also set a labeller to adjust facet labels:
+- `facet_grid(. ~ fl, labeller = label_both)`
+- `facet_grid(. ~ fl, labeller = label_bquote(alpha ^ .(x)))`
+- `facet_grid(. ~ fl, labeller = label_parsed)`
+
+
+---
+
+# Position Adjustments
+
+Position adjustments determine how to arrange geoms that would otherwise occupy the same space
+- **Dodge**: Arrange elements side by side 
+- **Fill**: Stack elements on top of one another, normalize height
+- **Stack**: Stack elements on top of one another
+
+`ggplot(cryptoart, aes(Times.Sold, fill = Growth)) + geom_bar(position = "")`
+
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+# Position Adjustments: Jitter
+
+- **Jitter**: Add random noise to X &amp; Y position of each element to avoid overplotting
+- There is also a jitter geom 
+
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+## Coordinate Systems
+
+- `coord_cartesian()`: The default cartesian coordinate system
+- `coord_fixed()`: Cartesian with fixed aspect ratio between x &amp; y units
+- `coord_flip()`: Flipped Cartesian coordinates
+- `coord_polar()`: Polar coordinates
+- `coord_trans()`: Transformed cartesian coordinates.
+- `coord_map()`: Map projections from the mapproj package (mercator (default), azequalarea, lagrange, etc.)
+
+
+
+&lt;img src="building-plots_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## ggplot2 extensions
+
+There are many ggplot2 extensions available. For example,
+
+* gganimate
+* GGally
+
+You can find other extensions here: https://exts.ggplot2.tidyverse.org/gallery/
+
+---
+
+## gganimate
+
+.pull-left[
+gganimate extends the grammar of graphics as implemented by ggplot2 to include the description of animation.
+
+```r
+ggplot(cryptoart, aes(x = Platform, y = End.Price)) + geom_boxplot()+theme(axis.text.x = element_text(angle = 45))+
+  transition_states(
+    Times.Sold,
+    transition_length = 2,
+    state_length = 1
+  ) +
+  enter_fade() + 
+  exit_shrink() +
+  ease_aes('sine-in-out')
+```
+]
+.pull-right[
+![](building-plots_files/figure-html/p1-out-1.gif)&lt;!-- --&gt;
+]
+
+---
+## GGally
+
+.pull-left[
+GGally extends ggplot2 by adding several functions to reduce the complexity of combining geoms with transformed data. 
+
+```r
+ggpairs(cryptoart)
+```
+]
+.pull-right[
+![](building-plots_files/figure-html/p2-out-1.png)&lt;!-- --&gt;
+]
+
+ 
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
