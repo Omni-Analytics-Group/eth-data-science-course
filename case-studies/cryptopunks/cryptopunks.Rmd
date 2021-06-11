@@ -1,0 +1,450 @@
+---
+title: "Crypto Punks Analysis <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+## Crypto Punks
+
+The CryptoPunks are 10,000 uniquely generated characters and each one of them are officially owned by a single person on the Ethereum blockchain. Originally, they were all claimed by for free. Now, you can buy, bid on, and offer punks for sale via the marketplace that's also embedded in the blockchain. 
+
+You can check them out on https://www.larvalabs.com/cryptopunks. 
+
+<p align="center">
+
+<img src="punk-image.png" >
+
+</p>
+
+---
+
+## Getting Started
+
+We will be using the following libraries:
+
+```{r}
+library(knitr)
+library(tidyverse)
+library(ggfortify)
+library(formattable)
+library(ggnewscale)
+library(scales)
+```
+
+<p align="center">
+
+<img src="Cut_outs/Cut_out_17.png"  width="200px" height="150px">
+
+</p>
+---
+
+## The Data
+
+We will be using two data:
+
+* Transaction data that we scrapped from https://www.larvalabs.com/cryptopunks/details on 12/30/2021. 
+* Details of each punk available on https://docs.google.com/spreadsheets/d/1qJLUy7BR1i3-aU2axFkuvNY_5EqLDsQiE9ryxB0dcA0/edit#gid=278362788
+
+Let's read in the data!
+
+```{r}
+punks_transactions <- read_csv("transactions_cryptopunks.csv")
+punks_raw <- read_csv("cryptopunks.csv")
+```
+
+---
+
+## Data Preview
+
+
+
+```{r}
+head(punks_transactions,3)
+head(punks_raw,3)
+```
+
+---
+
+## Data Cleaning
+
+The transaction data is good to go, but the punks data need some cleaning as the numerical value (percentage) are treated as character. We can simply use `parse_number()` to get the numerical value from those columns. 
+
+```{r}
+punks <- punks_raw %>%
+  mutate(across(c(TypeRare, AttCount, Att1_1, Att2_1, Att3_1, 
+                  Att4_1, Att5_1, Att6_1, Att7_1, 
+                  Min, Avg, Rank), parse_number))
+```
+
+Let's get started with the analysis!
+
+---
+
+## Transactions
+
+On 06/23/2017, all 10,000 punks were claimed for free by 365 unique owners. On the same day, 32 bids and 21 sales were made. As of 12/30/2021, there are a total of 60479 interactions, where interactions include 'Bid', 'Bid Withdrawn', 'Offered', 'Offer Withdrawn', '(Wrap)', '(Unwrap)', 'Sold', 'Transfer', and 'Claimed'. 
+
+Below shows a summary of the number of each interaction:
+```{r}
+punks_transactions %>% group_by(Type) %>% summarise(Count = n(), Average_per_punk = n()/10000)
+```
+
+---
+
+## Transactions at the punk level
+
+We can look at how many interactions of each type for each punk as the table shows:
+
+```{r}
+punks_transactions %>%
+  group_by(ID, Type) %>%
+  summarise(Count = n()) 
+  
+```
+
+---
+
+## Your Turn
+
+1. Find the number of unique owners for each punk.
+2. Find the number of unique bidders for each punk.
+
+Hint: `filter()` and `n_distinct()` is an useful function here.
+
+---
+
+## Answers 
+
+### 1.
+```{r}
+punks_transactions %>%
+  group_by(ID) %>%
+  summarise(unique_owners = n_distinct(To))
+```
+
+---
+
+### 2.
+```{r}
+punks_transactions %>%
+  filter(Type == "Bid") %>%
+  group_by(ID) %>%
+  summarise(unique_bidders = n_distinct(From))
+```
+
+
+---
+
+## Selling Price for each punk
+
+There are a total of 7567 sales and only 3665 punks were involved in these sales. Let's take a look at their prices. 
+
+```{r}
+punks_transactions %>%
+  filter(Type == "Sold") %>%
+  group_by(ID)
+```
+
+---
+
+## First sale and last sale
+
+Since some of the punks are sold multiple times, we are interested in its first and last sale. As we can see from the table in the previous slide, the sales are in chronological order. Thus, we can do the following:
+
+```{r}
+first_sold_by_ID <- punks_transactions %>%
+  filter(Type == "Sold") %>%
+  group_by(ID) %>%
+  filter(row_number()==n())%>%
+  rename(first_price_ETH = Crypto, first_price_USD = USD)
+
+last_sold_by_ID <- punks_transactions %>%
+  filter(Type == "Sold") %>%
+  group_by(ID) %>%
+  filter(row_number()==1) %>%
+  rename(last_price_ETH = Crypto, last_price_USD = USD)
+```
+
+---
+To put `first_sold_by_ID` and `last_sold_by_ID` together, we simply use `inner_join()` as follows:
+
+```{r}
+sales_temp <- first_sold_by_ID %>% 
+  select(ID, first_price_ETH, first_price_USD) %>% 
+  inner_join(last_sold_by_ID, by = c("ID"="ID")) 
+sales_temp
+```
+
+---
+
+## Your Turn
+
+1. Create a table named `num_sold` that has the number of the sales for each punk that was sold at least once. 
+2. Create a table named `sales_temp_2` that combines `sales_temp` and `num_sold` above. 
+
+
+---
+
+## Answers
+
+### 1. 
+```{r}
+num_sold <- punks_transactions %>%
+  filter(Type == "Sold") %>%
+  group_by(ID) %>%
+  summarise(num_sold = n())
+```
+
+### 2. 
+```{r}
+sales_temp_2 <- sales_temp %>%
+  inner_join(num_sold, by = c("ID"="ID"))
+```
+
+---
+
+## Price Change
+Let's also compute the percentage change in the sale prices and create an extra column that categorize the frequency of a punk is being sold: 'Low' means a punk is sold less than or equal to 3 times, 'Medium' is sold more than 3 times and less than or equal to 5 times, and 'High' is sold more than 5 times. 
+
+```{r}
+sales <-sales_temp_2 %>%
+  mutate(percentage_change_ETH = (last_price_ETH-first_price_ETH)/first_price_ETH*100,
+         percentage_change_USD = (last_price_USD-first_price_USD)/first_price_USD*100,
+         frequency_sold = ifelse(num_sold<=3, "Low", ifelse(num_sold<=5, "Medium", "High")))
+head(sales,2)
+```
+
+---
+
+## Ditribution of Percentage Changed in Sold Price (ETH)
+
+We can visualize the distribution using `ggplot2` as follows: 
+
+```{r, eval = FALSE}
+scaleFUN <- function(x) sprintf("%.0f", x)
+x_breaks = c(1,2,3,5,10,20,30,50,100,200,300,500,1000,2000,3000,5000,10000,20000,30000,50000,100000,
+             200000,300000,500000)
+
+sales %>% 
+  filter(num_sold>1) %>%
+  mutate(frequency_sold = factor(frequency_sold, levels=c("Low", "Medium", "High"))) %>%
+  ggplot(aes(x=percentage_change_ETH))+
+  geom_histogram(aes(fill = frequency_sold), colour="black")+
+  scale_x_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=20))+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))+
+  labs(title = "Ditribution of Percentage Changed in Sold Price (ETH)",
+       subtitle = "for all Crypto Punks that have been resold", x = "Percentage Change (%)")+
+  scale_fill_discrete(name = "Frequency Sold", labels = c("Low (2,3)", "Medium (4,5)", "High (>5)"))
+```
+
+---
+
+```{r, echo = FALSE, fig.height = 8, fig.width = 11}
+scaleFUN <- function(x) sprintf("%.0f", x)
+x_breaks = c(1,2,3,5,10,20,30,50,100,200,300,500,1000,2000,3000,5000,10000,20000,30000,50000,100000,
+             200000,300000,500000)
+
+sales %>% 
+  filter(num_sold>1) %>%
+  mutate(frequency_sold = factor(frequency_sold, levels=c("Low", "Medium", "High"))) %>%
+  ggplot(aes(x=percentage_change_ETH))+
+  geom_histogram(aes(fill = frequency_sold), colour="black")+
+  scale_x_log10(breaks = x_breaks,
+                labels = comma_format())+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=20))+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))+
+  labs(title = "Ditribution of Percentage Changed in Sold Price (ETH)",
+       subtitle = "for all Crypto Punks that have been resold", x = "Percentage Change (%)")+
+  scale_fill_discrete(name = "Frequency Sold", labels = c("Low (2,3)", "Medium (4,5)", "High (>5)"))
+```
+
+
+---
+
+## Time Series
+
+We can also create a time series of the number of sales as follows.
+
+```{r, eval = FALSE}
+sales$Month_Yr <- format(as.Date(sales$Txn), "%Y-%m")
+sales %>%
+  group_by(Month_Yr) %>%
+  summarise(num_sales = n()) %>%
+  ggplot(aes(x=Month_Yr,y=num_sales, group=1))+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  geom_line(color="blue")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.9))+
+  labs(title = "Number of Sales over time", y = "Number of Sales", x= "Time")
+```
+---
+
+## Time Series (continued...)
+```{r, echo = FALSE}
+sales$Month_Yr <- format(as.Date(sales$Txn), "%Y-%m")
+sales %>%
+  group_by(Month_Yr) %>%
+  summarise(num_sales = n()) %>%
+  ggplot(aes(x=Month_Yr,y=num_sales, group=1))+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  geom_line(color="blue")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.9))+
+  labs(title = "Number of Sales over time", y = "Number of Sales", x= "Time")
+```
+---
+
+## Your Turn
+
+Create a time series showing the total sales in each month!
+
+--
+
+## Answers
+
+```{r, eval = FALSE}
+sales %>%
+  group_by(Month_Yr) %>%
+  summarise(total_sales = sum(last_price_ETH)) %>%
+  ggplot(aes(x=Month_Yr,y=total_sales, group=1))+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  geom_line(color="blue")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.9))+
+  labs(title = "Total Sales over time", y = "Total Sales (ETH)", x= "Time")
+```
+
+---
+
+## Answers (continued...)
+
+```{r, echo = FALSE}
+sales %>%
+  group_by(Month_Yr) %>%
+  summarise(total_sales = sum(last_price_ETH)) %>%
+  ggplot(aes(x=Month_Yr,y=total_sales, group=1))+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  geom_line(color="blue")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.9))+
+  labs(title = "Total Sales over time", y = "Total Sales (ETH)", x= "Time")
+```
+
+---
+
+## Punk's Rank vs its' Price
+
+We will use the existing 'Rank' column to create 'RankNum' using the `Rank` function and join it with the 'last_sold_by_ID' table.
+
+```{r}
+rank_and_transaction <- punks %>%
+  mutate(RankNum = rank(desc(Rank))) %>%
+  inner_join(last_sold_by_ID, by = c("Punk"="ID")) 
+
+head(rank_and_transaction,3)
+```
+
+---
+
+## Crypto Punks Last Sold Price vs Uniqueness Score
+
+```{r, eval = FALSE}
+scaleFUN <- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.02,0.03,0.05,0.07, 0.1,0.2,0.3,0.5,0.7,1,2,3,5,7,10,20,30,50, 70,
+             100,200, 300, 500, 700, 1000, 2000, 3000, 5000, 7000, 10000, 20000, 30000, 50000, 70000, 100000)
+rank_and_transaction %>% 
+  ggplot(aes(x=RankNum, y=last_price_ETH))+
+  geom_point()+
+  geom_smooth(aes(colour = ..y..), se=FALSE, size=2)+
+  scale_colour_gradient(low = "red", high = "green")+
+  labs(title = "Crypto Punks Last Sold Price vs Uniqueness Score", 
+       y = "Last Sold Price (ETH)", x = "Uniqueness Score")+
+  scale_x_continuous(breaks = scales::pretty_breaks(n=20))+
+  scale_y_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  theme_bw()+
+  theme(legend.position = "none")
+```
+
+---
+
+```{r, echo = FALSE, fig.width= 11}
+scaleFUN <- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.02,0.03,0.05,0.07, 0.1,0.2,0.3,0.5,0.7,1,2,3,5,7,10,20,30,50, 70,
+             100,200, 300, 500, 700, 1000, 2000, 3000, 5000, 7000, 10000, 20000, 30000, 50000, 70000, 100000)
+rank_and_transaction %>% 
+  ggplot(aes(x=RankNum, y=last_price_ETH))+
+  geom_point()+
+  geom_smooth(aes(colour = ..y..), se=FALSE, size=2)+
+  scale_colour_gradient(low = "red", high = "green")+
+  labs(title = "Crypto Punks Last Sold Price vs Uniqueness Score", 
+       y = "Last Sold Price (ETH)", x = "Uniqueness Score")+
+  scale_x_continuous(breaks = scales::pretty_breaks(n=20))+
+  scale_y_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  theme_bw()+
+  theme(legend.position = "none")
+```
+
+---
+
+## Distribution of Last Price Sold
+
+```{r, eval = FALSE}
+scaleFUN <- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.03, 0.05,0.1,0.3, 0.5, 1, 3,5, 10, 30,50, 100)
+rank_and_transaction %>% 
+  ggplot(aes(x=last_price_ETH))+
+  geom_histogram(aes(fill=Type.x),color ="black", boundary=0)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  scale_x_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  facet_wrap(~Type.x, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))+
+  labs(title = "Distribution of Last Price Sold by Type", x="Last Sale Price (ETH)")+
+  theme(legend.position = "none")
+```
+
+---
+
+```{r, echo = FALSE, fig.height = 8, fig.width = 11}
+scaleFUN <- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.03, 0.05,0.1,0.3, 0.5, 1, 3,5, 10, 30,50, 100)
+rank_and_transaction %>% 
+  ggplot(aes(x=last_price_ETH))+
+  geom_histogram(aes(fill=Type.x),color ="black", boundary=0)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  scale_x_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  facet_wrap(~Type.x, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))+
+  labs(title = "Distribution of Last Price Sold by Type", x="Last Sale Price (ETH)")+
+  theme(legend.position = "none")
+```
+
+---
+## Conclusion
+
+This data science case study taught us how to use analytics to understand the market for Crypto Punk NFTs.  We used graphs to show not only that sales have been increasing over time, but to objectively validate that the rarity of a punk has an impact on its selling price. Can you think of other interesting analysis?  If so, please feel free to share!
+
+<br> <br> <br>
+
+<p align="right">
+
+<img src="Cut_outs/Cut_out_07.png"  width="200px" height="200px">
+
+</p>

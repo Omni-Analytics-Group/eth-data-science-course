@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Visualization and Design</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data Visualization and Design
+## Using ggplot2 <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+
+
+class: center, middle
+
+# BASICS
+
+---
+
+# Why is data visualization important?
+&lt;br/&gt;
+
+- Exploratory Data Analysis (EDA)
+
+&lt;br/&gt;&lt;br/&gt;
+
+Examples:  
+
+- Anscombe's Quartet Exercise
+
+- The Deception of Model Accuracy
+
+---
+
+# Anscombe's Quartet
+
+-  4 datasets that have nearly identical simple statistical properties that appear very different when graphed
+
+- demonstrate both the importance of graphing data before analyzing it and the effect of outliers on statistical properties
+
+- 11 (x,y) points
+
+- the same mean, median, standard deviation, and correlation coefficient between x and y
+---
+
+# Anscombe's Quartet: data
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-j2zy{background-color:#FCFBE3;vertical-align:top}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-jyax{background-color:#FCFBE3;font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+.tg .tg-yw4l{vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-amwm" colspan="2"&gt;I&lt;/th&gt;
+    &lt;th class="tg-amwm" colspan="2"&gt;II&lt;/th&gt;
+    &lt;th class="tg-amwm" colspan="2"&gt;III&lt;/th&gt;
+    &lt;th class="tg-amwm" colspan="2"&gt;IV&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-amwm"&gt;x&lt;/td&gt;
+    &lt;td class="tg-jyax"&gt;y&lt;/td&gt;
+    &lt;td class="tg-amwm"&gt;x&lt;/td&gt;
+    &lt;td class="tg-jyax"&gt;y&lt;/td&gt;
+    &lt;td class="tg-amwm"&gt;x&lt;/td&gt;
+    &lt;td class="tg-jyax"&gt;y&lt;/td&gt;
+    &lt;td class="tg-amwm"&gt;x&lt;/td&gt;
+    &lt;td class="tg-jyax"&gt;y&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;10.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.04&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;9.14&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.46&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.58&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.95&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.14&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.77&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;5.76&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;13.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.58&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;13.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.74&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;13.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;12.74&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.71&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;9.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.81&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;9.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.77&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;9.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.11&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.84&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;11.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.33&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;11.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;9.26&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;11.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.81&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.47&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;14.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;9.96&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;14.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.10&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;14.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.84&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.04&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;6.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.24&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;6.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.13&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;6.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.08&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;5.25&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;4.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;4.26&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;4.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;3.10&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;4.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;5.39&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;19.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;12.50&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;12.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;10.84&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;12.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;9.13&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;12.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;8.15&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;5.56&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;7.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;4.82&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;7.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.26&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;7.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.42&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;7.91&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-yw4l"&gt;5.0&lt;/td&gt;
+    &lt;td class="tg-j2zy"&gt;5.68&lt;/td&gt;
+    &lt;td class="tg-yw4l"&gt;5.0&lt;/td&gt;
+    &lt;td class="tg-j2zy"&gt;4.74&lt;/td&gt;
+    &lt;td class="tg-yw4l"&gt;5.0&lt;/td&gt;
+    &lt;td class="tg-j2zy"&gt;5.73&lt;/td&gt;
+    &lt;td class="tg-yw4l"&gt;8.0&lt;/td&gt;
+    &lt;td class="tg-j2zy"&gt;6.89&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+---
+
+# Anscombe's Quartet: summary statistics
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;border:none;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-2od3{background-color:#FCFBE3;font-weight:bold;text-align:right}
+.tg .tg-axdc{background-color:#FCFBE3;font-weight:bold;text-align:right;vertical-align:top}
+.tg .tg-lyaj{background-color:#FCFBE3;text-align:center}
+.tg .tg-hgcj{font-weight:bold;text-align:center}
+.tg .tg-34fq{font-weight:bold;text-align:right}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-031e"&gt;&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;I&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;II&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;III&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;IV&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-2od3"&gt;mean(x)&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;9&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;9&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;9&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;9&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-34fq"&gt;sd(x)&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;3.32&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;3.32&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;3.32&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;3.32&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-2od3"&gt;mean(y)&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;7.5&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;7.5&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;7.5&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;7.5&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-34fq"&gt;sd(y)&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;2.03&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;2.03&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;2.03&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;2.03&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-axdc"&gt;corr(x,y)&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.816&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.816&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.816&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.816&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+
+???
+
+each dataset has the same mean, median, standard deviation, and correlation coefficient between x and y.
+ 
+ 
+---
+
+# Anscombe's Quartet: plots
+
+&lt;img src="basics_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+
+???
+
+plot y versus x for each set with a linear regression trendline displayed on each plot:
+
+This classic example really illustrates the importance of looking at your data, not just the summary statistics and model parameters you compute from it.
+
+---
+
+# The Deception of Model Accuracy
+
+&lt;img src="basics_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# The Deception of Model Accuracy
+
+Two models
+
+&lt;img src="basics_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# The Deception of Model Accuracy
+
+
+
+
+&lt;img src="basics_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+.pull-left[
+&lt;img src="basics_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+]
+.pull-right[
+- Both models have the same level of accuracy (62.5%) but they divide the data space differently
+
+- The class balance accuracy for the all red and class partitioned models are 20.8% and 50% respectfully
+]
+
+---
+class: center, middle
+
+# Data Types, Formats, and Structures
+
+---
+
+# Data
+
+Before it’s possible to talk about a graphical grammar, it’s important to know the type and format of the data you’re working with.  
+  
+&lt;br/&gt;
+
+--
+Why?
+--
+
+- the data contains all of the information you’re trying to convey
+
+- the appropriate graphical techniques depend on the kind of data that you are working with
+
+- Working with R and ggplot is much easier if the data you use is in the right shape.
+
+---
+
+# Data: levels of measurement
+
+.pull-left[
+**Quantitative**:
+
+- Continuous
+  - e.g. height, weight
+  
+- Discrete  
+  - e.g. age in years  
+]
+.pull-right[
+**Qualitative**:
+
+- Nominal
+  - categories have no meaningful order  
+  
+  - e.g. colors
+  
+- Ordinal
+  - categories have order but no meaningful distance between categories
+  
+  - e.g. five star ratings
+]
+
+---
+
+# Data: Dimensionality, Form, and Type
+
+.pull-left[
+**Dimensions**
+
+- Univariate  
+  - 1 variable
+
+- Bivariate  
+  - 2 variables
+
+- Multivariate
+  - 2+ variables
+
+**Forms**
+
+- Traditional  
+
+- Aggregated
+]
+.pull-right[
+**Types**
+
+- Count  
+
+  - Word Frequency  
+
+  - Sports Statistics  
+
+- Time Series  
+
+- Spatial  
+
+- Time to Event  
+
+  - Survival  
+  
+  - Reliability  
+  
+- Categorical 
+
+]
+---
+
+# Exploring Relationships
+
+- Continuous vs. Continuous  
+  - scatter plot, line plot
+  
+- Continuous vs. Categorical  
+  - boxplots, dotcharts, multiple density plots, violin plots
+
+- Categorical vs. Categorical  
+  - mosaicplots, side-by-side barplots
+  
+- Multidimensional
+
+
+
+---
+class: center, middle 
+
+# Formating your data: 
+
+## A tidy data discussion
+
+---
+
+# Data format 
+
+- Working with R and ggplot is much easier if the data you use is in the right shape.
+
+- Unlike base graphics, ggplot works with dataframes and not individual vectors. 
+
+- All the data needed to make the plot is typically contained within the dataframe 
+
+- ggplot expects your data to be in a particular sort of shape - "tidy data"
+
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_26.png"  width="200px" height="250px"&gt;
+
+&lt;/p&gt;
+---
+
+# Same data, different layouts
+
+.pull-left[
+**Option 1:**
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-gmsq{background-color:#FCFBE3;font-style:italic;text-align:center}
+.tg .tg-lyaj{background-color:#FCFBE3;text-align:center}
+.tg .tg-hgcj{font-weight:bold;text-align:center}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-hgcj"&gt;Name&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;Treatment A&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;Treatment B&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-s6z2"&gt;John Smith&lt;/td&gt;
+    &lt;td class="tg-gmsq"&gt;NA&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;18&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-s6z2"&gt;Jane Doe&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;4&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;1&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-s6z2"&gt;Mary Johnson&lt;/td&gt;
+    &lt;td class="tg-lyaj"&gt;6&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;7&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;br/&gt;
+
+**Option 2:**
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-amwm"&gt;Treatment&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;John Smith&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;Jane Doe&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;Mary Johnson&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-yq6s"&gt;A&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;NA&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;4&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;18&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;7&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+]
+.pull-right[
+**Option 3:**
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-s6z2{text-align:center}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-hgcj{font-weight:bold;text-align:center}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-hgcj"&gt;Name&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;Treatment&lt;/th&gt;
+    &lt;th class="tg-hgcj"&gt;Measurement&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-s6z2"&gt;John Smith&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;A&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;NA&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-s6z2"&gt;Jane Doe&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;A&lt;/td&gt;
+    &lt;td class="tg-s6z2"&gt;4&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Mary Johnson&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;A&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;6&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;John Smith&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;18&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Jane Doe&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Mary Johnson&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;7&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+]
+
+
+
+
+
+???
+
+The data is the same, but the layout is different. Our vocabulary of rows and columns is simply not rich enough to describe why the two tables represent the same data. In addition to appearance, we need a way to describe the underlying semantics, or meaning, of the values displayed in the table
+
+---
+
+
+# Wide Format vs. Long Format
+
+.pull-left[
+**Wide format**
+
+- some variables are spread out across columns.
+
+- typically uses less space to display
+
+- how you would typically choose to present your data
+
+- far less repetition of labels and row elements
+
+
+![](images/tablewide2.png)
+
+]
+.pull-right[
+
+**Long format**
+
+- each variable is a column
+
+- each observation is a row
+
+- is likely not the data's most compact form
+
+
+&lt;img src="basics_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+# Tidy Data
+
+
+- Each variable is a column
+
+- Each observation is a row
+
+- Each type of observational unit forms a table
+
+&lt;br/&gt;
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-amwm"&gt;Name&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;Treatment&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;Measurement&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;John Smith&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;A&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;NA&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;John Smith&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;18&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Jane Doe&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;A&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;4&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Jane Doe&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Mary Johnson&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;A&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;6&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;Mary Johnson&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;B&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;7&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+
+---
+
+# Messy data
+
+ *Happy families are all alike; every unhappy family is unhappy in its own way. - Leo Tolstoy*  
+&lt;br/&gt;
+--
+
+**Five main ways tables of data tend not to be tidy:**
+
+1. Column headers are values, not variable names.
+
+2. Multiple variables are stored in one column.
+
+3. Variables are stored in both rows and columns.
+
+4. Multiple types of observational units are stored in the same table.
+
+5. A single observational unit is stored in multiple tables.
+
+
+---
+
+# Tidy your data
+
+
+
+```r
+data(french_fries, package="reshape2")
+head(french_fries)
+```
+
+**Wide Format:**
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+.tg .tg-yq6s{background-color:#FCFBE3;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-amwm"&gt;time&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;treatment&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;subject&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;rep&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;potato&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;buttery&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;grassy&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;rancid&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;painty&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;3&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2.9&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;5.5&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;3&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;14.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1.1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;11.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;6.4&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;9.9&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;5.9&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2.9&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;2.2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;15&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1.2&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;0.1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;0.0&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1.1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;5.1&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;15&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.8&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;3.0&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;3.6&lt;/td&gt;
+    &lt;td class="tg-yq6s"&gt;1.5&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2.3&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+---
+
+# Tidy your data
+
+
+```r
+french_fries_long &lt;- french_fries %&gt;% 
+  gather(key = variable, value = rating, potato:painty)
+head(french_fries_long)
+```
+
+
+
+** Tidy (long) format:**
+
+&lt;style type="text/css"&gt;
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aaa;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#333;background-color:#fff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aaa;color:#fff;background-color:#f38630;}
+.tg .tg-baqh{text-align:center;vertical-align:top}
+.tg .tg-amwm{font-weight:bold;text-align:center;vertical-align:top}
+&lt;/style&gt;
+&lt;table class="tg"&gt;
+  &lt;tr&gt;
+    &lt;th class="tg-amwm"&gt;time&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;treatment&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;subject&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;rep&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;variable&lt;/th&gt;
+    &lt;th class="tg-amwm"&gt;rating&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;3&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;potato&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2.9&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;3&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;potato&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;14.0&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;potato&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;11.0&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;10&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;potato&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;9.9&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;15&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;potato&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1.2&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;1&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;15&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;2&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;potato&lt;/td&gt;
+    &lt;td class="tg-baqh"&gt;8.8&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

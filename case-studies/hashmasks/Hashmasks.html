@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Hashmasks Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Hashmasks Analysis <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Hashmasks
+
+According to their official website, Hashmasks is a living digital art collectible created by over 70 artists globally. It is a collection of 16,384 unique digital portraits brought to the Ethereum ecosystem by Suum Cuique Labs from Zug, Switzerland. In addition to having a unique piece of art, by holding the artwork you accumulate the NCT token on a daily basis, which allows you to choose a name for your portrait. This unconventional mixture of tokenomics, scarcity and visual aesthetics create a user experience where art enthusiasts  are compelled to collect, hoard and sporadically trade the Hashmasks in their possession. In this analytics case study, we'll be using data to gain a broad understanding of what visual traits make a mask more or less rare.
+
+
+&lt;p align="center"&gt;
+
+&lt;img src="hashmasks.png" width="600px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Getting Started
+
+We will be using the tidyverse library, an "opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures."
+
+
+```r
+library(tidyverse)
+```
+
+
+&lt;br&gt; &lt;br&gt;&lt;br&gt; &lt;br&gt;
+&lt;p align="center"&gt;
+
+&lt;img src="Cut_outs/Cut_out_16.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+---
+
+## The Data
+
+The data we use in this case study are available here: https://docs.google.com/spreadsheets/d/1rLagIfx4dSU_4ZbhuRxTjPYg0A5-ZQC8PIhLs29srwI/edit#gid=282814562.
+
+Our dataset contains columns that track the skin color, character type, eye color, mask type, an item indicator and a rarity score.
+
+Let's view the first few rows of the data:
+
+
+```r
+hashmasks_raw &lt;- read_csv('All Hashmasks.csv')
+
+sample_n(hashmasks_raw,5)
+```
+
+```
+## # A tibble: 5 x 10
+##      ID X2     Skin  Character Eyes  Mask   Item  Rarity URL   Preview          
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;            
+## 1 15007 #NAME? Gray  Female    Green Chine~ No I~  27.0  #NAM~ https://hashmask~
+## 2 10042 #NAME? Light Male      Dark  Doodle No I~   1.85 #NAM~ https://hashmask~
+## 3  1923 #NAME? Gray  Male      Dark  Mexic~ No I~   0    #NAM~ https://hashmask~
+## 4  3792 #NAME? Gray  Male      Dark  Doodle No I~   0.46 #NAM~ https://hashmask~
+## 5  1210 #NAME? Dark  Male      Green Indian No I~  20.1  #NAM~ https://hashmask~
+```
+
+---
+
+## The Data (continued...)
+
+To make our dataset a little tidier, we will remove the `X2`, `URL` and `Preview` columns as they are not useful in our analysis. 
+
+
+```r
+hashmasks &lt;- hashmasks_raw %&gt;%
+  select(-X2, -URL, -Preview)
+
+sample_n(hashmasks,5)
+```
+
+```
+## # A tibble: 5 x 7
+##      ID Skin  Character Eyes  Mask    Item    Rarity
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;
+## 1 14473 Dark  Male      Dark  Pixel   No Item   6.51
+## 2 15723 Dark  Female    Dark  Doodle  No Item  12.1 
+## 3 10011 Blue  Female    Freak Basic   Mirror   79.2 
+## 4  1265 Dark  Male      Blue  African No Item  17.4 
+## 5  9672 Dark  Male      Green Basic   No Item  16.7
+```
+
+---
+
+## Traits
+
+Each hashmask is unique and here are traits that are provided: 
+
+* `Skin` - Blue, Dark, Freak, Gold, Gray, Light, Mystical, Steel, Transparent, Wood 
+* `Character` - Female, Golden Robot, Male, Mystical, Puppet, Robot
+* `Eyes` - Blue, Dark, Freak, Glass, Green, Heterochromatic, Mystical, Painted
+* `Mask` - Abstract, African, Animal, Aztec, Basic, Chinese, Crayon, Doodle, Hawaiian, Indian, Mexican, Pixel, Steampunk, Street, Unique, Unmasked
+* `Item` - Book, Bottle, Golden Toilet Paper, Mirror, No Item, Shadow Monkey, Toilet Paper
+
+Note that, there are a total of 1545 unique combination of these traits for the Hashmasks. 
+
+---
+
+## Rarity 
+
+Each Hashmask has a `Rarity` score that ranges between 0 and 100. This `Rarity` score is based on the aforementioned traits. This is referred to Explicit Rarity on the official website. 
+
+For instance, only 1% of all Hashmasks (165 Hashmasks)  have `Gold` Skins and thus having `Gold` Skin will have a higher than average `Rarity` score. 
+
+Also, there are 416 Hashmasks that have `Rarity` of 0 and only 9 Hashmasks that have `Rarity` of 100.
+
+Here is a summary of the `Rarity` score:
+
+
+```r
+hashmasks %&gt;% filter(!is.na(Rarity)) %&gt;% summarise(Mean = mean(Rarity), Median = median(Rarity))
+```
+
+```
+## # A tibble: 1 x 2
+##    Mean Median
+##   &lt;dbl&gt;  &lt;dbl&gt;
+## 1  23.1   15.3
+```
+
+---
+
+## Exploring the Rarity
+
+We can also view the `Rarity` scores on a graph.  Here we've created a sorted `Rarity` curve.
+
+&lt;img src="Hashmasks_files/figure-html/unnamed-chunk-5-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## The code
+
+
+```r
+hashmasks %&gt;%
+  arrange(Rarity) %&gt;%
+  mutate(Index = 1:nrow(.)) %&gt;%
+  ggplot(aes(x=Index, y= Rarity, color = Rarity))+
+  geom_line(size = 2)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10), expand = c(0,0))+
+  scale_x_continuous(breaks = scales::pretty_breaks(n=20), expand = c(0,0),limits = c(0, 16500))+
+  labs(title = "Hashmasks Rarity Curve",
+       y= "Rarity Score")+
+  scale_colour_gradient(low = "red", high = "green")+
+  theme(legend.position = "OFF")
+```
+
+---
+## Exploring the traits
+
+We can use `ggplot2` to plot the distribution of each trait. For instance,
+
+&lt;img src="Hashmasks_files/figure-html/unnamed-chunk-7-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## The code
+
+
+```r
+skincolor &lt;-  c(Freak = "#516818", Dark = "#613F04", Light = "#FACD7F", 
+                Gold = "gold", Wood = "#DEA034", Gray = "#3F4756", 
+                Steel = "#8B7D64", Blue = "#20407B", Mystical = "#E5CAE5", Transparent = "#F8F4F8")
+
+hashmasks %&gt;%
+  ggplot(aes(x = Skin, fill = Skin))+
+  geom_bar(color = "black")+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=20), expand = c(0,0), limits = c(0,4800))+
+  geom_text(aes(label= scales::percent(..count../sum(..count..))), stat= "count", vjust = -0.25)+
+  theme(legend.position = "OFF")+
+  labs(title = "Distribution of Hashmasks' Skin Types")+
+  scale_fill_manual(values = skincolor)
+```
+
+---
+
+## Exploring the traits (continued...)
+
+We can also look at the boxplots for each trait. For instance,
+
+&lt;img src="Hashmasks_files/figure-html/unnamed-chunk-9-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+---
+
+## The Code
+
+
+```r
+ggplot(hashmasks, aes(x = Skin, y = Rarity, fill = Skin))+
+  geom_boxplot()+
+  labs(title = "Boxplot of Rarity vs Skin")+
+  scale_fill_manual(values = skincolor)+
+  theme(legend.position = "OFF")+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))
+```
+
+---
+
+## Your Turn
+
+1. Plot the `Distribution of Hashmasks' Eyes Types` using `ggplot2`. 
+2. Plot the `Boxplot of Rarity vs Eyes` using `ggplot2`. 
+
+
+&lt;br&gt; &lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;p align="center"&gt;
+
+&lt;img src="Cut_outs/Cut_out_06.png"  width="200px" height="160px"&gt;
+
+&lt;/p&gt;
+---
+
+## Answers
+
+### 1. 
+
+.pull-left[
+
+```r
+eyescolor &lt;-  c(Freak = "#D34818", Dark = "#47585E", Green = "#9AC828", 
+               Blue = "#289FC8", Glass = "gold", Painted = "black", 
+               Mystical = "#F2C623", Heterochromatic = "red")
+hashmasks %&gt;%
+  ggplot(aes(x = Eyes, fill = Eyes))+
+  geom_bar(color = "black")+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=20), 
+                     expand = c(0, 0), limits = c(0, 8000))+
+  geom_text(aes(label= scales::percent(..count../sum(..count..))), 
+            stat= "count", vjust = -0.25)+
+  theme(legend.position = "OFF")+
+  labs(title = "Distribution of Hashmasks' Eyes Types")+
+  scale_fill_manual(values = eyescolor)
+```
+]
+
+.pull-right[
+&lt;img src="Hashmasks_files/figure-html/p1-out-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+]
+---
+
+### 2.
+
+.pull-left[
+
+```r
+ggplot(hashmasks, 
+       aes(x = Eyes, 
+           y = Rarity, 
+           fill = Eyes))+
+  geom_boxplot()+
+  labs(title = "Boxplot of Rarity vs Eyes")+
+  scale_fill_manual(values = eyescolor)+
+  theme(legend.position = "OFF")+
+  scale_y_continuous(
+    breaks = scales::pretty_breaks(n=10)
+    )
+```
+]
+
+.pull-right[
+&lt;img src="Hashmasks_files/figure-html/p2-out-1.png" width="600" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+## Regression 
+
+We try to fit a regression that gives Rarity based on the traits provided. This will give us an estimate of the effect of each individual train on a Hashmask's rarity score.
+
+
+```r
+model &lt;- lm(Rarity ~ relevel(as.factor(Skin), ref = "Gray")+
+           relevel(as.factor(Character), ref = "Male")+
+           relevel(as.factor(Eyes), ref = "Dark")+
+           relevel(as.factor(Mask), ref = "Mexican")+
+           relevel(as.factor(Item), ref = "No Item"), 
+           data = hashmasks)
+```
+
+Note that we use `relevel` to make the most common attribute in each trait as the base level so that it is easier to interpret the coefficients. 
+
+---
+## Regression (continued...)
+
+
+```r
+summary(model)
+```
+
+```
+## 
+## Call:
+## lm(formula = Rarity ~ relevel(as.factor(Skin), ref = "Gray") + 
+##     relevel(as.factor(Character), ref = "Male") + relevel(as.factor(Eyes), 
+##     ref = "Dark") + relevel(as.factor(Mask), ref = "Mexican") + 
+##     relevel(as.factor(Item), ref = "No Item"), data = hashmasks)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.0714 -0.1646 -0.0196  0.1599  5.5299 
+## 
+## Coefficients: (6 not defined because of singularities)
+##                                                               Estimate
+## (Intercept)                                                  -0.159859
+## relevel(as.factor(Skin), ref = "Gray")Blue                    9.439765
+## relevel(as.factor(Skin), ref = "Gray")Dark                    2.468439
+## relevel(as.factor(Skin), ref = "Gray")Freak                  12.656804
+## relevel(as.factor(Skin), ref = "Gray")Gold                   36.616305
+## relevel(as.factor(Skin), ref = "Gray")Light                   1.144057
+## relevel(as.factor(Skin), ref = "Gray")Mystical               57.996568
+## relevel(as.factor(Skin), ref = "Gray")Steel                  29.252450
+## relevel(as.factor(Skin), ref = "Gray")Transparent            12.910064
+## relevel(as.factor(Skin), ref = "Gray")Wood                   53.331019
+## relevel(as.factor(Character), ref = "Male")Female             8.963299
+## relevel(as.factor(Character), ref = "Male")Golden Robot             NA
+## relevel(as.factor(Character), ref = "Male")Mystical                 NA
+## relevel(as.factor(Character), ref = "Male")Puppet                   NA
+## relevel(as.factor(Character), ref = "Male")Robot                    NA
+## relevel(as.factor(Eyes), ref = "Dark")Blue                   10.925984
+## relevel(as.factor(Eyes), ref = "Dark")Freak                  19.675795
+## relevel(as.factor(Eyes), ref = "Dark")Glass                  16.191663
+## relevel(as.factor(Eyes), ref = "Dark")Green                  13.444449
+## relevel(as.factor(Eyes), ref = "Dark")Heterochromatic        20.535772
+## relevel(as.factor(Eyes), ref = "Dark")Mystical                      NA
+## relevel(as.factor(Eyes), ref = "Dark")Painted                       NA
+## relevel(as.factor(Mask), ref = "Mexican")Abstract             6.032094
+## relevel(as.factor(Mask), ref = "Mexican")African              4.223227
+## relevel(as.factor(Mask), ref = "Mexican")Animal               1.165283
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                6.220334
+## relevel(as.factor(Mask), ref = "Mexican")Basic                0.722125
+## relevel(as.factor(Mask), ref = "Mexican")Chinese              4.478982
+## relevel(as.factor(Mask), ref = "Mexican")Crayon               5.475550
+## relevel(as.factor(Mask), ref = "Mexican")Doodle               0.776847
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian             2.548140
+## relevel(as.factor(Mask), ref = "Mexican")Indian               4.674494
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                4.167913
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk            6.291528
+## relevel(as.factor(Mask), ref = "Mexican")Street               4.389820
+## relevel(as.factor(Mask), ref = "Mexican")Unique               6.602882
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked             6.543291
+## relevel(as.factor(Item), ref = "No Item")Book                39.568981
+## relevel(as.factor(Item), ref = "No Item")Bottle              39.743742
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper 40.808554
+## relevel(as.factor(Item), ref = "No Item")Mirror              39.978611
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey       40.344597
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper        39.775297
+##                                                              Std. Error t value
+## (Intercept)                                                    0.010648  -15.01
+## relevel(as.factor(Skin), ref = "Gray")Blue                     0.013840  682.08
+## relevel(as.factor(Skin), ref = "Gray")Dark                     0.009390  262.87
+## relevel(as.factor(Skin), ref = "Gray")Freak                    0.036886  343.13
+## relevel(as.factor(Skin), ref = "Gray")Gold                     0.120605  303.61
+## relevel(as.factor(Skin), ref = "Gray")Light                    0.009061  126.26
+## relevel(as.factor(Skin), ref = "Gray")Mystical                 0.129797  446.83
+## relevel(as.factor(Skin), ref = "Gray")Steel                    0.119665  244.45
+## relevel(as.factor(Skin), ref = "Gray")Transparent              0.339721   38.00
+## relevel(as.factor(Skin), ref = "Gray")Wood                     0.019805 2692.75
+## relevel(as.factor(Character), ref = "Male")Female              0.007691 1165.37
+## relevel(as.factor(Character), ref = "Male")Golden Robot              NA      NA
+## relevel(as.factor(Character), ref = "Male")Mystical                  NA      NA
+## relevel(as.factor(Character), ref = "Male")Puppet                    NA      NA
+## relevel(as.factor(Character), ref = "Male")Robot                     NA      NA
+## relevel(as.factor(Eyes), ref = "Dark")Blue                     0.008952 1220.47
+## relevel(as.factor(Eyes), ref = "Dark")Freak                    0.022724  865.86
+## relevel(as.factor(Eyes), ref = "Dark")Glass                    0.119737  135.23
+## relevel(as.factor(Eyes), ref = "Dark")Green                    0.009980 1347.15
+## relevel(as.factor(Eyes), ref = "Dark")Heterochromatic          0.042397  484.37
+## relevel(as.factor(Eyes), ref = "Dark")Mystical                       NA      NA
+## relevel(as.factor(Eyes), ref = "Dark")Painted                        NA      NA
+## relevel(as.factor(Mask), ref = "Mexican")Abstract              0.026165  230.54
+## relevel(as.factor(Mask), ref = "Mexican")African               0.016639  253.82
+## relevel(as.factor(Mask), ref = "Mexican")Animal                0.012951   89.98
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                 0.027837  223.46
+## relevel(as.factor(Mask), ref = "Mexican")Basic                 0.012863   56.14
+## relevel(as.factor(Mask), ref = "Mexican")Chinese               0.016731  267.70
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                0.021195  258.34
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                0.012587   61.72
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian              0.013879  183.59
+## relevel(as.factor(Mask), ref = "Mexican")Indian                0.017691  264.23
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                 0.016127  258.45
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk             0.030270  207.85
+## relevel(as.factor(Mask), ref = "Mexican")Street                0.016760  261.93
+## relevel(as.factor(Mask), ref = "Mexican")Unique                0.156253   42.26
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked              0.445761   14.68
+## relevel(as.factor(Item), ref = "No Item")Book                  0.021223 1864.41
+## relevel(as.factor(Item), ref = "No Item")Bottle                0.022891 1736.20
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper   0.049640  822.10
+## relevel(as.factor(Item), ref = "No Item")Mirror                0.025306 1579.82
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey         0.028858 1398.04
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper          0.022414 1774.56
+##                                                              Pr(&gt;|t|)    
+## (Intercept)                                                    &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Blue                     &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Dark                     &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Freak                    &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Gold                     &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Light                    &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Mystical                 &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Steel                    &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Transparent              &lt;2e-16 ***
+## relevel(as.factor(Skin), ref = "Gray")Wood                     &lt;2e-16 ***
+## relevel(as.factor(Character), ref = "Male")Female              &lt;2e-16 ***
+## relevel(as.factor(Character), ref = "Male")Golden Robot            NA    
+## relevel(as.factor(Character), ref = "Male")Mystical                NA    
+## relevel(as.factor(Character), ref = "Male")Puppet                  NA    
+## relevel(as.factor(Character), ref = "Male")Robot                   NA    
+## relevel(as.factor(Eyes), ref = "Dark")Blue                     &lt;2e-16 ***
+## relevel(as.factor(Eyes), ref = "Dark")Freak                    &lt;2e-16 ***
+## relevel(as.factor(Eyes), ref = "Dark")Glass                    &lt;2e-16 ***
+## relevel(as.factor(Eyes), ref = "Dark")Green                    &lt;2e-16 ***
+## relevel(as.factor(Eyes), ref = "Dark")Heterochromatic          &lt;2e-16 ***
+## relevel(as.factor(Eyes), ref = "Dark")Mystical                     NA    
+## relevel(as.factor(Eyes), ref = "Dark")Painted                      NA    
+## relevel(as.factor(Mask), ref = "Mexican")Abstract              &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")African               &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Animal                &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                 &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Basic                 &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Chinese               &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian              &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Indian                &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                 &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk             &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Street                &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Unique                &lt;2e-16 ***
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked              &lt;2e-16 ***
+## relevel(as.factor(Item), ref = "No Item")Book                  &lt;2e-16 ***
+## relevel(as.factor(Item), ref = "No Item")Bottle                &lt;2e-16 ***
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper   &lt;2e-16 ***
+## relevel(as.factor(Item), ref = "No Item")Mirror                &lt;2e-16 ***
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey         &lt;2e-16 ***
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper          &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4264 on 16345 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.9996,	Adjusted R-squared:  0.9996 
+## F-statistic: 1.211e+06 on 36 and 16345 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
+## Regression (continued...)
+
+However, the regression has failed due to some of the traits are highly dependent on each other. Specifically, we have the following unique combinations of traits:
+
+* `Skin` is `Wood` if and only if `Character` is `Puppet` if and only if `Eyes` is `Painted` 
+* `Skin` is `Steel` if and only if `Character` is `Robot`
+* `Skin` is `Mystical` if and only if `Character` is `Mystical` if and only if `Eyes` is `Mystical`
+* `Skin` is `Gold` if and only if `Character` is `Golden Robot`
+
+One way to go around this is to combine these traits into one column as follows:
+
+```r
+data &lt;- hashmasks %&gt;% unite("SCE", Skin:Character:Eyes) 
+model2 &lt;- lm(Rarity ~ 
+           relevel(as.factor(SCE), ref = "Gray_Male_Dark")+
+           relevel(as.factor(Mask), ref = "Mexican")+
+           relevel(as.factor(Item), ref = "No Item"), data = data)
+```
+
+---
+## Regression (continued...)
+
+
+```r
+summary(model2)
+```
+
+```
+## 
+## Call:
+## lm(formula = Rarity ~ relevel(as.factor(SCE), ref = "Gray_Male_Dark") + 
+##     relevel(as.factor(Mask), ref = "Mexican") + relevel(as.factor(Item), 
+##     ref = "No Item"), data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -9.0386 -0.1564 -0.0093  0.1506  5.5321 
+## 
+## Coefficients:
+##                                                                                   Estimate
+## (Intercept)                                                                       -0.18047
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Blue                   29.38922
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Dark                   18.42976
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Freak                  38.11175
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Green                  31.89269
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Heterochromatic        38.78636
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Blue                     20.30661
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Dark                      9.50270
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Freak                    29.07421
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Green                    22.91992
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Heterochromatic          29.98209
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Blue                   22.43515
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Dark                   11.42648
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Freak                  31.16858
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Green                  24.89185
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Heterochromatic        32.43104
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Blue                     13.38151
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Dark                      2.46400
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Freak                    22.43806
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Green                    15.97094
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Heterochromatic          23.28474
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Blue                  33.18180
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Dark                  21.69315
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Freak                 41.11329
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Green                 35.12243
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Heterochromatic       41.92970
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Blue                    23.57392
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Dark                    12.92463
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Freak                   32.30520
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Green                   26.17301
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Heterochromatic         32.98723
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Glass            52.84968
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Heterochromatic  56.64660
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Blue                   19.88148
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Dark                    9.05254
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Freak                  28.75669
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Green                  22.40152
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Heterochromatic        29.61287
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Blue                     10.93356
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Freak                    19.65211
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Green                    13.43536
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Heterochromatic          20.52250
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Blue                  21.06262
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Dark                  10.05930
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Freak                 29.54623
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Green                 23.53827
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Heterochromatic       30.91727
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Blue                    12.12783
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Dark                     1.20183
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Freak                   20.71894
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Green                   14.61912
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Heterochromatic         21.76003
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Mystical_Mystical_Mystical         58.01266
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Glass                  45.46236
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Heterochromatic        50.15222
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Female_Heterochromatic 42.39118
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Male_Heterochromatic   33.40828
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Wood_Puppet_Painted                53.35094
+## relevel(as.factor(Mask), ref = "Mexican")Abstract                                  6.03314
+## relevel(as.factor(Mask), ref = "Mexican")African                                   4.22390
+## relevel(as.factor(Mask), ref = "Mexican")Animal                                    1.16707
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                                     6.22338
+## relevel(as.factor(Mask), ref = "Mexican")Basic                                     0.72213
+## relevel(as.factor(Mask), ref = "Mexican")Chinese                                   4.47851
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                                    5.47676
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                                    0.77755
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian                                  2.54802
+## relevel(as.factor(Mask), ref = "Mexican")Indian                                    4.67779
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                                     4.16744
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk                                 6.29191
+## relevel(as.factor(Mask), ref = "Mexican")Street                                    4.39293
+## relevel(as.factor(Mask), ref = "Mexican")Unique                                    6.64929
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked                                  6.54782
+## relevel(as.factor(Item), ref = "No Item")Book                                     39.57290
+## relevel(as.factor(Item), ref = "No Item")Bottle                                   39.74286
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper                      40.77701
+## relevel(as.factor(Item), ref = "No Item")Mirror                                   39.97591
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey                            40.33084
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper                             39.77045
+##                                                                                   Std. Error
+## (Intercept)                                                                          0.01267
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Blue                      0.03770
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Dark                      0.03507
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Freak                     0.06512
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Green                     0.03751
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Heterochromatic           0.15145
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Blue                        0.02911
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Dark                        0.02903
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Freak                       0.05956
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Green                       0.03037
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Heterochromatic             0.12349
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Blue                      0.02377
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Dark                      0.01907
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Freak                     0.07436
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Green                     0.02783
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Heterochromatic           0.21301
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Blue                        0.01963
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Dark                        0.01641
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Freak                       0.05032
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Green                       0.02207
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Heterochromatic             0.11857
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Blue                     0.14245
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Dark                     0.11449
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Freak                    0.12346
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Green                    0.15096
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Heterochromatic          0.11949
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Blue                       0.10385
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Dark                       0.10129
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Freak                      0.08764
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Green                      0.10098
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Heterochromatic            0.09880
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Glass               0.03577
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Heterochromatic     0.17562
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Blue                      0.02344
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Dark                      0.01678
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Freak                     0.07289
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Green                     0.02683
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Heterochromatic           0.11877
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Blue                        0.02009
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Freak                       0.05789
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Green                       0.02306
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Heterochromatic             0.16183
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Blue                     0.02388
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Dark                     0.01752
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Freak                    0.07657
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Green                    0.02736
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Heterochromatic          0.15258
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Blue                       0.02011
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Dark                       0.01518
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Freak                      0.05462
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Green                      0.02248
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Heterochromatic            0.09655
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Mystical_Mystical_Mystical            0.12926
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Glass                     0.01598
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Heterochromatic           0.14347
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Female_Heterochromatic    0.45217
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Male_Heterochromatic      0.45255
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Wood_Puppet_Painted                   0.02101
+## relevel(as.factor(Mask), ref = "Mexican")Abstract                                    0.02613
+## relevel(as.factor(Mask), ref = "Mexican")African                                     0.01661
+## relevel(as.factor(Mask), ref = "Mexican")Animal                                      0.01295
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                                       0.02776
+## relevel(as.factor(Mask), ref = "Mexican")Basic                                       0.01287
+## relevel(as.factor(Mask), ref = "Mexican")Chinese                                     0.01668
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                                      0.02112
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                                      0.01254
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian                                    0.01383
+## relevel(as.factor(Mask), ref = "Mexican")Indian                                      0.01764
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                                       0.01605
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk                                   0.03021
+## relevel(as.factor(Mask), ref = "Mexican")Street                                      0.01672
+## relevel(as.factor(Mask), ref = "Mexican")Unique                                      0.15709
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked                                    0.44315
+## relevel(as.factor(Item), ref = "No Item")Book                                        0.02128
+## relevel(as.factor(Item), ref = "No Item")Bottle                                      0.02285
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper                         0.04996
+## relevel(as.factor(Item), ref = "No Item")Mirror                                      0.02574
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey                               0.02897
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper                                0.02251
+##                                                                                   t value
+## (Intercept)                                                                        -14.24
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Blue                    779.51
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Dark                    525.53
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Freak                   585.23
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Green                   850.25
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Heterochromatic         256.10
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Blue                      697.57
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Dark                      327.37
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Freak                     488.16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Green                     754.72
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Heterochromatic           242.80
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Blue                    943.87
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Dark                    599.26
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Freak                   419.16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Green                   894.50
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Heterochromatic         152.25
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Blue                      681.62
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Dark                      150.18
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Freak                     445.90
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Green                     723.75
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Heterochromatic           196.37
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Blue                   232.93
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Dark                   189.48
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Freak                  333.02
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Green                  232.67
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Heterochromatic        350.92
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Blue                     227.00
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Dark                     127.60
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Freak                    368.61
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Green                    259.20
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Heterochromatic          333.87
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Glass            1477.31
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Heterochromatic   322.56
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Blue                    848.36
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Dark                    539.52
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Freak                   394.52
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Green                   834.93
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Heterochromatic         249.32
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Blue                      544.32
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Freak                     339.45
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Green                     582.59
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Heterochromatic           126.82
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Blue                   882.10
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Dark                   574.06
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Freak                  385.85
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Green                  860.18
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Heterochromatic        202.63
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Blue                     603.01
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Dark                      79.15
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Freak                    379.30
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Green                    650.26
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Heterochromatic          225.38
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Mystical_Mystical_Mystical          448.82
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Glass                  2844.61
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Heterochromatic         349.56
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Female_Heterochromatic   93.75
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Male_Heterochromatic     73.82
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Wood_Puppet_Painted                2538.74
+## relevel(as.factor(Mask), ref = "Mexican")Abstract                                  230.89
+## relevel(as.factor(Mask), ref = "Mexican")African                                   254.23
+## relevel(as.factor(Mask), ref = "Mexican")Animal                                     90.12
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                                     224.22
+## relevel(as.factor(Mask), ref = "Mexican")Basic                                      56.13
+## relevel(as.factor(Mask), ref = "Mexican")Chinese                                   268.49
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                                    259.27
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                                     61.99
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian                                  184.21
+## relevel(as.factor(Mask), ref = "Mexican")Indian                                    265.21
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                                     259.59
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk                                 208.26
+## relevel(as.factor(Mask), ref = "Mexican")Street                                    262.75
+## relevel(as.factor(Mask), ref = "Mexican")Unique                                     42.33
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked                                   14.78
+## relevel(as.factor(Item), ref = "No Item")Book                                     1859.46
+## relevel(as.factor(Item), ref = "No Item")Bottle                                   1739.32
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper                       816.13
+## relevel(as.factor(Item), ref = "No Item")Mirror                                   1552.79
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey                            1391.96
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper                             1766.97
+##                                                                                   Pr(&gt;|t|)
+## (Intercept)                                                                         &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Blue                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Dark                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Freak                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Green                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Heterochromatic          &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Blue                       &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Dark                       &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Freak                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Green                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Heterochromatic            &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Blue                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Dark                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Freak                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Green                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Heterochromatic          &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Blue                       &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Dark                       &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Freak                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Green                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Heterochromatic            &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Blue                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Dark                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Freak                   &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Green                   &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Heterochromatic         &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Blue                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Dark                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Freak                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Green                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Heterochromatic           &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Glass              &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Heterochromatic    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Blue                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Dark                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Freak                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Green                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Heterochromatic          &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Blue                       &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Freak                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Green                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Heterochromatic            &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Blue                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Dark                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Freak                   &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Green                   &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Heterochromatic         &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Blue                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Dark                      &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Freak                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Green                     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Heterochromatic           &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Mystical_Mystical_Mystical           &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Glass                    &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Heterochromatic          &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Female_Heterochromatic   &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Male_Heterochromatic     &lt;2e-16
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Wood_Puppet_Painted                  &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Abstract                                   &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")African                                    &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Animal                                     &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                                      &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Basic                                      &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Chinese                                    &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                                     &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                                     &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian                                   &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Indian                                     &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                                      &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk                                  &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Street                                     &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Unique                                     &lt;2e-16
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked                                   &lt;2e-16
+## relevel(as.factor(Item), ref = "No Item")Book                                       &lt;2e-16
+## relevel(as.factor(Item), ref = "No Item")Bottle                                     &lt;2e-16
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper                        &lt;2e-16
+## relevel(as.factor(Item), ref = "No Item")Mirror                                     &lt;2e-16
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey                              &lt;2e-16
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper                               &lt;2e-16
+##                                                                                      
+## (Intercept)                                                                       ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Blue                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Dark                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Freak                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Green                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Female_Heterochromatic        ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Blue                     ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Dark                     ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Freak                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Green                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Blue_Male_Heterochromatic          ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Blue                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Dark                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Freak                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Green                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Female_Heterochromatic        ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Blue                     ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Dark                     ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Freak                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Green                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Dark_Male_Heterochromatic          ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Blue                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Dark                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Freak                 ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Green                 ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Female_Heterochromatic       ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Blue                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Dark                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Freak                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Green                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Freak_Male_Heterochromatic         ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Glass            ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gold_Golden Robot_Heterochromatic  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Blue                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Dark                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Freak                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Green                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Female_Heterochromatic        ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Blue                     ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Freak                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Green                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Gray_Male_Heterochromatic          ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Blue                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Dark                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Freak                 ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Green                 ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Female_Heterochromatic       ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Blue                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Dark                    ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Freak                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Green                   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Light_Male_Heterochromatic         ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Mystical_Mystical_Mystical         ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Glass                  ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Steel_Robot_Heterochromatic        ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Female_Heterochromatic ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Transparent_Male_Heterochromatic   ***
+## relevel(as.factor(SCE), ref = "Gray_Male_Dark")Wood_Puppet_Painted                ***
+## relevel(as.factor(Mask), ref = "Mexican")Abstract                                 ***
+## relevel(as.factor(Mask), ref = "Mexican")African                                  ***
+## relevel(as.factor(Mask), ref = "Mexican")Animal                                   ***
+## relevel(as.factor(Mask), ref = "Mexican")Aztec                                    ***
+## relevel(as.factor(Mask), ref = "Mexican")Basic                                    ***
+## relevel(as.factor(Mask), ref = "Mexican")Chinese                                  ***
+## relevel(as.factor(Mask), ref = "Mexican")Crayon                                   ***
+## relevel(as.factor(Mask), ref = "Mexican")Doodle                                   ***
+## relevel(as.factor(Mask), ref = "Mexican")Hawaiian                                 ***
+## relevel(as.factor(Mask), ref = "Mexican")Indian                                   ***
+## relevel(as.factor(Mask), ref = "Mexican")Pixel                                    ***
+## relevel(as.factor(Mask), ref = "Mexican")Steampunk                                ***
+## relevel(as.factor(Mask), ref = "Mexican")Street                                   ***
+## relevel(as.factor(Mask), ref = "Mexican")Unique                                   ***
+## relevel(as.factor(Mask), ref = "Mexican")Unmasked                                 ***
+## relevel(as.factor(Item), ref = "No Item")Book                                     ***
+## relevel(as.factor(Item), ref = "No Item")Bottle                                   ***
+## relevel(as.factor(Item), ref = "No Item")Golden Toilet Paper                      ***
+## relevel(as.factor(Item), ref = "No Item")Mirror                                   ***
+## relevel(as.factor(Item), ref = "No Item")Shadow Monkey                            ***
+## relevel(as.factor(Item), ref = "No Item")Toilet Paper                             ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4239 on 16303 degrees of freedom
+##   (2 observations deleted due to missingness)
+## Multiple R-squared:  0.9996,	Adjusted R-squared:  0.9996 
+## F-statistic: 5.653e+05 on 78 and 16303 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## Conclusion
+Our journey into Haskmasks showed us how to plot the rarity of a mask along a curve, how to use boxplots to compare characteristic traits against their rarity scores, and ultimately how to estimate the effect each trait has on mask exclusivity. Are there any other interesting analysis you can think of?  If so, feel free to share them with us!
+
+
+&lt;p align="center"&gt;
+
+&lt;img src="hashmask_gif.gif"  width="25%" height="25%"&gt;
+
+&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
