@@ -17,10 +17,10 @@ Gitcoin Grant Link: https://gitcoin.co/grants/562/learning-data-science-on-the-e
 ## Tentative Course Outline
 
 [Module 1 - Basic Data Structures and Munging](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%201)
-* Motivating Example([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html),[Video]())
-* Reading Files([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html),[Video]())
-* Basics([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html),[Video]())
-* Data structures([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html),[Video]())
+* Motivating Example([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html),[Video]())
+* Reading Files([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html),[Video]())
+* Basics([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html),[Video]())
+* Data structures([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html),[Video]())
 
 Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
 
@@ -30,6 +30,7 @@ Module 2 - Statistical Graphics and Visualization
 * [Plotting Basics ]()
 * [Building Plots Layer by Layer]()
 * [Polishing Your Graphs]()
+
 Data Sources: *Omni Analytics Group*, [*CryptoPunks*](https://www.larvalabs.com/cryptopunks)
 
 Module 3 - Supervised and Unsupervised Machine Learning
