@@ -16,21 +16,21 @@ Gitcoin Grant Link: https://gitcoin.co/grants/562/learning-data-science-on-the-e
 
 ## Tentative Course Outline
 
-[Module 1 - Basic Data Structures and Munging](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%201)
-* [Motivating Example](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html)
-* [Reading Files](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html)
-* [Basics](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html)
-* [Data structures](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html)
+[Module 1 - Basic Data Structures and Munging]([R](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%201),[Video]())
+* [Motivating Example]([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html),[Video]())
+* [Reading Files]([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html),[Video]())
+* [Basics]([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html),[Video]())
+* [Data structures]([R](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html),[Video]())
 
 Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
 
 Module 2 - Statistical Graphics and Visualization
-* Why graph?
-* Thinking in layers
-* Basic graph types
-* Advanced statistical graphics
-
-Data Sources: *Etherscan*
+* [Why graph?]()
+* [Visualization Principles and Practices]()
+* [Plotting Basics ]()
+* [Building Plots Layer by Layer]()
+* [Polishing Your Graphs]()
+Data Sources: *Omni Analytics Group*, [*CryptoPunks*](https://www.larvalabs.com/cryptopunks)
 
 Module 3 - Supervised and Unsupervised Machine Learning
 * The ML workflow
@@ -49,8 +49,10 @@ Module 4 - Case Studies
 * [Tornado.Cash Initial Distribution Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/tornado-cash/#1)
 * [Stable Coin Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/stable-coins/#1)
 * [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/) ([Part 1](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-1-ShinyIntro.html), [Part 2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-2-ShinyStructure.html), [Part 3](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-3-ShinyTools.html), [Part 4](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-4-BuildShinyAppPart1.html), [Part 5](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-5-BuildShinyAppPart2.html), [Part 6](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-6-BuildShinyAppPart3.html), [Part 7](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-7-BuildShinyAppPart4.html), [Part 8](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-8-BuildShinyAppPart5.html), [Part 9](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-9-BuildShinyAppFinalPart.html))
+* [Crypto Punks Analysis]([R](),[Video]())
+* [Reconstructing the Crypto Sentiment Investment Curve in ggplot2]([R](),[Video]())
 
-Data Sources: *Beaconscan, Numerai Tournament Data*
+Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks*
 
 ## Updates
 
@@ -71,6 +73,14 @@ Change log
 * Module 1 updated
 * 5 New case studies (with 2 more to be published during the active grant round)
 * First video lecture published to Youtube
+
+*Gitcoin Grant Round 10*
+
+Soon (TM)
+
+Change log
+* tons of copy edits...
+* More Soon (TM)
 
 ## FAQ
 
@@ -96,3 +106,4 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 * [Crypto Art Pulse](https://cryptoartpulse.com/)
 * [Numerai](https://numer.ai/)
 * [Tornado Cash](https://tornado.cash/)
+* [Hashmasks](https://www.thehashmasks.com/)
