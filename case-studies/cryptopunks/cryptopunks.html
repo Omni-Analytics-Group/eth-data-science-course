@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Crypto Punks Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Crypto Punks Analysis <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Crypto Punks
+
+The CryptoPunks are 10,000 uniquely generated characters and each one of them are officially owned by a single person on the Ethereum blockchain. Originally, they were all claimed by for free. Now, you can buy, bid on, and offer punks for sale via the marketplace that's also embedded in the blockchain. 
+
+You can check them out on https://www.larvalabs.com/cryptopunks. 
+
+&lt;p align="center"&gt;
+
+&lt;img src="punk-image.png" &gt;
+
+&lt;/p&gt;
+
+---
+
+## Getting Started
+
+We will be using the following libraries:
+
+
+```r
+library(knitr)
+library(tidyverse)
+library(ggfortify)
+library(formattable)
+library(ggnewscale)
+library(scales)
+```
+
+&lt;p align="center"&gt;
+
+&lt;img src="Cut_outs/Cut_out_17.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## The Data
+
+We will be using two data:
+
+* Transaction data that we scrapped from https://www.larvalabs.com/cryptopunks/details on 12/30/2021. 
+* Details of each punk available on https://docs.google.com/spreadsheets/d/1qJLUy7BR1i3-aU2axFkuvNY_5EqLDsQiE9ryxB0dcA0/edit#gid=278362788
+
+Let's read in the data!
+
+
+```r
+punks_transactions &lt;- read_csv("transactions_cryptopunks.csv")
+punks_raw &lt;- read_csv("cryptopunks.csv")
+```
+
+---
+
+## Data Preview
+
+
+
+
+```r
+head(punks_transactions,3)
+```
+
+```
+## # A tibble: 3 x 7
+##   Type          From     To    Crypto   USD Txn           ID
+##   &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;
+## 1 Bid Withdrawn natealex &lt;NA&gt;      69 25532 2020-09-16     0
+## 2 Bid           natealex &lt;NA&gt;      69 25104 2020-09-15     0
+## 3 Bid Withdrawn natealex &lt;NA&gt;      49  7031 2020-01-11     0
+```
+
+```r
+head(punks_raw,3)
+```
+
+```
+## # A tibble: 3 x 25
+##    Punk Sex   Type  Skin  TypeSkin Slots Att1  Att2  Att3  Att4  Att5  Att6 
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1  6487 Girl  Fema~ Albi~ FemaleA~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
+## 2  2204 Girl  Fema~ Dark  FemaleD~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
+## 3   641 Girl  Fema~ Light FemaleL~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
+## # ... with 13 more variables: Att7 &lt;chr&gt;, TypeRare &lt;chr&gt;, AttCount &lt;chr&gt;,
+## #   Att1_1 &lt;chr&gt;, Att2_1 &lt;chr&gt;, Att3_1 &lt;chr&gt;, Att4_1 &lt;chr&gt;, Att5_1 &lt;chr&gt;,
+## #   Att6_1 &lt;chr&gt;, Att7_1 &lt;chr&gt;, Min &lt;chr&gt;, Avg &lt;chr&gt;, Rank &lt;chr&gt;
+```
+
+---
+
+## Data Cleaning
+
+The transaction data is good to go, but the punks data need some cleaning as the numerical value (percentage) are treated as character. We can simply use `parse_number()` to get the numerical value from those columns. 
+
+
+```r
+punks &lt;- punks_raw %&gt;%
+  mutate(across(c(TypeRare, AttCount, Att1_1, Att2_1, Att3_1, 
+                  Att4_1, Att5_1, Att6_1, Att7_1, 
+                  Min, Avg, Rank), parse_number))
+```
+
+Let's get started with the analysis!
+
+---
+
+## Transactions
+
+On 06/23/2017, all 10,000 punks were claimed for free by 365 unique owners. On the same day, 32 bids and 21 sales were made. As of 12/30/2021, there are a total of 60479 interactions, where interactions include 'Bid', 'Bid Withdrawn', 'Offered', 'Offer Withdrawn', '(Wrap)', '(Unwrap)', 'Sold', 'Transfer', and 'Claimed'. 
+
+Below shows a summary of the number of each interaction:
+
+```r
+punks_transactions %&gt;% group_by(Type) %&gt;% summarise(Count = n(), Average_per_punk = n()/10000)
+```
+
+```
+## # A tibble: 9 x 3
+##   Type            Count Average_per_punk
+##   &lt;chr&gt;           &lt;int&gt;            &lt;dbl&gt;
+## 1 (Unwrap)          922           0.0922
+## 2 (Wrap)           1397           0.140 
+## 3 Bid             10705           1.07  
+## 4 Bid Withdrawn    5181           0.518 
+## 5 Claimed         10000           1     
+## 6 Offer Withdrawn  2872           0.287 
+## 7 Offered         17179           1.72  
+## 8 Sold             7567           0.757 
+## 9 Transfer         4656           0.466
+```
+
+---
+
+## Transactions at the punk level
+
+We can look at how many interactions of each type for each punk as the table shows:
+
+
+```r
+punks_transactions %&gt;%
+  group_by(ID, Type) %&gt;%
+  summarise(Count = n()) 
+```
+
+```
+## # A tibble: 31,170 x 3
+## # Groups:   ID [10,000]
+##       ID Type            Count
+##    &lt;dbl&gt; &lt;chr&gt;           &lt;int&gt;
+##  1     0 Bid                17
+##  2     0 Bid Withdrawn       6
+##  3     0 Claimed             1
+##  4     0 Offered             3
+##  5     0 Sold                3
+##  6     0 Transfer            1
+##  7     1 Bid                12
+##  8     1 Bid Withdrawn       6
+##  9     1 Claimed             1
+## 10     1 Offer Withdrawn     6
+## # ... with 31,160 more rows
+```
+
+---
+
+## Your Turn
+
+1. Find the number of unique owners for each punk.
+2. Find the number of unique bidders for each punk.
+
+Hint: `filter()` and `n_distinct()` is an useful function here.
+
+---
+
+## Answers 
+
+### 1.
+
+```r
+punks_transactions %&gt;%
+  group_by(ID) %&gt;%
+  summarise(unique_owners = n_distinct(To))
+```
+
+```
+## # A tibble: 10,000 x 2
+##       ID unique_owners
+##    &lt;dbl&gt;         &lt;int&gt;
+##  1     0             6
+##  2     1             9
+##  3     2             2
+##  4     3             2
+##  5     4             2
+##  6     5             2
+##  7     6             2
+##  8     7             2
+##  9     8             2
+## 10     9             2
+## # ... with 9,990 more rows
+```
+
+---
+
+### 2.
+
+```r
+punks_transactions %&gt;%
+  filter(Type == "Bid") %&gt;%
+  group_by(ID) %&gt;%
+  summarise(unique_bidders = n_distinct(From))
+```
+
+```
+## # A tibble: 4,484 x 2
+##       ID unique_bidders
+##    &lt;dbl&gt;          &lt;int&gt;
+##  1     0              9
+##  2     1             10
+##  3     2              8
+##  4     3              6
+##  5     4              5
+##  6     5              3
+##  7     6              3
+##  8     7              6
+##  9     8              8
+## 10     9              8
+## # ... with 4,474 more rows
+```
+
+
+---
+
+## Selling Price for each punk
+
+There are a total of 7567 sales and only 3665 punks were involved in these sales. Let's take a look at their prices. 
+
+
+```r
+punks_transactions %&gt;%
+  filter(Type == "Sold") %&gt;%
+  group_by(ID)
+```
+
+```
+## # A tibble: 7,567 x 7
+## # Groups:   ID [3,665]
+##    Type  From      To        Crypto   USD Txn           ID
+##    &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;
+##  1 Sold  0xf5099e  14715954   25     2822 2018-11-30     0
+##  2 Sold  0x00d7c9  10528156    1.6    386 2017-07-07     0
+##  3 Sold  0xc352b5  55241       0.98   320 2017-06-23     0
+##  4 Sold  EliteCat… 0xcf6165   60    36305 2020-11-30     1
+##  5 Sold  0xf5099e  GoWest23   31     5155 2019-04-06     1
+##  6 Sold  0xc352b5  0xa0a59c    0.42   107 2017-06-26     1
+##  7 Sold  0x582fa7  0x7c00c9…   2.5    234 2018-12-07    14
+##  8 Sold  0xd8e806  0x582fa7    1.85   351 2017-07-17    14
+##  9 Sold  0xc352b5  0xd8e806    0.9    185 2017-07-13    14
+## 10 Sold  0xc352b5  6689278     0.51   105 2017-07-10    33
+## # ... with 7,557 more rows
+```
+
+---
+
+## First sale and last sale
+
+Since some of the punks are sold multiple times, we are interested in its first and last sale. As we can see from the table in the previous slide, the sales are in chronological order. Thus, we can do the following:
+
+
+```r
+first_sold_by_ID &lt;- punks_transactions %&gt;%
+  filter(Type == "Sold") %&gt;%
+  group_by(ID) %&gt;%
+  filter(row_number()==n())%&gt;%
+  rename(first_price_ETH = Crypto, first_price_USD = USD)
+
+last_sold_by_ID &lt;- punks_transactions %&gt;%
+  filter(Type == "Sold") %&gt;%
+  group_by(ID) %&gt;%
+  filter(row_number()==1) %&gt;%
+  rename(last_price_ETH = Crypto, last_price_USD = USD)
+```
+
+---
+To put `first_sold_by_ID` and `last_sold_by_ID` together, we simply use `inner_join()` as follows:
+
+
+```r
+sales_temp &lt;- first_sold_by_ID %&gt;% 
+  select(ID, first_price_ETH, first_price_USD) %&gt;% 
+  inner_join(last_sold_by_ID, by = c("ID"="ID")) 
+sales_temp
+```
+
+```
+## # A tibble: 3,665 x 9
+## # Groups:   ID [3,665]
+##       ID first_price_ETH first_price_USD Type  From  To    last_price_ETH
+##    &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
+##  1     0            0.98             320 Sold  0xf5~ 1471~          25   
+##  2     1            0.42             107 Sold  Elit~ 0xcf~          60   
+##  3    14            0.9              185 Sold  0x58~ 0x7c~           2.5 
+##  4    33            0.51             105 Sold  0xc3~ 6689~           0.51
+##  5    89            1.5              336 Sold  jmg   Toke~          20.0 
+##  6   116            1.2              229 Sold  0xd8~ 5779~           2.4 
+##  7   143            6.5             1041 Sold  0xc3~ MrTp~           6.5 
+##  8   155            7               2708 Sold  Mich~ DANNY          12   
+##  9   169            1                127 Sold  Pran~ Slat~           6.99
+## 10   240            2                255 Sold  Pran~ Slat~           7   
+## # ... with 3,655 more rows, and 2 more variables: last_price_USD &lt;dbl&gt;,
+## #   Txn &lt;date&gt;
+```
+
+---
+
+## Your Turn
+
+1. Create a table named `num_sold` that has the number of the sales for each punk that was sold at least once. 
+2. Create a table named `sales_temp_2` that combines `sales_temp` and `num_sold` above. 
+
+
+---
+
+## Answers
+
+### 1. 
+
+```r
+num_sold &lt;- punks_transactions %&gt;%
+  filter(Type == "Sold") %&gt;%
+  group_by(ID) %&gt;%
+  summarise(num_sold = n())
+```
+
+### 2. 
+
+```r
+sales_temp_2 &lt;- sales_temp %&gt;%
+  inner_join(num_sold, by = c("ID"="ID"))
+```
+
+---
+
+## Price Change
+Let's also compute the percentage change in the sale prices and create an extra column that categorize the frequency of a punk is being sold: 'Low' means a punk is sold less than or equal to 3 times, 'Medium' is sold more than 3 times and less than or equal to 5 times, and 'High' is sold more than 5 times. 
+
+
+```r
+sales &lt;-sales_temp_2 %&gt;%
+  mutate(percentage_change_ETH = (last_price_ETH-first_price_ETH)/first_price_ETH*100,
+         percentage_change_USD = (last_price_USD-first_price_USD)/first_price_USD*100,
+         frequency_sold = ifelse(num_sold&lt;=3, "Low", ifelse(num_sold&lt;=5, "Medium", "High")))
+head(sales,2)
+```
+
+```
+## # A tibble: 2 x 13
+## # Groups:   ID [2]
+##      ID first_price_ETH first_price_USD Type  From  To    last_price_ETH
+##   &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
+## 1     0            0.98             320 Sold  0xf5~ 1471~             25
+## 2     1            0.42             107 Sold  Elit~ 0xcf~             60
+## # ... with 6 more variables: last_price_USD &lt;dbl&gt;, Txn &lt;date&gt;, num_sold &lt;int&gt;,
+## #   percentage_change_ETH &lt;dbl&gt;, percentage_change_USD &lt;dbl&gt;,
+## #   frequency_sold &lt;chr&gt;
+```
+
+---
+
+## Ditribution of Percentage Changed in Sold Price (ETH)
+
+We can visualize the distribution using `ggplot2` as follows: 
+
+
+```r
+scaleFUN &lt;- function(x) sprintf("%.0f", x)
+x_breaks = c(1,2,3,5,10,20,30,50,100,200,300,500,1000,2000,3000,5000,10000,20000,30000,50000,100000,
+             200000,300000,500000)
+
+sales %&gt;% 
+  filter(num_sold&gt;1) %&gt;%
+  mutate(frequency_sold = factor(frequency_sold, levels=c("Low", "Medium", "High"))) %&gt;%
+  ggplot(aes(x=percentage_change_ETH))+
+  geom_histogram(aes(fill = frequency_sold), colour="black")+
+  scale_x_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=20))+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))+
+  labs(title = "Ditribution of Percentage Changed in Sold Price (ETH)",
+       subtitle = "for all Crypto Punks that have been resold", x = "Percentage Change (%)")+
+  scale_fill_discrete(name = "Frequency Sold", labels = c("Low (2,3)", "Medium (4,5)", "High (&gt;5)"))
+```
+
+---
+
+&lt;img src="cryptopunks_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Time Series
+
+We can also create a time series of the number of sales as follows.
+
+
+```r
+sales$Month_Yr &lt;- format(as.Date(sales$Txn), "%Y-%m")
+sales %&gt;%
+  group_by(Month_Yr) %&gt;%
+  summarise(num_sales = n()) %&gt;%
+  ggplot(aes(x=Month_Yr,y=num_sales, group=1))+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  geom_line(color="blue")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.9))+
+  labs(title = "Number of Sales over time", y = "Number of Sales", x= "Time")
+```
+---
+
+## Time Series (continued...)
+&lt;img src="cryptopunks_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+---
+
+## Your Turn
+
+Create a time series showing the total sales in each month!
+
+--
+
+## Answers
+
+
+```r
+sales %&gt;%
+  group_by(Month_Yr) %&gt;%
+  summarise(total_sales = sum(last_price_ETH)) %&gt;%
+  ggplot(aes(x=Month_Yr,y=total_sales, group=1))+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  geom_line(color="blue")+
+  theme(axis.text.x = element_text(angle = 90, vjust=0.9))+
+  labs(title = "Total Sales over time", y = "Total Sales (ETH)", x= "Time")
+```
+
+---
+
+## Answers (continued...)
+
+&lt;img src="cryptopunks_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Punk's Rank vs its' Price
+
+We will use the existing 'Rank' column to create 'RankNum' using the `Rank` function and join it with the 'last_sold_by_ID' table.
+
+
+```r
+rank_and_transaction &lt;- punks %&gt;%
+  mutate(RankNum = rank(desc(Rank))) %&gt;%
+  inner_join(last_sold_by_ID, by = c("Punk"="ID")) 
+
+head(rank_and_transaction,3)
+```
+
+```
+## # A tibble: 3 x 32
+##    Punk Sex   Type.x Skin  TypeSkin Slots Att1  Att2  Att3  Att4  Att5  Att6 
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1  6487 Girl  Female Albi~ FemaleA~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
+## 2   641 Girl  Female Light FemaleL~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
+## 3  1050 Girl  Female Mid   FemaleM~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
+## # ... with 20 more variables: Att7 &lt;chr&gt;, TypeRare &lt;dbl&gt;, AttCount &lt;dbl&gt;,
+## #   Att1_1 &lt;dbl&gt;, Att2_1 &lt;dbl&gt;, Att3_1 &lt;dbl&gt;, Att4_1 &lt;dbl&gt;, Att5_1 &lt;dbl&gt;,
+## #   Att6_1 &lt;dbl&gt;, Att7_1 &lt;dbl&gt;, Min &lt;dbl&gt;, Avg &lt;dbl&gt;, Rank &lt;dbl&gt;,
+## #   RankNum &lt;dbl&gt;, Type.y &lt;chr&gt;, From &lt;chr&gt;, To &lt;chr&gt;, last_price_ETH &lt;dbl&gt;,
+## #   last_price_USD &lt;dbl&gt;, Txn &lt;date&gt;
+```
+
+---
+
+## Crypto Punks Last Sold Price vs Uniqueness Score
+
+
+```r
+scaleFUN &lt;- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.02,0.03,0.05,0.07, 0.1,0.2,0.3,0.5,0.7,1,2,3,5,7,10,20,30,50, 70,
+             100,200, 300, 500, 700, 1000, 2000, 3000, 5000, 7000, 10000, 20000, 30000, 50000, 70000, 100000)
+rank_and_transaction %&gt;% 
+  ggplot(aes(x=RankNum, y=last_price_ETH))+
+  geom_point()+
+  geom_smooth(aes(colour = ..y..), se=FALSE, size=2)+
+  scale_colour_gradient(low = "red", high = "green")+
+  labs(title = "Crypto Punks Last Sold Price vs Uniqueness Score", 
+       y = "Last Sold Price (ETH)", x = "Uniqueness Score")+
+  scale_x_continuous(breaks = scales::pretty_breaks(n=20))+
+  scale_y_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  theme_bw()+
+  theme(legend.position = "none")
+```
+
+---
+
+&lt;img src="cryptopunks_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Distribution of Last Price Sold
+
+
+```r
+scaleFUN &lt;- function(x) sprintf("%.2f", x)
+x_breaks = c(0.01,0.03, 0.05,0.1,0.3, 0.5, 1, 3,5, 10, 30,50, 100)
+rank_and_transaction %&gt;% 
+  ggplot(aes(x=last_price_ETH))+
+  geom_histogram(aes(fill=Type.x),color ="black", boundary=0)+
+  scale_y_continuous(breaks = scales::pretty_breaks(n=10))+
+  scale_x_log10(breaks = x_breaks,
+                labels = scaleFUN)+
+  facet_wrap(~Type.x, scales = "free_y")+
+  theme(axis.text.x = element_text(angle = 45, vjust=0.9))+
+  labs(title = "Distribution of Last Price Sold by Type", x="Last Sale Price (ETH)")+
+  theme(legend.position = "none")
+```
+
+---
+
+&lt;img src="cryptopunks_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Conclusion
+
+This data science case study taught us how to use analytics to understand the market for Crypto Punk NFTs.  We used graphs to show not only that sales have been increasing over time, but to objectively validate that the rarity of a punk has an impact on its selling price. Can you think of other interesting analysis?  If so, please feel free to share!
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="right"&gt;
+
+&lt;img src="Cut_outs/Cut_out_07.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
