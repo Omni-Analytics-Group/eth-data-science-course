@@ -24,7 +24,7 @@ Gitcoin Grant Link: https://gitcoin.co/grants/562/learning-data-science-on-the-e
 
 Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
 
-Module 2 - Statistical Graphics and Visualization
+[Module 2 - Statistical Graphics and Visualization](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%202)
 * [Why graph?](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%202/motivation/motivation.html#1)
 * [Visualization Principles and Practices](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%202/perception/perception.html#1)
 * [Plotting Basics ](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%202/basics/basics.html#1)
