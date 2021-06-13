@@ -78,7 +78,7 @@ In order to do that, we need to create an intermediate data representation. We h
 fees <- yearn[,.(timestamp, amount_usd, protocol)][order(-timestamp)]
 fees$timestamp <- mdy_hm(fees$timestamp)
 fees[,date:=date(timestamp)]
-fees[, amount_day := sum(amount_usd), by=date]
+fees[, amount_day := sum(amount_usd), by=.(protocol, date)]
 daily_fees <- unique(fees[,.(date, amount_day, protocol)])
 daily_fees <- daily_fees[order(date)]
 daily_fees[,cum_amount:=cumsum(amount_day), by=protocol]
@@ -106,7 +106,7 @@ We want to visualize the `rewards` vs `strategist` fee destinations over time (n
 fee_dest <- yearn[,.(timestamp, amount_usd, fee_dest)][order(-timestamp)]
 fee_dest$timestamp <- mdy_hm(fee_dest$timestamp)
 fee_dest[,date:=date(timestamp)]
-fee_dest[, amount_day := sum(amount_usd), by=date]
+fee_dest[, amount_day := sum(amount_usd), by=.(fee_dest, date)]
 daily_fee_dest <- unique(fee_dest[,.(date, amount_day, fee_dest)])
 daily_fee_dest <- daily_fee_dest[order(date)]
 daily_fee_dest[,cum_amount:=cumsum(amount_day), by=fee_dest]
@@ -122,6 +122,9 @@ ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) +
   geom_line() + 
   ggtitle("Protocol Fee Destinations")
 ```
+
+
+
 ---
 
 ## `fee_type` Analysis
@@ -132,7 +135,7 @@ We want to visualize the fee types over time. (need better explanation here)
 fee_type <- yearn[,.(timestamp, amount_usd, fee_type)][order(-timestamp)]
 fee_type$timestamp <- mdy_hm(fee_type$timestamp)
 fee_type[,date:=date(timestamp)]
-fee_type[, amount_day := sum(amount_usd), by=date]
+fee_type[, amount_day := sum(amount_usd), by=.(fee_type, date)]
 daily_fee_type <- unique(fee_type[,.(date, amount_day, fee_type)])
 daily_fee_type <- daily_fee_type[order(date)]
 daily_fee_type[,cum_amount:=cumsum(amount_day), by=fee_type]
@@ -148,4 +151,16 @@ ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) +
   geom_line() + 
   ggtitle("Protocol Fee Types")
 ```
+
+
+
 ---
+
+
+## Daily Protocol Fees
+
+```{r}
+ggplot(daily_fees, aes(x=date, y=amount_day, color=protocol)) +
+  geom_line()
+```
+
