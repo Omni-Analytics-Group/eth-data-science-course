@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>yearn.finance Analysis          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# yearn.finance Analysis <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Yearn Finance
+
+Yearn Finance is a suite of products in Decentralized Finance (DeFi) that provides lending aggregation, yield generation, and insurance on the Ethereum blockchain. The protocol is maintained by various independent developers and is governed by YFI holders. Their core products are **Vaults** and **Earn**.  
+
+#### Vaults
+
+Capital pools that automatically generate yield based on opportunities present in the market. Vaults benefit users by socializing gas costs, automating the yield generation and rebalancing process, and automatically shifting capital as opportunities arise. End users also do not need to have a proficient knowledge of the underlying protocols involved or DeFi, thus the Vaults represent a passive-investing strategy.  
+
+#### Earn
+
+The first Yearn product was a lending aggregator. Funds are shifted between dYdX, AAVE, and Compound automatically as interest rates change between these protocols. Users can deposit to these lending aggregator smart contracts via the Earn page. This product completely optimizes the interest accrual process for end-users to ensure they are obtaining the highest interest rates at all times among the platforms specified above.  
+
+You can check out the project at https://yearn.finance/  
+
+---
+
+## Getting Started
+
+We will be using the following libraries:
+
+
+```r
+library(data.table)
+library(ggplot2)
+library(lubridate)
+```
+
+The `data.table` library is a wrangling library like `tidyverse`, but focuses more on concise syntax patterns and *blazing fast speed*. It build on top of base data.frame operations. Check it out here: https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+
+&lt;p align="center"&gt;
+
+&lt;img src="Cut_outs/Cut_out_17.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## The Data
+
+We will be using a data set obtained from Yearn themselves! Each row represents a transaction that interacted with the Yearn protocol. We have a number of different features containing metadata around the transaction. Let's read in the data.
+
+
+```r
+yearn &lt;- fread("08-fees-combined.csv")
+str(yearn)
+```
+
+```
+## Classes 'data.table' and 'data.frame':	23508 obs. of  14 variables:
+##  $ timestamp       : chr  "8/15/2020 12:22" "8/15/2020 12:23" "8/15/2020 12:58" "8/15/2020 12:58" ...
+##  $ block_number    : int  10664621 10664627 10664770 10664775 10664849 10664905 10664960 10665138 10665138 10665142 ...
+##  $ transaction_hash: chr  "0x09e941c8112501e0aa09558d93a211e711312b5e6a9ab057a9869cf4d46ca7d2" "0x849b603609726e415c3e8d70eac33ad93137d10d8617eda417844ae9211e50e2" "0x939660735a1dcdd032e5ceda63ce5335d9982b7813046bcce5c32e5acb6d0d3b" "0x3698945a8a8d306056db7374679863fdff46a909456a6540708328b1831d2ded" ...
+##  $ vault           : chr  "0xACd43E627e64355f1861cEC6d3a6688B31a6F952" "0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c" "0x2f08119C6f07c006695E079AAFc638b8789FAf18" "0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c" ...
+##  $ token           : chr  "0x6B175474E89094C44Da98b954EedeAC495271d0F" "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8" "0xdAC17F958D2ee523a2206206994597C13D831ec7" "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8" ...
+##  $ strategy        : chr  "0xd643cf07344428770b84973e049A1c18B5d47edE" "0xa069E33994DcC24928D99f4BBEDa83AAeF00B5f3" "0x787C771035bDE631391ced5C083db424A4A64bD8" "0xa069E33994DcC24928D99f4BBEDa83AAeF00B5f3" ...
+##  $ recipient       : chr  "0xFEB4acf3df3cDEA7399794D0869ef76A6EfAff52" "0xFEB4acf3df3cDEA7399794D0869ef76A6EfAff52" "0xFEB4acf3df3cDEA7399794D0869ef76A6EfAff52" "0xFEB4acf3df3cDEA7399794D0869ef76A6EfAff52" ...
+##  $ fee_type        : chr  "harvest" "withdrawal" "harvest" "harvest" ...
+##  $ fee_dest        : chr  "rewards" "rewards" "rewards" "rewards" ...
+##  $ func            : chr  "harvest()" "withdraw(uint256)" "harvest()" "harvest()" ...
+##  $ token_price     : num  1 1.05 1 1.05 1 ...
+##  $ amount_native   : num  1.681 52.996 0.103 528.595 38.169 ...
+##  $ amount_usd      : num  1.681 55.611 0.103 554.684 38.169 ...
+##  $ protocol        : chr  "v1" "v1" "v1" "v1" ...
+##  - attr(*, ".internal.selfref")=&lt;externalptr&gt;
+```
+
+---
+
+## Protocol Performance Analysis
+
+At Yearn, they've released 2 versions of their protocol: `v1` and `v2`. The protocol makes money by collecting management fees, so we're interested in seeing the amount of fees collected over time and comparing the two protocol versions.  
+
+In order to do that, we need to create an intermediate data representation. We have each transaction, but we need to aggrergate the fees over time. Let's do the following:
+- create a new table called `fees` and subset `yearn` to only the columns we need
+- compute a new column that represents cumulative fees up to that point in time
+
+
+```r
+fees &lt;- yearn[,.(timestamp, amount_usd, protocol)][order(-timestamp)]
+fees$timestamp &lt;- mdy_hm(fees$timestamp)
+fees[,date:=date(timestamp)]
+fees[, amount_day := sum(amount_usd), by=date]
+daily_fees &lt;- unique(fees[,.(date, amount_day, protocol)])
+daily_fees &lt;- daily_fees[order(date)]
+daily_fees[,cum_amount:=cumsum(amount_day), by=protocol]
+daily_fees &lt;- daily_fees[order(-date)]
+```
+
+
+---
+
+## Plot the fees
+
+
+```r
+ggplot(daily_fees, aes(date, cum_amount, colour=protocol)) + 
+  geom_line() + 
+  ggtitle("Protocol Fees")
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## `fee_dest` Analysis
+
+We want to visualize the `rewards` vs `strategist` fee destinations over time (need a better explanation here). Prepare the data.
+
+
+```r
+fee_dest &lt;- yearn[,.(timestamp, amount_usd, fee_dest)][order(-timestamp)]
+fee_dest$timestamp &lt;- mdy_hm(fee_dest$timestamp)
+fee_dest[,date:=date(timestamp)]
+fee_dest[, amount_day := sum(amount_usd), by=date]
+daily_fee_dest &lt;- unique(fee_dest[,.(date, amount_day, fee_dest)])
+daily_fee_dest &lt;- daily_fee_dest[order(date)]
+daily_fee_dest[,cum_amount:=cumsum(amount_day), by=fee_dest]
+daily_fee_dest &lt;- daily_fee_dest[order(-date)]
+```
+
+---
+
+## Plot the fee destinations
+
+
+```r
+ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) + 
+  geom_line() + 
+  ggtitle("Protocol Fee Destinations")
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+---
+
+## `fee_type` Analysis
+
+We want to visualize the fee types over time. (need better explanation here)
+
+
+```r
+fee_type &lt;- yearn[,.(timestamp, amount_usd, fee_type)][order(-timestamp)]
+fee_type$timestamp &lt;- mdy_hm(fee_type$timestamp)
+fee_type[,date:=date(timestamp)]
+fee_type[, amount_day := sum(amount_usd), by=date]
+daily_fee_type &lt;- unique(fee_type[,.(date, amount_day, fee_type)])
+daily_fee_type &lt;- daily_fee_type[order(date)]
+daily_fee_type[,cum_amount:=cumsum(amount_day), by=fee_type]
+daily_fee_type &lt;- daily_fee_type[order(-date)]
+```
+
+---
+
+## Plot `fee_type` Analysis
+
+
+```r
+ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) + 
+  geom_line() + 
+  ggtitle("Protocol Fee Types")
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+---
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

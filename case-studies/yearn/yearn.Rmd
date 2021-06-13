@@ -1,0 +1,151 @@
+---
+title: "yearn.finance Analysis <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+## Yearn Finance
+
+Yearn Finance is a suite of products in Decentralized Finance (DeFi) that provides lending aggregation, yield generation, and insurance on the Ethereum blockchain. The protocol is maintained by various independent developers and is governed by YFI holders. Their core products are **Vaults** and **Earn**.  
+
+#### Vaults
+
+Capital pools that automatically generate yield based on opportunities present in the market. Vaults benefit users by socializing gas costs, automating the yield generation and rebalancing process, and automatically shifting capital as opportunities arise. End users also do not need to have a proficient knowledge of the underlying protocols involved or DeFi, thus the Vaults represent a passive-investing strategy.  
+
+#### Earn
+
+The first Yearn product was a lending aggregator. Funds are shifted between dYdX, AAVE, and Compound automatically as interest rates change between these protocols. Users can deposit to these lending aggregator smart contracts via the Earn page. This product completely optimizes the interest accrual process for end-users to ensure they are obtaining the highest interest rates at all times among the platforms specified above.  
+
+You can check out the project at https://yearn.finance/  
+
+---
+
+## Getting Started
+
+We will be using the following libraries:
+
+```{r}
+library(data.table)
+library(ggplot2)
+library(lubridate)
+```
+
+The `data.table` library is a wrangling library like `tidyverse`, but focuses more on concise syntax patterns and *blazing fast speed*. It build on top of base data.frame operations. Check it out here: https://cran.r-project.org/web/packages/data.table/vignettes/datatable-intro.html
+
+<p align="center">
+
+<img src="Cut_outs/Cut_out_17.png"  width="200px" height="150px">
+
+</p>
+---
+
+## The Data
+
+We will be using a data set obtained from Yearn themselves! Each row represents a transaction that interacted with the Yearn protocol. We have a number of different features containing metadata around the transaction. Let's read in the data.
+
+```{r}
+yearn <- fread("08-fees-combined.csv")
+str(yearn)
+```
+
+---
+
+## Protocol Performance Analysis
+
+At Yearn, they've released 2 versions of their protocol: `v1` and `v2`. The protocol makes money by collecting management fees, so we're interested in seeing the amount of fees collected over time and comparing the two protocol versions.  
+
+In order to do that, we need to create an intermediate data representation. We have each transaction, but we need to aggrergate the fees over time. Let's do the following:
+- create a new table called `fees` and subset `yearn` to only the columns we need
+- compute a new column that represents cumulative fees up to that point in time
+
+```{r}
+fees <- yearn[,.(timestamp, amount_usd, protocol)][order(-timestamp)]
+fees$timestamp <- mdy_hm(fees$timestamp)
+fees[,date:=date(timestamp)]
+fees[, amount_day := sum(amount_usd), by=date]
+daily_fees <- unique(fees[,.(date, amount_day, protocol)])
+daily_fees <- daily_fees[order(date)]
+daily_fees[,cum_amount:=cumsum(amount_day), by=protocol]
+daily_fees <- daily_fees[order(-date)]
+```
+
+
+---
+
+## Plot the fees
+
+```{r}
+ggplot(daily_fees, aes(date, cum_amount, colour=protocol)) + 
+  geom_line() + 
+  ggtitle("Protocol Fees")
+```
+
+---
+
+## `fee_dest` Analysis
+
+We want to visualize the `rewards` vs `strategist` fee destinations over time (need a better explanation here). Prepare the data.
+
+```{r}
+fee_dest <- yearn[,.(timestamp, amount_usd, fee_dest)][order(-timestamp)]
+fee_dest$timestamp <- mdy_hm(fee_dest$timestamp)
+fee_dest[,date:=date(timestamp)]
+fee_dest[, amount_day := sum(amount_usd), by=date]
+daily_fee_dest <- unique(fee_dest[,.(date, amount_day, fee_dest)])
+daily_fee_dest <- daily_fee_dest[order(date)]
+daily_fee_dest[,cum_amount:=cumsum(amount_day), by=fee_dest]
+daily_fee_dest <- daily_fee_dest[order(-date)]
+```
+
+---
+
+## Plot the fee destinations
+
+```{r}
+ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) + 
+  geom_line() + 
+  ggtitle("Protocol Fee Destinations")
+```
+---
+
+## `fee_type` Analysis
+
+We want to visualize the fee types over time. (need better explanation here)
+
+```{r}
+fee_type <- yearn[,.(timestamp, amount_usd, fee_type)][order(-timestamp)]
+fee_type$timestamp <- mdy_hm(fee_type$timestamp)
+fee_type[,date:=date(timestamp)]
+fee_type[, amount_day := sum(amount_usd), by=date]
+daily_fee_type <- unique(fee_type[,.(date, amount_day, fee_type)])
+daily_fee_type <- daily_fee_type[order(date)]
+daily_fee_type[,cum_amount:=cumsum(amount_day), by=fee_type]
+daily_fee_type <- daily_fee_type[order(-date)]
+```
+
+---
+
+## Plot `fee_type` Analysis
+
+```{r}
+ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) + 
+  geom_line() + 
+  ggtitle("Protocol Fee Types")
+```
+---
