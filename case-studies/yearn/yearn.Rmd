@@ -163,4 +163,26 @@ ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) +
 ggplot(daily_fees, aes(x=date, y=amount_day, color=protocol)) +
   geom_line()
 ```
+This is choppy. Let's smooth it out a bit by using a rolling average.
+
+---
+
+Compute a rolling average.
+
+```{r}
+daily_fees <- daily_fees[order(date)]
+daily_fees[, amount_rolling_avg:=Reduce(`+`, shift(amount_day + 0, 0:6, type='lag')),
+           by=.(protocol)]
+daily_fees$amount_rolling_avg <- daily_fees$amount_rolling_avg/7
+daily_fees[is.na(amount_rolling_avg), amount_rolling_avg:=0]
+```
+
+---
+
+## Plot weekly rolling average across protocols
+
+```{r}
+ggplot(daily_fees, aes(x=date, y=amount_rolling_avg, color=protocol)) +
+  geom_line()
+```
 
