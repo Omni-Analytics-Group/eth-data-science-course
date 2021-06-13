@@ -186,3 +186,35 @@ ggplot(daily_fees, aes(x=date, y=amount_rolling_avg, color=protocol)) +
   geom_line()
 ```
 
+
+
+---
+
+## Plot by Protocol, Fee Destination
+
+```{r}
+fee_dest_pro <- yearn[,.(timestamp, amount_usd, protocol, fee_dest)][order(-timestamp)]
+fee_dest_pro$timestamp <- mdy_hm(fee_dest_pro$timestamp)
+fee_dest_pro[,date:=date(timestamp)]
+fee_dest_pro[, amount_day := sum(amount_usd), by=.(protocol, fee_dest, date)]
+daily_fee_dest_pro <- unique(fee_dest_pro[,.(date, amount_day, protocol, fee_dest)])
+daily_fee_dest_pro <- daily_fee_dest_pro[order(date)]
+daily_fee_dest_pro[,cum_amount:=cumsum(amount_day), by=.(protocol, fee_dest)]
+daily_fee_dest_pro <- daily_fee_dest_pro[order(-date)]
+daily_fee_dest_pro$grp <- paste(daily_fee_dest_pro$protocol, daily_fee_dest_pro$fee_dest)
+```
+
+```{r}
+ggplot(daily_fee_dest_pro, aes(x=date, y=cum_amount, color=grp)) +
+  geom_line()
+```
+
+---
+
+# Cont.
+
+```{r}
+ggplot(daily_fee_dest_pro, aes(x=date, y=amount_day, color=grp)) +
+  geom_line()
+```
+
