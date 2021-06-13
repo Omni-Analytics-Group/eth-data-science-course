@@ -101,7 +101,7 @@ In order to do that, we need to create an intermediate data representation. We h
 fees &lt;- yearn[,.(timestamp, amount_usd, protocol)][order(-timestamp)]
 fees$timestamp &lt;- mdy_hm(fees$timestamp)
 fees[,date:=date(timestamp)]
-fees[, amount_day := sum(amount_usd), by=date]
+fees[, amount_day := sum(amount_usd), by=.(protocol, date)]
 daily_fees &lt;- unique(fees[,.(date, amount_day, protocol)])
 daily_fees &lt;- daily_fees[order(date)]
 daily_fees[,cum_amount:=cumsum(amount_day), by=protocol]
@@ -133,7 +133,7 @@ We want to visualize the `rewards` vs `strategist` fee destinations over time (n
 fee_dest &lt;- yearn[,.(timestamp, amount_usd, fee_dest)][order(-timestamp)]
 fee_dest$timestamp &lt;- mdy_hm(fee_dest$timestamp)
 fee_dest[,date:=date(timestamp)]
-fee_dest[, amount_day := sum(amount_usd), by=date]
+fee_dest[, amount_day := sum(amount_usd), by=.(fee_dest, date)]
 daily_fee_dest &lt;- unique(fee_dest[,.(date, amount_day, fee_dest)])
 daily_fee_dest &lt;- daily_fee_dest[order(date)]
 daily_fee_dest[,cum_amount:=cumsum(amount_day), by=fee_dest]
@@ -152,6 +152,9 @@ ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) +
 ```
 
 &lt;img src="yearn_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
 ---
 
 ## `fee_type` Analysis
@@ -163,7 +166,7 @@ We want to visualize the fee types over time. (need better explanation here)
 fee_type &lt;- yearn[,.(timestamp, amount_usd, fee_type)][order(-timestamp)]
 fee_type$timestamp &lt;- mdy_hm(fee_type$timestamp)
 fee_type[,date:=date(timestamp)]
-fee_type[, amount_day := sum(amount_usd), by=date]
+fee_type[, amount_day := sum(amount_usd), by=.(fee_type, date)]
 daily_fee_type &lt;- unique(fee_type[,.(date, amount_day, fee_type)])
 daily_fee_type &lt;- daily_fee_type[order(date)]
 daily_fee_type[,cum_amount:=cumsum(amount_day), by=fee_type]
@@ -182,6 +185,116 @@ ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) +
 ```
 
 &lt;img src="yearn_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+
+## Daily Protocol Fees
+
+
+```r
+ggplot(daily_fees, aes(x=date, y=amount_day, color=protocol)) +
+  geom_line()
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+This is choppy. Let's smooth it out a bit by using a rolling average.
+
+---
+
+Compute a rolling average.
+
+
+```r
+daily_fees &lt;- daily_fees[order(date)]
+daily_fees[, amount_rolling_avg:=Reduce(`+`, shift(amount_day + 0, 0:6, type='lag')),
+           by=.(protocol)]
+daily_fees$amount_rolling_avg &lt;- daily_fees$amount_rolling_avg/7
+daily_fees[is.na(amount_rolling_avg), amount_rolling_avg:=0]
+```
+
+---
+
+## Plot weekly rolling average across protocols
+
+
+```r
+ggplot(daily_fees, aes(x=date, y=amount_rolling_avg, color=protocol)) +
+  geom_line()
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+## Plot by Protocol, Fee Destination
+
+
+```r
+fee_dest_pro &lt;- yearn[,.(timestamp, amount_usd, protocol, fee_dest)][order(-timestamp)]
+fee_dest_pro$timestamp &lt;- mdy_hm(fee_dest_pro$timestamp)
+fee_dest_pro[,date:=date(timestamp)]
+fee_dest_pro[, amount_day := sum(amount_usd), by=.(protocol, fee_dest, date)]
+daily_fee_dest_pro &lt;- unique(fee_dest_pro[,.(date, amount_day, protocol, fee_dest)])
+daily_fee_dest_pro &lt;- daily_fee_dest_pro[order(date)]
+daily_fee_dest_pro[,cum_amount:=cumsum(amount_day), by=.(protocol, fee_dest)]
+daily_fee_dest_pro &lt;- daily_fee_dest_pro[order(-date)]
+daily_fee_dest_pro$grp &lt;- paste(daily_fee_dest_pro$protocol, daily_fee_dest_pro$fee_dest)
+```
+
+---
+
+
+```r
+ggplot(daily_fee_dest_pro, aes(x=date, y=cum_amount, color=grp)) +
+  geom_line()
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Cont.
+
+
+```r
+ggplot(daily_fee_dest_pro, aes(x=date, y=amount_day, color=grp)) +
+  geom_line()
+```
+
+&lt;img src="yearn_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+fees[,month:=month(timestamp)]
+fees[,year:=year(timestamp)]
+fees[, amount_month := sum(amount_usd), by=.(year,month)]
+fees$my &lt;- paste(fees$month, fees$year,  sep="-")
+monthly_fees &lt;- unique(fees[,.(amount_month, my)])
+monthly_fees[order(my)]
+```
+
+```
+##     amount_month      my
+##  1:     812805.6  1-2021
+##  2:    1095888.2 10-2020
+##  3:     290858.3 11-2020
+##  4:     340549.6 12-2020
+##  5:    1460617.4  2-2021
+##  6:    4672856.0  3-2021
+##  7:    7584701.2  4-2021
+##  8:   10164772.2  5-2021
+##  9:    2485961.5  6-2021
+## 10:     843832.1  8-2020
+## 11:    2072363.3  9-2020
+```
+
 ---
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

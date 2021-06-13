@@ -90,7 +90,7 @@ daily_fees <- daily_fees[order(-date)]
 
 ## Plot the fees
 
-```{r}
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fees, aes(date, cum_amount, colour=protocol)) + 
   geom_line() + 
   ggtitle("Protocol Fees")
@@ -117,7 +117,7 @@ daily_fee_dest <- daily_fee_dest[order(-date)]
 
 ## Plot the fee destinations
 
-```{r}
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) + 
   geom_line() + 
   ggtitle("Protocol Fee Destinations")
@@ -146,7 +146,7 @@ daily_fee_type <- daily_fee_type[order(-date)]
 
 ## Plot `fee_type` Analysis
 
-```{r}
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) + 
   geom_line() + 
   ggtitle("Protocol Fee Types")
@@ -159,7 +159,7 @@ ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) +
 
 ## Daily Protocol Fees
 
-```{r}
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fees, aes(x=date, y=amount_day, color=protocol)) +
   geom_line()
 ```
@@ -181,7 +181,7 @@ daily_fees[is.na(amount_rolling_avg), amount_rolling_avg:=0]
 
 ## Plot weekly rolling average across protocols
 
-```{r}
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fees, aes(x=date, y=amount_rolling_avg, color=protocol)) +
   geom_line()
 ```
@@ -204,7 +204,9 @@ daily_fee_dest_pro <- daily_fee_dest_pro[order(-date)]
 daily_fee_dest_pro$grp <- paste(daily_fee_dest_pro$protocol, daily_fee_dest_pro$fee_dest)
 ```
 
-```{r}
+---
+
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fee_dest_pro, aes(x=date, y=cum_amount, color=grp)) +
   geom_line()
 ```
@@ -213,8 +215,20 @@ ggplot(daily_fee_dest_pro, aes(x=date, y=cum_amount, color=grp)) +
 
 # Cont.
 
-```{r}
+```{r, fig.height = 6, fig.width = 11}
 ggplot(daily_fee_dest_pro, aes(x=date, y=amount_day, color=grp)) +
   geom_line()
 ```
 
+---
+
+```{r}
+fees[,month:=month(timestamp)]
+fees[,year:=year(timestamp)]
+fees[, amount_month := sum(amount_usd), by=.(year,month)]
+fees$my <- paste(fees$month, fees$year,  sep="-")
+monthly_fees <- unique(fees[,.(amount_month, my)])
+monthly_fees[order(my)]
+```
+
+---
