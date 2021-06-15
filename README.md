@@ -17,10 +17,10 @@ Gitcoin Grant Link: https://gitcoin.co/grants/562/learning-data-science-on-the-e
 ## Tentative Course Outline
 
 [Module 1 - Basic Data Structures and Munging](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%201)
-* Motivating Example ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html), [Video]())
-* Reading Files ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html), [Video]())
-* Basics ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html), [Video]())
-* Data structures ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html), [Video]())
+* Motivating Example ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html), [Video](https://youtu.be/jlzqAAjeIIE))
+* Reading Files ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html), [Video](https://youtu.be/80kccJuFn2s))
+* Basics ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html), [Video](https://youtu.be/-jVk1F3cSD8))
+* Data structures ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html), [Video](https://youtu.be/XkQzdhcC0b0))
 
 Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto Art Pulse*](https://cryptoartpulse.com/)
 
@@ -50,8 +50,8 @@ Module 4 - Case Studies
 * [Tornado.Cash Initial Distribution Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/tornado-cash/#1)
 * [Stable Coin Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/stable-coins/#1)
 * [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/) ([Part 1](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-1-ShinyIntro.html), [Part 2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-2-ShinyStructure.html), [Part 3](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-3-ShinyTools.html), [Part 4](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-4-BuildShinyAppPart1.html), [Part 5](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-5-BuildShinyAppPart2.html), [Part 6](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-6-BuildShinyAppPart3.html), [Part 7](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-7-BuildShinyAppPart4.html), [Part 8](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-8-BuildShinyAppPart5.html), [Part 9](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-9-BuildShinyAppFinalPart.html))
-* Crypto Punks NFT Value Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/cryptopunks/cryptopunks.html#1), [Video]())
-* Hashmask Rarity Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/hashmasks/Hashmasks.html), [Video]())
+* Crypto Punks NFT Value Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/crypto_punks/cryptopunks.html#1)), [Video](https://youtu.be/mhx9dU0DbT8))
+* Hashmask Rarity Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/hashmasks/Hashmasks.html), [Video](https://youtu.be/qeMfaO3wQ1w))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks*
 
