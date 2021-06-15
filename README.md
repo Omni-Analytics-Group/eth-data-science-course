@@ -77,7 +77,7 @@ Change log
 
 *Gitcoin Grant Round 10*
 
-This round update had us working wtith our first outside contributer. [@Amelia188](https://github.com/amelia188) gave our courase a proper copy edit by fixing tons of typos, correcting grammar errors and improving the overall readability of the material. We look forward to her continued contributions and encourage others to reach out to us about opportunities to collaborate. To further expand out the base content for the course, we completed the material for the second module that focuses on statistical graphics.  Other updates for this round include two NFT related case studies and a host of new video lectures. Your support for this round will help us expand our contributor pool and further improve on the quality of our content.
+This round update had us working with our first outside contributor. [@Amelia188](https://github.com/amelia188) gave our course a proper copy edit by fixing tons of typos, correcting grammar errors and improving the overall readability of the material. We look forward to her continued contributions and encourage others to reach out to us about opportunities to collaborate. To further expand out the base content for the course, we completed the material for the second module that focuses on statistical graphics.  Other updates for this round include two NFT related case studies and a host of new video lectures. Your support for this round will help us expand our contributor pool and further improve on the quality of our content.
 
 Change log
 * Tons of copy edits
