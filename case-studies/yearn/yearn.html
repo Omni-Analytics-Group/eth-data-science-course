@@ -33,7 +33,7 @@ Capital pools that automatically generate yield based on opportunities present i
 
 The first Yearn product was a lending aggregator. Funds are shifted between dYdX, AAVE, and Compound automatically as interest rates change between these protocols. Users can deposit to these lending aggregator smart contracts via the Earn page. This product completely optimizes the interest accrual process for end-users to ensure they are obtaining the highest interest rates at all times among the platforms specified above.  
 
-You can check out the project at https://yearn.finance/  
+A useful fiat-world comparison to Yearn would be an investment manager like BlackRock -- except Yearn employs &lt; 100 people, the investment management is entirely automated, and they earn you better yields! You can check out the project at https://yearn.finance/  
 
 ---
 
@@ -126,7 +126,9 @@ ggplot(daily_fees, aes(date, cum_amount, colour=protocol)) +
 
 ## `fee_dest` Analysis
 
-We want to visualize the `rewards` vs `strategist` fee destinations over time (need a better explanation here). Prepare the data.
+We want to visualize the `rewards` vs `strategist` fee destinations over time. Yearn is decentralized and community-run. This means anyone can develop a strategy and deploy it on the Yearn protocol for anyone to use. If the strategy is successful, more people will want to participate in it. The yield earned from the strategy gets split between the strategist (person/group who created the investment strategy) and the participants, which gets distributed proportional to their share of the pool from the rewards allocation. So that's what we're interested in seeing -- how much money goes to the strategists versus gets paid out to the participants in rewards.  
+
+First we need to create a data.table that tells us how much of the daily fees go to the rewards and strategist.
 
 
 ```r
@@ -159,7 +161,7 @@ ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) +
 
 ## `fee_type` Analysis
 
-We want to visualize the fee types over time. (need better explanation here)
+We want to visualize the fee types over time. Once you deposit money into one of the Yearn products, you will begin earning yield. After some time, that yield will accumulate and you can do 2 things with it -- reinvest it, or withdraw it. Either way, money moves from the protocol so Yearn will collect fees once action is taken upon the yield. We just want to see where most of the fees come from. 
 
 
 ```r
@@ -177,6 +179,8 @@ daily_fee_type &lt;- daily_fee_type[order(-date)]
 
 ## Plot `fee_type` Analysis
 
+Most of their fees come from the "harvest" fee type. This means people are re-investing their yield back into the platform to increase their yield even more, reinforcing the trust and satisfaction people have in the platform.
+
 
 ```r
 ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) + 
@@ -191,7 +195,9 @@ ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) +
 ---
 
 
-## Daily Protocol Fees
+## Daily Protocol Fees  
+
+How much does the protocol make on a daily basis?
 
 
 ```r
@@ -233,6 +239,8 @@ ggplot(daily_fees, aes(x=date, y=amount_rolling_avg, color=protocol)) +
 
 ## Plot by Protocol, Fee Destination
 
+If we want to break things out even further, we can combine the grouping to include both the protocol version and the fee destination.
+
 
 ```r
 fee_dest_pro &lt;- yearn[,.(timestamp, amount_usd, protocol, fee_dest)][order(-timestamp)]
@@ -247,6 +255,8 @@ daily_fee_dest_pro$grp &lt;- paste(daily_fee_dest_pro$protocol, daily_fee_dest_p
 ```
 
 ---
+
+## Plot by Protocol, Fee Destination
 
 
 ```r
@@ -269,6 +279,9 @@ ggplot(daily_fee_dest_pro, aes(x=date, y=amount_day, color=grp)) +
 &lt;img src="yearn_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
+
+## Fee Table per Month, Year
+
 
 
 ```r

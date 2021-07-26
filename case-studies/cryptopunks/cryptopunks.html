@@ -96,12 +96,12 @@ head(punks_raw,3)
 
 ```
 ## # A tibble: 3 x 25
-##    Punk Sex   Type  Skin  TypeSkin Slots Att1  Att2  Att3  Att4  Att5  Att6 
-##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1  6487 Girl  Fema~ Albi~ FemaleA~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
-## 2  2204 Girl  Fema~ Dark  FemaleD~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
-## 3   641 Girl  Fema~ Light FemaleL~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
-## # ... with 13 more variables: Att7 &lt;chr&gt;, TypeRare &lt;chr&gt;, AttCount &lt;chr&gt;,
+##    Punk Sex   Type   Skin   TypeSkin  Slots Att1   Att2  Att3  Att4  Att5  Att6 
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1  6487 Girl  Female Albino FemaleAl…     0 (blan… (bla… (bla… (bla… (bla… (bla…
+## 2  2204 Girl  Female Dark   FemaleDa…     0 (blan… (bla… (bla… (bla… (bla… (bla…
+## 3   641 Girl  Female Light  FemaleLi…     0 (blan… (bla… (bla… (bla… (bla… (bla…
+## # … with 13 more variables: Att7 &lt;chr&gt;, TypeRare &lt;chr&gt;, AttCount &lt;chr&gt;,
 ## #   Att1_1 &lt;chr&gt;, Att2_1 &lt;chr&gt;, Att3_1 &lt;chr&gt;, Att4_1 &lt;chr&gt;, Att5_1 &lt;chr&gt;,
 ## #   Att6_1 &lt;chr&gt;, Att7_1 &lt;chr&gt;, Min &lt;chr&gt;, Avg &lt;chr&gt;, Rank &lt;chr&gt;
 ```
@@ -177,7 +177,7 @@ punks_transactions %&gt;%
 ##  8     1 Bid Withdrawn       6
 ##  9     1 Claimed             1
 ## 10     1 Offer Withdrawn     6
-## # ... with 31,160 more rows
+## # … with 31,160 more rows
 ```
 
 ---
@@ -215,7 +215,7 @@ punks_transactions %&gt;%
 ##  8     7             2
 ##  9     8             2
 ## 10     9             2
-## # ... with 9,990 more rows
+## # … with 9,990 more rows
 ```
 
 ---
@@ -243,7 +243,7 @@ punks_transactions %&gt;%
 ##  8     7              6
 ##  9     8              8
 ## 10     9              8
-## # ... with 4,474 more rows
+## # … with 4,474 more rows
 ```
 
 
@@ -275,7 +275,7 @@ punks_transactions %&gt;%
 ##  8 Sold  0xd8e806  0x582fa7    1.85   351 2017-07-17    14
 ##  9 Sold  0xc352b5  0xd8e806    0.9    185 2017-07-13    14
 ## 10 Sold  0xc352b5  6689278     0.51   105 2017-07-10    33
-## # ... with 7,557 more rows
+## # … with 7,557 more rows
 ```
 
 ---
@@ -313,19 +313,19 @@ sales_temp
 ```
 ## # A tibble: 3,665 x 9
 ## # Groups:   ID [3,665]
-##       ID first_price_ETH first_price_USD Type  From  To    last_price_ETH
-##    &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
-##  1     0            0.98             320 Sold  0xf5~ 1471~          25   
-##  2     1            0.42             107 Sold  Elit~ 0xcf~          60   
-##  3    14            0.9              185 Sold  0x58~ 0x7c~           2.5 
-##  4    33            0.51             105 Sold  0xc3~ 6689~           0.51
-##  5    89            1.5              336 Sold  jmg   Toke~          20.0 
-##  6   116            1.2              229 Sold  0xd8~ 5779~           2.4 
-##  7   143            6.5             1041 Sold  0xc3~ MrTp~           6.5 
-##  8   155            7               2708 Sold  Mich~ DANNY          12   
-##  9   169            1                127 Sold  Pran~ Slat~           6.99
-## 10   240            2                255 Sold  Pran~ Slat~           7   
-## # ... with 3,655 more rows, and 2 more variables: last_price_USD &lt;dbl&gt;,
+##       ID first_price_ETH first_price_USD Type  From      To       last_price_ETH
+##    &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;             &lt;dbl&gt;
+##  1     0            0.98             320 Sold  0xf5099e  14715954          25   
+##  2     1            0.42             107 Sold  EliteCat… 0xcf6165          60   
+##  3    14            0.9              185 Sold  0x582fa7  0x7c00c…           2.5 
+##  4    33            0.51             105 Sold  0xc352b5  6689278            0.51
+##  5    89            1.5              336 Sold  jmg       TokenAn…          20.0 
+##  6   116            1.2              229 Sold  0xd8e806  5779367            2.4 
+##  7   143            6.5             1041 Sold  0xc352b5  MrTpunks           6.5 
+##  8   155            7               2708 Sold  Michel_M… DANNY             12   
+##  9   169            1                127 Sold  Pranksy   Slats_e…           6.99
+## 10   240            2                255 Sold  Pranksy   Slats_e…           7   
+## # … with 3,655 more rows, and 2 more variables: last_price_USD &lt;dbl&gt;,
 ## #   Txn &lt;date&gt;
 ```
 
@@ -374,11 +374,11 @@ head(sales,2)
 ```
 ## # A tibble: 2 x 13
 ## # Groups:   ID [2]
-##      ID first_price_ETH first_price_USD Type  From  To    last_price_ETH
-##   &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;          &lt;dbl&gt;
-## 1     0            0.98             320 Sold  0xf5~ 1471~             25
-## 2     1            0.42             107 Sold  Elit~ 0xcf~             60
-## # ... with 6 more variables: last_price_USD &lt;dbl&gt;, Txn &lt;date&gt;, num_sold &lt;int&gt;,
+##      ID first_price_ETH first_price_USD Type  From      To       last_price_ETH
+##   &lt;dbl&gt;           &lt;dbl&gt;           &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;             &lt;dbl&gt;
+## 1     0            0.98             320 Sold  0xf5099e  14715954             25
+## 2     1            0.42             107 Sold  EliteCat… 0xcf6165             60
+## # … with 6 more variables: last_price_USD &lt;dbl&gt;, Txn &lt;date&gt;, num_sold &lt;int&gt;,
 ## #   percentage_change_ETH &lt;dbl&gt;, percentage_change_USD &lt;dbl&gt;,
 ## #   frequency_sold &lt;chr&gt;
 ```
@@ -481,12 +481,12 @@ head(rank_and_transaction,3)
 
 ```
 ## # A tibble: 3 x 32
-##    Punk Sex   Type.x Skin  TypeSkin Slots Att1  Att2  Att3  Att4  Att5  Att6 
-##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1  6487 Girl  Female Albi~ FemaleA~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
-## 2   641 Girl  Female Light FemaleL~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
-## 3  1050 Girl  Female Mid   FemaleM~     0 (bla~ (bla~ (bla~ (bla~ (bla~ (bla~
-## # ... with 20 more variables: Att7 &lt;chr&gt;, TypeRare &lt;dbl&gt;, AttCount &lt;dbl&gt;,
+##    Punk Sex   Type.x Skin   TypeSkin  Slots Att1   Att2  Att3  Att4  Att5  Att6 
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1  6487 Girl  Female Albino FemaleAl…     0 (blan… (bla… (bla… (bla… (bla… (bla…
+## 2   641 Girl  Female Light  FemaleLi…     0 (blan… (bla… (bla… (bla… (bla… (bla…
+## 3  1050 Girl  Female Mid    FemaleMid     0 (blan… (bla… (bla… (bla… (bla… (bla…
+## # … with 20 more variables: Att7 &lt;chr&gt;, TypeRare &lt;dbl&gt;, AttCount &lt;dbl&gt;,
 ## #   Att1_1 &lt;dbl&gt;, Att2_1 &lt;dbl&gt;, Att3_1 &lt;dbl&gt;, Att4_1 &lt;dbl&gt;, Att5_1 &lt;dbl&gt;,
 ## #   Att6_1 &lt;dbl&gt;, Att7_1 &lt;dbl&gt;, Min &lt;dbl&gt;, Avg &lt;dbl&gt;, Rank &lt;dbl&gt;,
 ## #   RankNum &lt;dbl&gt;, Type.y &lt;chr&gt;, From &lt;chr&gt;, To &lt;chr&gt;, last_price_ETH &lt;dbl&gt;,
