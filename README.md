@@ -85,6 +85,14 @@ Change log
 * Slides for Module 2 - Statistical Graphics and Visualization have been completed
 * 2 NFT related case studies were created and videos produced
 
+*Gitcoin Grant Round 11*
+
+Coming in 12 hours!
+
+Change log
+
+Coming in 12 hours!
+
 ## FAQ
 
 *Do you all have experience in this stuff?*  
