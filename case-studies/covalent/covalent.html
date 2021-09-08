@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Covalent API</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Covalent API
+## via httr <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Covalent API
+
+Covalent provides a unified API bringing visibility to billions of blockchain data points and it's free for everyone. To get started, you can simply sign up with an email address and get an API key. To learn more about Covalent, please visit https://www.covalenthq.com/. 
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/covalent.png" width="300px"&gt;
+
+&lt;/p&gt;
+
+---
+## Covalent Documentation
+
+After you have created an account and obtained an API key, you should carefully read all the information provided in the [Covalent Documentation](https://www.covalenthq.com/docs/api/#overview). 
+
+We will be following these two endpoints:
+
+
+![](images/endpoint1.png)
+
+
+
+![](images/endpoint2.png)
+
+Each parameter is bracketed with {}. Thus, we will need to fill in `chain_id` and `address`.  
+
+
+---
+
+## httr
+In this case study, we will show you how to use `httr` package to obtain data through Covalent API. `httr` provide a wrapper for the curl package, customized to the demands of modern web APIs. First, we can use the `GET()` function to retrieve information from a url, which returns `response()` object. To get the content of this object, we will use the `content()` function along with the `parsed` parameter to convert it into an R object as follows.
+
+
+```r
+library(httr)
+assets &lt;- GET("https://api.covalenthq.com/v1/1/networks/aave/assets/")
+assets_parsed &lt;- content(assets, "parsed")
+assets
+```
+
+```
+## Response [https://api.covalenthq.com/v1/1/networks/aave/assets/]
+##   Date: 2021-04-30 13:43
+##   Status: 503
+##   Content-Type: text/html
+##   Size: 197 B
+## &lt;html&gt;
+## &lt;head&gt;&lt;title&gt;503 Service Temporarily Unavailable&lt;/title&gt;&lt;/head&gt;
+## &lt;body&gt;
+## &lt;center&gt;&lt;h1&gt;503 Service Temporarily Unavailable&lt;/h1&gt;&lt;/center&gt;
+## &lt;hr&gt;&lt;center&gt;nginx/1.19.6&lt;/center&gt;
+## &lt;/body&gt;
+## &lt;/html&gt;
+```
+
+---
+
+## httr (continued...)
+Let's take a look at the structure of `assets_parsed`. Note that it gives information on each asset. 
+
+```r
+str(assets_parsed)
+```
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/example1.png"&gt;
+
+&lt;/p&gt;
+
+---
+
+## AAVE network assets
+
+Now that we have the data, we can use the following to obtain information on the first asset
+
+
+```r
+assets_parsed$data$items[[1]]
+```
+
+.pull-left[
+![](images/example2.png)
+]
+.pull-right[
+![](images/example3.png)
+]
+
+---
+
+## GET transactions
+
+Recall `GET /v1/{chain_id}/address/{address}/transactions_v2/` from Covalent Documenation. To demonstrate, we fill `chain_id` with 1 as it represents Ethereum Network and `address` with `$atoken$contract_address` from previous slide. 
+
+
+```r
+transaction &lt;- GET("https://api.covalenthq.com/v1/1/address/0xfc1e690f61efd961294b3e1ce3313fbd8aa4f85d/transactions_v2/?format=csv")
+transaction_parsed &lt;- content(transaction, "parsed")
+dim(transaction_parsed)
+```
+
+```
+## NULL
+```
+
+---
+
+## Transactions Data
+Let's take a look a the first few rows of the data. 
+
+```r
+head(transaction_parsed)
+```
+
+![](images/example4.png)
+
+---
+
+## Conclusion
+
+You have just used Covalent API for the first time! Now you can explore more and obtain other data. 
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_07.png"  width="200px" height="200px"&gt;
+
+&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
