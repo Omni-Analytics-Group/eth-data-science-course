@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Cryptojobs Analysis Part 2          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Cryptojobs Analysis Part 2 <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Cryptojobs
+
+Cryptojobs is the number one website for blockchain jobs. This website is for employers who are looking for blockchain experts and for blockchain experts who are looking for job opportunities. For more information, check out https://crypto.jobs/. 
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/cryptojobs.png" width="700px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Data and libraries
+
+We scraped the data from Cryptojobs on 4/15/2021. In this case study, We will be using these libraries as well. 
+
+
+```r
+library(tidyverse)
+library(lubridate)
+library(tidytext)
+library(ggrepel)
+library(RColorBrewer)
+library(ggwordcloud)
+
+scrape_date &lt;- ymd("2021-04-15")
+jobs &lt;- read_csv("data/Crypto_Jobs_data_2.csv")
+```
+
+&lt;br&gt; &lt;br&gt;
+
+&lt;p align="middle"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_14.png"  width="150px" height="100px"&gt;
+
+&lt;/p&gt;
+---
+
+## The Data
+
+The data has 260 rows and 13 columns, where each row represents a job posting. The columns are as follow
+
+* `Name` - The job title.
+* `Company` - The name of the company.
+* `Type` - Whether the job is Full-Time or Part-Time.
+* `Field` - The field of the job. For example, a job could be in Marketing field.
+* `Tag` - A tag used in the website.
+* `Remote` - Whether the job is remote. 
+* `Country` - Country of the job location. It is blank if the job is remote. 
+* `View` - The number of times of which the job posting was viewed.
+* `Time` - The date when the job posting was created. 
+* `URL` - The link to the job posting.
+* `Description` - The detail of the job description and requirements.
+* `Skills` - The skills required for the job.
+* `Compensation` - The compensation that the company offers.
+
+---
+
+## The Data (continued...)
+
+Below shows the first few rows of the data.
+
+
+```r
+head(jobs)
+```
+
+```
+## # A tibble: 6 × 13
+##   Name     Company  Type   Field Tag   Remote Country Views Time       URL      
+##   &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;    
+## 1 Graphic… PolkaBr… Full … Desi… &lt;U+0… Remote &lt;NA&gt;    3398… 2021-04-11 https://…
+## 2 DeFi Yi… Eylan T… Full … Tech  &lt;NA&gt;  Remote United… 74 v… 2021-04-15 https://…
+## 3 Social … Boson P… Full … Tech  &lt;NA&gt;  Remote UK      773 … 2021-04-15 https://…
+## 4 Social … INDX     Part … Mark… &lt;NA&gt;  Remote &lt;NA&gt;    1601… 2021-04-15 https://…
+## 5 Senior … MXC Fou… Full … Mark… &lt;NA&gt;  &lt;NA&gt;   Germany 1732… 2021-04-15 https://…
+## 6 Senior … Paxful   Full … Tech  &lt;NA&gt;  &lt;NA&gt;   &lt;NA&gt;    53 v… 2021-04-14 https://…
+## # … with 3 more variables: Description &lt;chr&gt;, Skills &lt;chr&gt;, Compensation &lt;chr&gt;
+```
+
+---
+
+## Monthly Count of Crypto Job Postings
+
+First, we count the number of Monthly job postings via `group_by()` and `floor_date()` functions.
+
+
+```r
+jobs_monthly &lt;- jobs %&gt;%
+    group_by(Month = floor_date(Time, "month")) %&gt;%
+    summarise(Count = n()) %&gt;%
+    arrange(Month) 
+```
+
+Then, we can simply use `ggplot()` to create the plot. 
+
+
+```r
+ggplot(data = jobs_monthly, aes(x = Month, y = Count)) +
+  geom_point() + geom_line() +
+  scale_x_date(date_breaks = "2 months" , date_labels = "%b-%y")+
+  labs(
+        title = "Monthly Count of Crypto Job Postings",
+        subtitle = paste0("For jobs available on the site as of ", scrape_date),
+        x = "Date",
+        y = "Number of Job Postings"
+    )
+```
+
+---
+
+## Monthly Count of Crypto Job Postings (continued...)
+
+&lt;img src="crypto_jobs_part2_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Job Titles Word/Two-grams Count by Location
+
+Now, we will see some of the common words/two-grams that are in the Job Titles. We will create the following two tables by removing words like "of", "and", "a", and make the job titles all lower case. Then, we will use `unnest_tokens()` to get all the words/two-grams. 
+
+
+```r
+jobs_words &lt;- jobs %&gt;%
+    mutate(Name = gsub(" of | and | a |^a ", "", tolower(Name))) %&gt;%
+    unnest_tokens(word, Name) 
+jobs_twograms &lt;- jobs %&gt;%
+    mutate(Name = gsub(" of | and | a |^a ", "", tolower(Name))) %&gt;%
+    unnest_tokens(twograms, Name, token = "ngrams", n = 2, n_min = 2)
+```
+
+&lt;br&gt;
+
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_01.png"  width="200px" height="160px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Job Titles Word/Two-grams Count by Location (continued...)
+
+Now that we have the words and two-grams of the Job Titles. We can count them as follows.
+
+
+```r
+word_count &lt;- jobs_words %&gt;%
+    filter(!is.na(Country)) %&gt;%
+    group_by(Country, word) %&gt;%
+    summarise(Count = n()) %&gt;%
+    arrange(desc(Count)) %&gt;%
+    slice(1:5) 
+
+twogram_count &lt;- jobs_twograms %&gt;%
+    filter(!is.na(Country)) %&gt;%
+    group_by(Country, twograms) %&gt;%
+    summarise(Count = n()) %&gt;%   
+    arrange(desc(Count)) %&gt;%
+    slice(1:5)
+```
+
+---
+
+## Top Five Words by Country for Job Titles
+
+Now, let's plot them! We will use `expr()` and `eval()` to create plots for each of the countries in one shot as follows.
+
+
+```r
+p1 &lt;- expr(ggplot(data = word_count, aes(x = word, y = Count, fill = Country)) +
+    geom_bar(stat = "identity", colour = "black") +
+    scale_fill_brewer(palette = "Set3") +
+    facet_wrap(~Country, scales = "free") +
+    theme_minimal(14) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+        legend.position = "off",
+        plot.margin = margin(10, 10, 10, 60)
+    ) +
+    labs(
+        title = "Top Five Words by Country for Job Titles",
+        subtitle = paste0("For Countries with at least 20 Postings on Crypto.jobs as of ", scrape_date)
+    ))
+p1s &lt;- eval(p1)
+```
+
+---
+
+## Top Five Words by Country for Job Titles (continued...)
+
+&lt;img src="crypto_jobs_part2_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Your Turn
+
+Create a `Top Five 2-grams by Country for Job Titles` plot. 
+
+--
+
+## Answers
+
+
+```r
+p2 &lt;- expr(ggplot(data = twogram_count, aes(x = twograms, y = Count, fill = Country)) +
+    geom_bar(stat = "identity", colour = "black") +
+    scale_fill_brewer(palette = "Set3") +
+    facet_wrap(~Country, scales = "free") +
+    theme_minimal(14) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+        legend.position = "off",
+        plot.margin = margin(10, 10, 10, 60)
+    ) +
+    labs(
+        title = "Top Five 2-Grams by Country for Job Titles",
+        subtitle = paste0("For Countries with at least 20 Postings on Crypto.jobs as of ", scrape_date)
+    ) )
+p2s &lt;- eval(p2)
+```
+
+---
+
+## Top Five 2-Grams by Country for Job Titles
+
+&lt;img src="crypto_jobs_part2_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Skills Required by Field Word Cloud
+
+Now, we will create a table that gives us the normalized count of skills required by field. 
+
+
+```r
+jobs_skills &lt;- jobs %&gt;%
+    mutate(Field = factor(Field, levels = unique(jobs$Field))) %&gt;%
+    group_by(Field) %&gt;%
+    mutate(Skill_list = gsub("(good)|(excellent)|(skills)", "", tolower(Skills))) %&gt;% #Remove 'stop words'
+    mutate(Skill_list = gsub("(communications)", "(communication)", Skill_list)) %&gt;% #Remove typos
+    mutate(Skill_list = strsplit(Skill_list, ",|;|\\. | &amp; | and | or ")) %&gt;%
+    unnest(Skill_list) %&gt;%
+    mutate(Skill_list = str_trim(Skill_list)) %&gt;% #Remove spaces
+    filter(!is.na(Skill_list), Skill_list != "") %&gt;%
+    group_by(Field, Skill_list) %&gt;%
+    summarise(Count = length(Skill_list)) %&gt;%
+    arrange(desc(Count)) %&gt;%
+    group_by(Field) %&gt;%
+    mutate(max = max(Count), min = min(Count)) %&gt;%
+    mutate(Count = ifelse( (max-min) ==0, 1, (Count - min) / (max - min))) #Normalize 
+```
+
+
+---
+
+## Skills Required by Field Word Cloud (continued...)
+
+Now that we have the table ready, we can plot it. 
+
+
+```r
+col_palette &lt;- colorRampPalette(brewer.pal(8, "Set1"))(9)
+
+p3 &lt;- ggplot(data = jobs_skills, aes(label = Skill_list, size = Count, color = Field)) +
+    scale_color_manual(values = col_palette) +
+    scale_size_continuous(range = c(2, 22)) +
+    geom_text_wordcloud_area(area_corr_power = 1, shape = "square", xlim = c(0, 1), ylim = c(0, 1), rm_outside = TRUE) +
+    geom_rect(data = jobs_skills %&gt;% group_by(Field) %&gt;% slice(1), colour = NA, xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, aes(fill = Field), alpha = 0.15) +
+    scale_fill_manual(values = col_palette) +
+    theme_minimal(14) +
+    facet_wrap(~Field, scales = "free") +
+    theme(
+        plot.title = element_text(face = "bold"),
+        axis.text = element_text(face = "bold", colour = "#656373"),
+        strip.text = element_text(face = "bold"),
+        legend.position = "off"
+    ) +
+    labs(title = "Skills Required by Field",
+         subtitle = paste0("For Crypto.jobs postings as of ", scrape_date, " "))
+```
+
+---
+
+## Skills Required by Field Word Cloud (continued...)
+
+&lt;img src="crypto_jobs_part2_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Conclusion 
+
+You have learned to use `tidytext` package for text mining and `ggwordcloud` package to create word cloud. You should now try to create some other analysis with the data!
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_07.png"  width="200px" height="160px"&gt;
+
+&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

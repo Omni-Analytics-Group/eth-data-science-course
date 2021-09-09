@@ -1,0 +1,285 @@
+---
+title: "Cryptojobs Analysis Part 1"
+subtitle: "via Google Maps Platform  <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=11, fig.height=7)
+```
+
+## Cryptojobs
+
+Cryptojobs is the number one website for blockchain jobs. This website is for employers who are looking for blockchain experts and for blockchain experts who are looking for job opportunities. For more information, check out https://crypto.jobs/. 
+
+<p align="center">
+
+<img src="images/cryptojobs.png" width="700px">
+
+</p>
+
+---
+
+## Google Maps Platform
+
+In this case study, we will be using Google Maps Platform to help us identify longitude and latitude of locations so we can plot them on a map. To get started, follow these steps:
+
+1. Visit https://developers.google.com/maps/gmp-get-started and click `Get Started`. 
+2. Then, you will be prompted to `Create Billing Account`. Follow the steps to start a free trial.
+3. Copy the API key that is provided and click `Done`. 
+
+Now, we are ready to get started!
+
+<br>
+
+<p align="left">
+
+<img src="images/Cut_outs/Cut_out_08.png"  width="200px" height="150px">
+
+</p>
+---
+
+## Data and libraries
+
+We scraped the data from Cryptojobs on 4/15/2021. In this case study, We will be using these libraries as well. 
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(tidytext)
+library(ggmap)
+library(ggrepel)
+library(maps)
+library(rworldmap)
+library(cowplot)
+library(RColorBrewer)
+library(ggwordcloud)
+
+scrape_date <- ymd("2021-04-15")
+jobs <- read_csv("data/Crypto_Jobs_data.csv")
+```
+
+---
+
+## The Data
+
+The data has 260 rows and 13 columns, where each row represents a job posting. The columns are as follow
+
+* `Name` - The job title.
+* `Company` - The name of the company.
+* `Type` - Whether the job is Full-Time or Part-Time.
+* `Field` - The field of the job. For example, a job could be in Marketing field.
+* `Tag` - A tag used in the website.
+* `Remote` - Whether the job is remote. 
+* `Location` - Location of the job. It is blank if the job is remote. 
+* `View` - The number of times of which the job posting was viewed.
+* `Time` - The date when the job posting was created. 
+* `URL` - The link to the job posting.
+* `Description` - The detail of the job description and requirements.
+* `Skills` - The skills required for the job.
+* `Compensation` - The compensation that the company offers.
+
+---
+
+## The Data (continued...)
+
+Below shows the first few rows of the data.
+
+```{r}
+head(jobs)
+```
+
+---
+
+## Google Geocode API
+
+Now, let's first get the longitude and latitude of the `Location` column in our data as follows.
+
+```{r, eval = FALSE}
+register_google(key = "YOUR API KEY HERE")
+locations <- unique(jobs$Location)[!is.na(unique(jobs$Location))]
+geocode_adr <- data.frame(lon = numeric(0), lat = numeric(0))
+for (i in 1:length(locations)){
+ geocode_adr[i,] <- geocode(locations[i])
+}
+```
+
+Or simply load the data `geocode_adr.RData` we have prepared for you!
+
+```{r}
+load("data/geocode_adr.RData")
+```
+
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px">
+
+</p>
+
+---
+
+## Map of Job Postings by Locations
+To plot a map using the longitude and latitude we obtained, we will also need to use the `map_data()` function that returns the corresponding region of different parts of the world.
+
+```{r}
+world <- map_data("world")
+```
+
+Let's now create our first map!
+
+```{r, eval = FALSE}
+ggplot(data = world, aes(x = long, y = lat)) +
+  geom_map(map = world, aes(map_id = region), fill = "grey90", colour = "grey60") +
+  geom_point(data = geocode_adr, aes(x = lon, y = lat), colour = "#e6550d", alpha = 0.7, size = 1.5) +
+  theme_map() +
+  coord_equal() +
+  labs(
+      title = "Map of Job Postings by Location",
+      subtitle = paste0("For jobs available on Crypto.jobs as of ", scrape_date)
+  ) +
+  theme(
+      plot.title = element_text(hjust = .5),
+      plot.subtitle = element_text(hjust = .5)
+  )
+```
+
+
+---
+
+## Map of Job Postings by Locations (continued...)
+
+```{r, echo = FALSE}
+ggplot(data = world, aes(x = long, y = lat)) +
+  geom_map(map = world, aes(map_id = region), fill = "grey90", colour = "grey60") +
+  geom_point(data = geocode_adr, aes(x = lon, y = lat), colour = "#e6550d", alpha = 0.7, size = 1.5) +
+  theme_map() +
+  coord_equal() +
+  labs(
+      title = "Map of Job Postings by Location",
+      subtitle = paste0("For jobs available on Crypto.jobs as of ", scrape_date)
+  ) +
+  theme(
+      plot.title = element_text(hjust = .5),
+      plot.subtitle = element_text(hjust = .5)
+  )
+```
+
+---
+
+## Coordinate to Country Function
+
+For the next map, we will need to get the corresponding country. For that, we will use the following function. 
+
+```{r}
+coords2country = function(points) {  
+    countriesSP <- getMap(resolution='low')
+    
+    #setting CRS directly to that from rworldmap
+    pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
+    
+    # use 'over' to get indices of the Polygons object containing each point 
+    indices = over(pointsSP, countriesSP)
+    
+    # return the ADMIN names of each country
+    indices$ADMIN  
+}
+
+geocode_adr_complete <- geocode_adr %>%
+    filter(!is.na(lat), !is.na(lon)) %>%
+    mutate(Country = coords2country(.)) %>%
+    mutate(Country2 = ifelse(Country == "United States of America", "USA",
+                      ifelse(Country == "United Kingdom", "UK", as.character(Country)))) 
+```
+
+---
+
+## Number of Job Postings by Country
+
+Now, we can count the number of job postings for each country. Then, we also create a new column `Interval` that categorize the number of job postings. 
+```{r}
+all_counts <- geocode_adr_complete %>%
+    group_by(Country2) %>%
+    summarise(Count = n()) %>%
+    mutate(Interval = as.character(cut(Count, breaks = c(-Inf, 0, 1, 3, 8, 16, Inf),
+                          labels = c("0", "1", "2-3", "4-8", "9-16", ">16"))))
+```
+
+With that, we merge the table into the `world` table so we can create a map. 
+```{r}
+world_merge <- world %>%
+    left_join(all_counts, by = c("region" = "Country2")) %>%
+    mutate(Interval = ifelse(is.na(Interval), "0", Interval)) %>%
+    mutate(Interval = factor(Interval, levels = c("0", "1", "2-3", "4-8", "9-16", ">16")))
+```
+
+---
+
+## Map of Job Postings by Locations 2
+
+The code is very similar to the first map we created. We will now utilize the `fill` parameter as follows.
+
+```{r, eval = FALSE}
+ors <- c("white", brewer.pal(n = 6, name = "Oranges")[1:5])
+
+ggplot(data = world_merge, aes(x = long, y = lat)) +
+  geom_map(map = world, aes(map_id = region, fill = Interval), colour = "grey60") +
+  scale_fill_manual("Job Count", values = ors) +
+  theme_map() +
+  coord_equal() +
+  labs(
+      title = "Map of Job Postings by Location",
+      subtitle = paste0("For jobs available on Crypto.jobs as of ", scrape_date)
+  ) +
+  theme(
+      plot.title = element_text(hjust = .5),
+      plot.subtitle = element_text(hjust = .5),
+      legend.position = "bottom"
+  ) 
+```
+
+---
+
+## Map of Job Postings by Locations 2 (continued...)
+
+```{r, echo = FALSE}
+ors <- c("white", brewer.pal(n = 6, name = "Oranges")[1:5])
+
+ggplot(data = world_merge, aes(x = long, y = lat)) +
+  geom_map(map = world, aes(map_id = region, fill = Interval), colour = "grey60") +
+  scale_fill_manual("Job Count", values = ors) +
+  theme_map() +
+  coord_equal() +
+  labs(
+      title = "Map of Job Postings by Location",
+      subtitle = paste0("For jobs available on Crypto.jobs as of ", scrape_date)
+  ) +
+  theme(
+      plot.title = element_text(hjust = .5),
+      plot.subtitle = element_text(hjust = .5),
+      legend.position = "bottom"
+  )
+```
+
+---
+
+## Conclusion 
+
+You have learned to use the google platform API and to create map plots. Now, try to create more plots on your own!
+
+<br> <br> <br> <br> <br>
+<p align="right">
+
+<img src="images/Cut_outs/Cut_out_07.png"  width="200px" height="160px">
+
+</p>
