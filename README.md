@@ -44,7 +44,7 @@ Data Sources: *Numerai Tournament Data, UniSwap*
 
 Module 4 - Case Studies
 * [Clustering and segmenting Ethereum validator performance](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/case-studies/validators) ([R](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/#1), [Python](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/Validator%20Case%20Study.html), [Video](https://youtu.be/2JLRnKmlV8I))
-* [Visualizing slashings in the Ethereum Medalla testnet](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/case-studies/slashers) ([R](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/slashers/#1), [Python](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/Validator%20Case%20Study.html))
+* [Visualizing slashings in the Ethereum Medalla testnet](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/case-studies/slashers) ([R](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/slashers/#1), [Python](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/validators/Validator%20Case%20Study.html), [Video](https://www.youtube.com/watch?v=ioqbkIku46M))
 * [Reconstructing the Crypto Sentiment Investment Curve in ggplot2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/investment-curve/#1)
 * [Interacting with and Analyzing Numerai Network Growth with GraphQL and ggplot2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-growth/#1)
 * [Tornado.Cash Initial Distribution Analysis](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/tornado-cash/#1)
@@ -52,6 +52,8 @@ Module 4 - Case Studies
 * [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/) ([Part 1](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-1-ShinyIntro.html), [Part 2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-2-ShinyStructure.html), [Part 3](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-3-ShinyTools.html), [Part 4](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-4-BuildShinyAppPart1.html), [Part 5](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-5-BuildShinyAppPart2.html), [Part 6](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-6-BuildShinyAppPart3.html), [Part 7](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-7-BuildShinyAppPart4.html), [Part 8](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-8-BuildShinyAppPart5.html), [Part 9](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-9-BuildShinyAppFinalPart.html))
 * Crypto Punks NFT Value Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/crypto_punks/cryptopunks.html#1), [Video](https://youtu.be/mhx9dU0DbT8))
 * Hashmask Rarity Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/hashmasks/Hashmasks.html), [Video](https://youtu.be/qeMfaO3wQ1w))
+* Geocoding and Mapping Cryptojobs ([Slides](), [Video](https://www.youtube.com/watch?v=ja7zufUyeG0))
+* Cryptojobs Exploratory Data Analysis ([Slides](), [Video](https://www.youtube.com/watch?v=d8ucLHZ7He8))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks*
 
@@ -87,11 +89,12 @@ Change log
 
 *Gitcoin Grant Round 11*
 
-Coming in 12 hours!
+We've been busy! Over the last quarter we've been working with DAOs to help them understand their data and it has been this work that inspired us to create two new case studies all about blockchain jobs using data from [Cryptojobs](https://cryptojobs.com/). In addition to these two case studies, we've included another one on Yearn.Finance created by our newest collaborator [@vintro]@(https://github.com/vintrocode). This update also includes 3 new videos to supplement the case studies.  As usual, we really appreciate the support and contributions this round will help us find and compensate additional course contributors.
 
 Change log
-
-Coming in 12 hours!
+* 3 Video lectures
+* 3 New case studies
+* Various copy edits
 
 ## FAQ
 
@@ -118,3 +121,4 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 * [Numerai](https://numer.ai/)
 * [Tornado Cash](https://tornado.cash/)
 * [Hashmasks](https://www.thehashmasks.com/)
+* [Cryptojobs](https://cryptojobs.com/)
