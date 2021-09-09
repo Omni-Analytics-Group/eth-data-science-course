@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Cryptojobs Analysis Part 1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Cryptojobs Analysis Part 1
+## via Google Maps Platform <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## Cryptojobs
+
+Cryptojobs is the number one website for blockchain jobs. This website is for employers who are looking for blockchain experts and for blockchain experts who are looking for job opportunities. For more information, check out https://crypto.jobs/. 
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/cryptojobs.png" width="700px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Google Maps Platform
+
+In this case study, we will be using Google Maps Platform to help us identify longitude and latitude of locations so we can plot them on a map. To get started, follow these steps:
+
+1. Visit https://developers.google.com/maps/gmp-get-started and click `Get Started`. 
+2. Then, you will be prompted to `Create Billing Account`. Follow the steps to start a free trial.
+3. Copy the API key that is provided and click `Done`. 
+
+Now, we are ready to get started!
+
+&lt;br&gt;
+
+&lt;p align="left"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_08.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+---
+
+## Data and libraries
+
+We scraped the data from Cryptojobs on 4/15/2021. In this case study, We will be using these libraries as well. 
+
+
+```r
+library(tidyverse)
+library(lubridate)
+library(tidytext)
+library(ggmap)
+library(ggrepel)
+library(maps)
+library(rworldmap)
+library(cowplot)
+library(RColorBrewer)
+library(ggwordcloud)
+
+scrape_date &lt;- ymd("2021-04-15")
+jobs &lt;- read_csv("data/Crypto_Jobs_data.csv")
+```
+
+---
+
+## The Data
+
+The data has 260 rows and 13 columns, where each row represents a job posting. The columns are as follow
+
+* `Name` - The job title.
+* `Company` - The name of the company.
+* `Type` - Whether the job is Full-Time or Part-Time.
+* `Field` - The field of the job. For example, a job could be in Marketing field.
+* `Tag` - A tag used in the website.
+* `Remote` - Whether the job is remote. 
+* `Location` - Location of the job. It is blank if the job is remote. 
+* `View` - The number of times of which the job posting was viewed.
+* `Time` - The date when the job posting was created. 
+* `URL` - The link to the job posting.
+* `Description` - The detail of the job description and requirements.
+* `Skills` - The skills required for the job.
+* `Compensation` - The compensation that the company offers.
+
+---
+
+## The Data (continued...)
+
+Below shows the first few rows of the data.
+
+
+```r
+head(jobs)
+```
+
+```
+## # A tibble: 6 × 13
+##   Name     Company  Type  Field Tag   Remote Location Views Time       URL      
+##   &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;    
+## 1 Graphic… PolkaBr… Full… Desi… 📌 S… Remote &lt;NA&gt;     3398… 2021-04-11 https://…
+## 2 DeFi Yi… Eylan T… Full… Tech  &lt;NA&gt;  Remote Dubai    74 v… 2021-04-15 https://…
+## 3 Social … Boson P… Full… Tech  &lt;NA&gt;  Remote United … 773 … 2021-04-15 https://…
+## 4 Social … INDX     Part… Mark… &lt;NA&gt;  Remote &lt;NA&gt;     1601… 2021-04-15 https://…
+## 5 Senior … MXC Fou… Full… Mark… &lt;NA&gt;  &lt;NA&gt;   Berlin   1732… 2021-04-15 https://…
+## 6 Senior … Paxful   Full… Tech  &lt;NA&gt;  &lt;NA&gt;   New York 53 v… 2021-04-14 https://…
+## # … with 3 more variables: Description &lt;chr&gt;, Skills &lt;chr&gt;, Compensation &lt;chr&gt;
+```
+
+---
+
+## Google Geocode API
+
+Now, let's first get the longitude and latitude of the `Location` column in our data as follows.
+
+
+```r
+register_google(key = "YOUR API KEY HERE")
+locations &lt;- unique(jobs$Location)[!is.na(unique(jobs$Location))]
+geocode_adr &lt;- data.frame(lon = numeric(0), lat = numeric(0))
+for (i in 1:length(locations)){
+ geocode_adr[i,] &lt;- geocode(locations[i])
+}
+```
+
+Or simply load the data `geocode_adr.RData` we have prepared for you!
+
+
+```r
+load("data/geocode_adr.RData")
+```
+
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_06.png"  width="200px" height="150px"&gt;
+
+&lt;/p&gt;
+
+---
+
+## Map of Job Postings by Locations
+To plot a map using the longitude and latitude we obtained, we will also need to use the `map_data()` function that returns the corresponding region of different parts of the world.
+
+
+```r
+world &lt;- map_data("world")
+```
+
+Let's now create our first map!
+
+
+```r
+ggplot(data = world, aes(x = long, y = lat)) +
+  geom_map(map = world, aes(map_id = region), fill = "grey90", colour = "grey60") +
+  geom_point(data = geocode_adr, aes(x = lon, y = lat), colour = "#e6550d", alpha = 0.7, size = 1.5) +
+  theme_map() +
+  coord_equal() +
+  labs(
+      title = "Map of Job Postings by Location",
+      subtitle = paste0("For jobs available on Crypto.jobs as of ", scrape_date)
+  ) +
+  theme(
+      plot.title = element_text(hjust = .5),
+      plot.subtitle = element_text(hjust = .5)
+  )
+```
+
+
+---
+
+## Map of Job Postings by Locations (continued...)
+
+&lt;img src="crypto_jobs_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Coordinate to Country Function
+
+For the next map, we will need to get the corresponding country. For that, we will use the following function. 
+
+
+```r
+coords2country = function(points) {  
+    countriesSP &lt;- getMap(resolution='low')
+    
+    #setting CRS directly to that from rworldmap
+    pointsSP = SpatialPoints(points, proj4string=CRS(proj4string(countriesSP)))  
+    
+    # use 'over' to get indices of the Polygons object containing each point 
+    indices = over(pointsSP, countriesSP)
+    
+    # return the ADMIN names of each country
+    indices$ADMIN  
+}
+
+geocode_adr_complete &lt;- geocode_adr %&gt;%
+    filter(!is.na(lat), !is.na(lon)) %&gt;%
+    mutate(Country = coords2country(.)) %&gt;%
+    mutate(Country2 = ifelse(Country == "United States of America", "USA",
+                      ifelse(Country == "United Kingdom", "UK", as.character(Country)))) 
+```
+
+---
+
+## Number of Job Postings by Country
+
+Now, we can count the number of job postings for each country. Then, we also create a new column `Interval` that categorize the number of job postings. 
+
+```r
+all_counts &lt;- geocode_adr_complete %&gt;%
+    group_by(Country2) %&gt;%
+    summarise(Count = n()) %&gt;%
+    mutate(Interval = as.character(cut(Count, breaks = c(-Inf, 0, 1, 3, 8, 16, Inf),
+                          labels = c("0", "1", "2-3", "4-8", "9-16", "&gt;16"))))
+```
+
+With that, we merge the table into the `world` table so we can create a map. 
+
+```r
+world_merge &lt;- world %&gt;%
+    left_join(all_counts, by = c("region" = "Country2")) %&gt;%
+    mutate(Interval = ifelse(is.na(Interval), "0", Interval)) %&gt;%
+    mutate(Interval = factor(Interval, levels = c("0", "1", "2-3", "4-8", "9-16", "&gt;16")))
+```
+
+---
+
+## Map of Job Postings by Locations 2
+
+The code is very similar to the first map we created. We will now utilize the `fill` parameter as follows.
+
+
+```r
+ors &lt;- c("white", brewer.pal(n = 6, name = "Oranges")[1:5])
+
+ggplot(data = world_merge, aes(x = long, y = lat)) +
+  geom_map(map = world, aes(map_id = region, fill = Interval), colour = "grey60") +
+  scale_fill_manual("Job Count", values = ors) +
+  theme_map() +
+  coord_equal() +
+  labs(
+      title = "Map of Job Postings by Location",
+      subtitle = paste0("For jobs available on Crypto.jobs as of ", scrape_date)
+  ) +
+  theme(
+      plot.title = element_text(hjust = .5),
+      plot.subtitle = element_text(hjust = .5),
+      legend.position = "bottom"
+  ) 
+```
+
+---
+
+## Map of Job Postings by Locations 2 (continued...)
+
+&lt;img src="crypto_jobs_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Conclusion 
+
+You have learned to use the google platform API and to create map plots. Now, try to create more plots on your own!
+
+&lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt; &lt;br&gt;
+&lt;p align="right"&gt;
+
+&lt;img src="images/Cut_outs/Cut_out_07.png"  width="200px" height="160px"&gt;
+
+&lt;/p&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
