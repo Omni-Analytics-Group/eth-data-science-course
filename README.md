@@ -89,7 +89,7 @@ Change log
 
 *Gitcoin Grant Round 11*
 
-We've been busy! Over the last quarter we've been working with DAOs to help them understand their data and it has been this work that inspired us to create two new case studies all about blockchain jobs using data from [Cryptojobs](https://cryptojobs.com/). In addition to these two case studies, we've included another one on Yearn.Finance created by our newest collaborator [@vintro]@(https://github.com/vintrocode). This update also includes 3 new videos to supplement the case studies.  As usual, we really appreciate the support and contributions this round will help us find and compensate additional course contributors.
+We've been busy! Over the last quarter we've been working with DAOs to help them understand their data and it has been this work that inspired us to create two new case studies all about blockchain jobs using data from [Cryptojobs](https://cryptojobs.com/). In addition to these two case studies, we've included another one on Yearn.Finance created by our newest collaborator [@vintro](https://github.com/vintrocode). This update also includes 3 new videos to supplement the case studies.  As usual, we really appreciate the support and contributions this round will help us find and compensate additional course contributors.
 
 Change log
 * 3 Video lectures
