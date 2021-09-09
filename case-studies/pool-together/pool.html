@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>PoolTogether Analysis          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# PoolTogether Analysis <br> <br> <br> <br> <br>
+### Omni Analytics Group
+
+---
+
+
+
+
+## PoolTogether
+
+PoolTogether is a fun, open sourced and decentralized protocol for “no-loss” lotteries where users transfer their crypto into a shared pool that acts as a “prize-linked savings account”. These deposits double as lottery tickets that give the depositor a chance to win proportional to the amount of the pool they claim. Just like traditional savings accounts, all money in the pool earns a yield and each user can withdraw at their discretion.
+
+#### Prizes
+
+At the time of this writing, \$3,801,856 worth of prizes have been awarded. Also, based on current deposits, the platform has been generating \$93,558 in interest per week for its users. Interested in earning? You can participate in PoolTogether on the Ethereum, xDai, Matic, and Binance Smart Chain networks.
+
+
+#### Proposals
+
+True to the spirit of decentralization, the PoolTogether protocol is managed by holders of the $POOL governance token who draft and vote on proposals that control the prize creation tools and prize pools. Proposals are ratified through a voting process and are then implemented by the community.
+
+---
+
+## Data
+
+To begin, we need to scrape the data. The code is provided below, if desired. The procedure for data scraping is:
+
+1. Retrieve the network/chain pool data from the pool together API json files.
+2. Parse the JSON / nested list structure into an R dataframe.
+3. Retrieve the rewards / prize history by making a GraphQL call to TheGraph's API.
+4. Retrieve information on the holders by making a GraphQL call to TheGraph's API.
+5. Save the three objects as R Data Files.
+
+We accomplish this using a custom R-based routine and the following libraries:
+
+
+
+---
+
+## Data Loading
+
+Next, with the data successfully scraped, we read in the R data objects into our local environment and take a look at the raw data. To the rewards data, we add an indicator of the pool name for each.
+
+
+
+---
+
+## Pools Data
+
+We can take a look at the first few rows of the pool data:
+
+&lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Symbol &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Address &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Subgraph_Version &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Num_Winners &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Freq_Secs &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pool_Type &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Base_Tok_Address &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Base_Tok_Decimals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Base_Tok_Name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Base_Tok_Symbol &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Base_Tok_Val_USD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Address &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Decimals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Symbol &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Num_Ticket_Holders &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Val_Base_Tok &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Val_USD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sponsorship_Address &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sponsorship_Decimals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sponsorship_Name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sponsorship_Symbol &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Num_Sponsorship_Holders &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sponsorship_Val_Base_Tok &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sponsorship_Val_USD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Reserve_Val_Base_Tok &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Reserve_Val_USD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Reserve_Rate &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Daily_Reward &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Daily_Reward_Token_Name &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Daily_Reward_Token_Decimals &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Daily_Reward_Token_Symbol &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Daily_Reward_Token_Val_USD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Effective_APR &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Current_Index &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Current_State &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Prize_Remaining_Secs &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Period_Started_At &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Total_USD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Internal &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_External &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_External_Yield &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_External_ERC20 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; DAI Pool &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PT-cDAI &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0xebfb47a7ad0fd6e57323c8a42b2e5a6a4f68fc1a &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3.1.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 604800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compound &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x6b175474e89094c44da98b954eedeac495271d0f &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dai Stablecoin &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DAI &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0025360 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x334cbb5858417aee161b53ee0d5349ccf54514cf &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether Dai Ticket (Compound) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PcDAI &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5518 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 27031562.847149068445242853 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 27031562.847149068445242853 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x0a2e7f69fe9588fa7fba5f5864236883cd4aac6d &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether Dai Sponsorship (Compound) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PDAIS &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 253821.482766163126362001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 253821.482766163126362001 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 380849.264812579060780233 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 380849.264812579060780233 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 44 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Awarded &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 602543 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-20 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15118.16 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6260.78 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8857.38 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8857.38 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; UNI Pool &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PT-cUNI &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x0650d780292142835f6ac58dd8e2a336e87b4393 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3.1.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 604800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compound &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x1f9840a85d5af5bf1d1762f925bdaddc4201f984 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Uniswap &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UNI &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28.4455677 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0xa92a861fc11b99b24296af880011b47f9cafb5ab &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether UNI Ticket (Compound) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PcUNI &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1105 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 527492.142962408746066652 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 15007151.467280528825596249 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x5cfb96a0475afa385d28320de2aa1a21aa947c05 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether UNI Sponsorship (Compound) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ScUNI &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 446.164754509948929549 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12693.387265808047045669 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 35 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Awarded &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 343343 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-17 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3117.7 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 908.49 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2209.21 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1247.64 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 961.57 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDC Pool &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PT-cUSDC &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0xde9ec95d7708b8319ccca4b8bc92c0a3b70bf416 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3.1.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 604800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compound &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; USD Coin &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; USDC &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9982249 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0xd81b1a8b1ad00baa2d6609e0bae28a38713872f7 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether USDC Ticket (Compound) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PcUSDC &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2476 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 79653982.14181 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 79653982.14181 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x391a437196c81eea7bbbbd5ed4df6b49de4f5c96 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether USDC Sponsorship (Compound) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; ScUSDC &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6176431.811651 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 6176431.811651 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 560792.713127 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 560792.713127 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 33 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Awarded &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 256943 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-16 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 48006.39 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 21690.07 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 26316.32 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18092.01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 8224.31 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; POOL Pool &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PT-stPOOL &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x396b4489da692788e327e2e4b2b0459a5ef26791 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3.3.2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 604800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; stake &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x0cec1a9154ff802e7934fc916ed7ca50bde6844e &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; POOL &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.5355684 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x27d22a7648e955e510a40bdb058333e9190d12d4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PoolTogether Pool Ticket (Stake) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PPOOL &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2018 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 951257.777699605648753597 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 16685061.420851083079138091 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0x089811ed7da2e09ae29f99518004b5c388165b7c &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; PT Stake POOL Sponsorship &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; SSPOOL &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 31.270374730242635937 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 548.482372768455834334 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 24 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Awarded &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 99299 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-14 23:12:36 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4246.55 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4246.55 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Holders Data
+
+The holders of the first pool:
+
+&lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; id &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; balance &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x052564eb0fd8b340803df55def89c25c432f43f4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4493219070921554199609132 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x30030383d959675ec884e7ec88f05ee0f186cc06 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 3284507114531434549903748 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0xcaacebe2fdac9d3783563b9b80c714df82705226 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1500000000000000000000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x2f994e2e4f3395649eee8a89092e63ca526da829 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1359279159175702142539944 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Rewards Data
+
+The past rewards for the first pool:
+
+&lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Awarded_Block &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Awarded_Time &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_Period_Started_At &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ticket_Supply &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Prize_External_ERC20 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Prize_Internal &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Pool &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 13063959 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-20 19:19:57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-13 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 27031562847149068445242853 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; [0xc00e94cb662c3520282e6f5717214004a7f26888;4.8165099755076;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;4.8165099755076;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;4.8165099755076;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;4.8165099755076;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;4.8165099755076;Compound;COMP] &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6746.640 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DAI Pool &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 13018758 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-13 19:32:30 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-06 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 30394109732258832063501193 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; [0xc00e94cb662c3520282e6f5717214004a7f26888;3.81597064475834;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.81597064475834;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.81597064475834;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.81597064475834;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.81597064475834;Compound;COMP] &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7550.235 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DAI Pool &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 12973196 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-08-06 19:06:59 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-07-30 19:00:00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 30959874485348992187650102 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; [0xc00e94cb662c3520282e6f5717214004a7f26888;3.79000297772481;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.79000297772481;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.79000297772481;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.79000297772481;Compound;COMP][0xc00e94cb662c3520282e6f5717214004a7f26888;3.79000297772481;Compound;COMP] &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7048.811 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DAI Pool &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Holder Balances
+
+
+
+With the pre-processed data, the first thing we can look at is a distribution of the balances of holders. Here we use free scales, which allows us to better see each panel individually despite the large difference between the different pools. We can clearly see that most of the balances fall in the $100 - $10,000 across the various pools, but there a few holders have very large balances.
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Holder Balances (Fixed X Axis)
+
+If we fix the x scales, we can now compare across the pools a little better, when stacking the graph like so. We can see that COMP, UNI, and others tend to have larger balances than the USDC or GUSD pools for example.
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Average time between rewards
+
+We can compute the mean and median time between rewards by arranging the award time, and then computing the difference between subsequent rows:
+
+
+```
+## [1] 2127.506
+```
+
+```
+## [1] 1450.067
+```
+
+One method to visualize this data is to plot a histogram of the distribution. This allows us to clearly see that the typical time between rewards is around 1500 minutes, or just about a day.
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Time between rewards over time
+
+But, this obscures how the time has decreased since the start. Here we order the rewards from first to last, and plot the time between to see both the oscillating pattern as of late, and how this has settled into the ~1 day value that it is today.
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Holders in Pools
+
+#### How many in more than one pool?
+
+We can perform some data manipulation in order to compute how many holders are in more than one pool. Doing so shows that about 2000 holders are in more than one pool:
+
+
+```
+## [1] 2038
+```
+
+#### How many in exactly one pool?
+
+By checking how many are in exactly one pool, we see that this represents the majority of holders, a bit over 7000 of them.
+
+
+```
+## [1] 7404
+```
+
+---
+
+## Most Pools
+
+Certain holders are in a large number of pools. At the time of this writing, the addresses below are those in the most pools. One particular holder is in 9 of the pools, and many others are in 8 of them.
+
+&lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; id &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Pools &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x4e1d9cedf4d87b6bcc7c97990704927a824fd940 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x049d49048dcd19892b2902a230afd89e3279a0da &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x0c6ac3fcea667fd6c62483ce1dbbce6f6ce0fb1f &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x2c38a374d4df6b165ed86dc8a6cab2c5aa955d5a &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x53e17b1d817a625d1eb5817b68cfaddcaa56950b &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x641763fb275dd3418012ee26591a9898360e9d69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0x9888428bbafc7d6117d5eb3e46ed2edd1d39cdd6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0xa4bd0ec4dd0f92c3e3cd9e431bb9085b0dc631a6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0xdd45ca901067d65860b54d4310e37371cd92fb09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 0xe17ae1176c98bd1dd7560c19874e18df3ad0dbd5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Computing Pool Diversity
+
+We can compute a metric of pool diversity by, for every holder in more than one pool, seeing the incidence that they occur with one another. From there, we can measure how similar the pools themselves are. The POOL Pool and the DAI pool have a fairly strong similarity, whereas (for example) the DAi pool and the BADGER Pool have very little similarity.
+
+&lt;table class="table table-striped table-hover" style="font-size: 14px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BADGER Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; COMP Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; DAI Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; GUSD Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; POOL Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SUSHI Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; UNI Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; UNI-V2 Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; USDC Pool &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BADGER Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1294118 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0473146 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0596026 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0633862 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1145038 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0847953 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0734824 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0590631 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; COMP Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1294118 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1024209 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0456140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1013250 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1497006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1827957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0699774 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1305182 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; DAI Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0473146 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1024209 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0157068 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.4447454 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1030741 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2250287 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0793254 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3889206 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; GUSD Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0596026 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0456140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0157068 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0145051 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0445104 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0218069 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0162602 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0269107 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; POOL Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0633862 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1013250 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.4447454 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0145051 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1215596 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2130137 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0937500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2163433 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; SUSHI Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1145038 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1497006 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1030741 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0445104 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1215596 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1404151 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0709939 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1189827 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; UNI Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0847953 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1827957 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2250287 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0218069 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2130137 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1404151 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0735484 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1574981 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; UNI-V2 Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0734824 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0699774 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0793254 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0162602 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0937500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0709939 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0735484 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0741445 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDC Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0590631 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1305182 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3889206 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0269107 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2163433 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1189827 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1574981 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0741445 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0000000 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Tokens in Reward Pools
+
+Finally, we can see the occurrences of particular tokens within each reward pool:
+
+&lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Pool &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 0xBTC &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ٨ &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; AAVE &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ALEPH &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ALEX &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BAT &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BEL &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BOI &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BOOKS &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; BUILD &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; CER &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BADGER Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; COMP Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; DAI Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; GUSD Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; POOL Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; SUSHI Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; UNI Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; UNI-V2 Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; USDC Pool &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
