@@ -16,8 +16,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
-
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=14, dpi=300)
 ```
 
 ## Yearn Finance
@@ -90,7 +89,7 @@ daily_fees <- daily_fees[order(-date)]
 
 ## Plot the fees
 
-```{r, fig.height = 6, fig.width = 11}
+```{r, fig.height = 6, fig.width = 14}
 ggplot(daily_fees, aes(date, cum_amount, colour=protocol)) + 
   geom_line() + 
   ggtitle("Protocol Fees")
@@ -119,7 +118,7 @@ daily_fee_dest <- daily_fee_dest[order(-date)]
 
 ## Plot the fee destinations
 
-```{r, fig.height = 6, fig.width = 11}
+```{r, fig.height = 6, fig.width = 14}
 ggplot(daily_fee_dest, aes(date, cum_amount, colour=fee_dest)) + 
   geom_line() + 
   ggtitle("Protocol Fee Destinations")
@@ -150,7 +149,7 @@ daily_fee_type <- daily_fee_type[order(-date)]
 
 Most of their fees come from the "harvest" fee type. This means people are re-investing their yield back into the platform to increase their yield even more, reinforcing the trust and satisfaction people have in the platform.
 
-```{r, fig.height = 4.5, fig.width = 11}
+```{r, fig.height = 4.5, fig.width = 14}
 ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) + 
   geom_line() + 
   ggtitle("Protocol Fee Types")
@@ -165,7 +164,7 @@ ggplot(daily_fee_type, aes(date, cum_amount, colour=fee_type)) +
 
 How much does the protocol make on a daily basis?
 
-```{r, fig.height = 4.5, fig.width = 11}
+```{r, fig.height = 4.5, fig.width = 14}
 ggplot(daily_fees, aes(x=date, y=amount_day, color=protocol)) +
   geom_line()
 ```
@@ -187,7 +186,7 @@ daily_fees[is.na(amount_rolling_avg), amount_rolling_avg:=0]
 
 ## Plot weekly rolling average across protocols
 
-```{r, fig.height = 6, fig.width = 11}
+```{r, fig.height = 6, fig.width = 14}
 ggplot(daily_fees, aes(x=date, y=amount_rolling_avg, color=protocol)) +
   geom_line()
 ```
@@ -216,7 +215,7 @@ daily_fee_dest_pro$grp <- paste(daily_fee_dest_pro$protocol, daily_fee_dest_pro$
 
 ## Plot by Protocol, Fee Destination
 
-```{r, fig.height = 6, fig.width = 11}
+```{r, fig.height = 6, fig.width = 14}
 ggplot(daily_fee_dest_pro, aes(x=date, y=cum_amount, color=grp)) +
   geom_line()
 ```
@@ -225,7 +224,7 @@ ggplot(daily_fee_dest_pro, aes(x=date, y=cum_amount, color=grp)) +
 
 # Cont.
 
-```{r, fig.height = 6, fig.width = 11}
+```{r, fig.height = 6, fig.width = 14}
 ggplot(daily_fee_dest_pro, aes(x=date, y=amount_day, color=grp)) +
   geom_line()
 ```
