@@ -16,7 +16,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=14, dpi=300)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=14, dpi=300)
 
 library(knitr)
 library(kableExtra)
@@ -83,7 +83,7 @@ for (i in 1:length(rewards_data)) {
 
 We can take a look at the first few rows of the pool data:
 
-```{r}
+```{r, echo=FALSE}
 pools_data %>% head(n = 4) %>% kable() %>%
     kable_styling(bootstrap_options = c("striped", "hover"))
 ```
@@ -94,7 +94,7 @@ pools_data %>% head(n = 4) %>% kable() %>%
 
 The holders of the first pool:
 
-```{r}
+```{r, echo=FALSE}
 holders_data[[1]] %>% head(n = 4) %>% kable() %>%
     kable_styling(bootstrap_options = c("striped", "hover"))
 ```
@@ -105,7 +105,7 @@ holders_data[[1]] %>% head(n = 4) %>% kable() %>%
 
 The past rewards for the first pool:
 
-```{r}
+```{r, echo=FALSE}
 rewards_data[[1]] %>% head(n = 3) %>% kable() %>%
     kable_styling(bootstrap_options = c("striped", "hover"))
 ```
@@ -113,6 +113,8 @@ rewards_data[[1]] %>% head(n = 3) %>% kable() %>%
 ---
 
 ## Holder Balances
+
+With the pre-processed data, the first thing we can look at is a distribution of the balances of holders. Here we use free scales, which allows us to better see each panel individually despite the large difference between the different pools. We can clearly see that most of the balances fall in the $100 - $10,000 across the various pools, but there a few holders have very large balances.
 
 ```{r}
 ## Flatten holders data
@@ -129,15 +131,15 @@ holders_flat <- do.call(rbind,mapply(function(x,y,z,w,xx) cbind(x,Pool_Name=y,Va
     mutate(across(c(balance, Value, USD, Dec), as.numeric)) %>%
     mutate(Price = USD / Value) %>%
     mutate(Bal = balance / (10^Dec) * Price)
-```
 
-With the pre-processed data, the first thing we can look at is a distribution of the balances of holders. Here we use free scales, which allows us to better see each panel individually despite the large difference between the different pools. We can clearly see that most of the balances fall in the $100 - $10,000 across the various pools, but there a few holders have very large balances.
-
-```{r, fig.height=5}
 my_dollars <- function(x) {
     ifelse(x < .01, paste0("$", x), scales::dollar(x))
 }
+```
 
+---
+
+```{r, fig.height=5}
 ggplot(holders_flat, aes(x = Bal)) +
     geom_histogram(aes(fill = Pool_Name), bins=100) +
     scale_x_log10(labels = my_dollars, breaks = c(1e-16, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1, 100, 10000, 1000000, 100000000)) +
@@ -154,7 +156,20 @@ ggplot(holders_flat, aes(x = Bal)) +
 
 If we fix the x scales, we can now compare across the pools a little better, when stacking the graph like so. We can see that COMP, UNI, and others tend to have larger balances than the USDC or GUSD pools for example.
 
-```{r, fig.height=6}
+```{r, fig.height=6, eval=FALSE}
+ggplot(holders_flat, aes(x = Bal)) +
+    geom_histogram(aes(fill = Pool_Name), bins=100) +
+    scale_x_log10(labels = my_dollars, breaks = c(1e-16, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1, 100, 10000, 1000000, 100000000)) +
+    facet_wrap(~Pool_Name, scales = "free_y", ncol = 1) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+        legend.position = "off"
+    )
+```
+
+---
+
+```{r, fig.height=8, echo=FALSE}
 ggplot(holders_flat, aes(x = Bal)) +
     geom_histogram(aes(fill = Pool_Name), bins=100) +
     scale_x_log10(labels = my_dollars, breaks = c(1e-16, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1, 100, 10000, 1000000, 100000000)) +
@@ -182,6 +197,8 @@ mean(rewards_data1$TimeBetween, na.rm = TRUE)
 median(rewards_data1$TimeBetween, na.rm = TRUE)
 ```
 
+---
+
 One method to visualize this data is to plot a histogram of the distribution. This allows us to clearly see that the typical time between rewards is around 1500 minutes, or just about a day.
 
 ```{r, fig.height=3.5}
@@ -200,7 +217,7 @@ ggplot(rewards_data1, aes(x = TimeBetween)) +
 
 But, this obscures how the time has decreased since the start. Here we order the rewards from first to last, and plot the time between to see both the oscillating pattern as of late, and how this has settled into the ~1 day value that it is today.
 
-```{r, fig.height=5.5}
+```{r, fig.height=4.5}
 ggplot(rewards_data1 %>% mutate(ID = 1:nrow(.)), aes(x = ID, y = TimeBetween)) +
     geom_point() +
     geom_line()
@@ -208,9 +225,7 @@ ggplot(rewards_data1 %>% mutate(ID = 1:nrow(.)), aes(x = ID, y = TimeBetween)) +
 
 ---
 
-## Holders in Pools
-
-#### How many in more than one pool?
+## How many holders in more than one pool?
 
 We can perform some data manipulation in order to compute how many holders are in more than one pool. Doing so shows that about 2000 holders are in more than one pool:
 
@@ -232,7 +247,9 @@ more_than_one <- flat %>%
 more_than_one %>% count() %>% pull
 ```
 
-#### How many in exactly one pool?
+---
+
+## How many in exactly one pool?
 
 By checking how many are in exactly one pool, we see that this represents the majority of holders, a bit over 7000 of them.
 
@@ -256,7 +273,7 @@ flat %>%
     group_by(id) %>%
     summarise(Pools = length(unique(Pool_Name))) %>%
     arrange(desc(Pools)) %>%
-    head(n = 10) %>%
+    head(n = 5) %>%
     kable() %>%
     kable_styling(bootstrap_options = c("striped", "hover"))
 ```
@@ -274,15 +291,21 @@ incidence <- flat %>% select(Address = id, Pool_Name) %>%
     spread(key = Pool_Name, value = Count)
 incidence[is.na(incidence)] <- 0
 
-inci <- 1 - dist(incidence %>% select(-Address) %>% t, method = "binary", upper = TRUE, diag = TRUE) %>% as.matrix
+inci <- 1 - dist(incidence %>% select(-Address) %>% t, method = "binary", 
+                 upper = TRUE, diag = TRUE) %>% 
+  as.matrix
+``` 
 
+---
+
+```{r}
 inci %>%
     as_tibble() %>%
     mutate(Pool = rownames(inci)) %>%
     select(Pool, everything()) %>%
     kable() %>%
     kable_styling(bootstrap_options = c("striped", "hover"), font_size = 14)
-``` 
+```
 
 ---
 
@@ -293,18 +316,25 @@ Finally, we can see the occurrences of particular tokens within each reward pool
 ```{r}
 res <- sapply(1:nrow(rewards_data1), function(i) {
     x <- rewards_data1$Prize_External_ERC20[i]
-    do.call(rbind, strsplit(gsub("\\[|\\]", "", strsplit(x, "][", fixed = TRUE)[[1]]), ";")) %>%
+    do.call(rbind, strsplit(gsub("\\[|\\]", "", 
+                                 strsplit(x, "][", fixed = TRUE)[[1]]), ";")) %>%
         as_tibble() %>%
         mutate(Pool = rewards_data1$Pool[i])
 }) %>% bind_rows() %>%
     rename(Address = V1, Amount = V2, Name = V3, Ticker = V4) %>%
     mutate(Amount = readr::parse_number(Amount))
 
-final <- res %>% group_by(Pool, Ticker) %>% summarise(Count = n()) %>% spread(key = Ticker, value = Count)
+final <- res %>% group_by(Pool, Ticker) %>% summarise(Count = n()) %>% 
+  spread(key = Ticker, value = Count)
 final[is.na(final)] <- 0
+```
 
+---
+
+```{r}
 final %>% head(n = 10) %>% select(1:12) %>%
     kable() %>%
     kable_styling(bootstrap_options = c("striped", "hover"))
 ```
+
 

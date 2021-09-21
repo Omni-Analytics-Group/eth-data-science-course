@@ -51,6 +51,13 @@ To begin, we need to scrape the data. The code is provided below, if desired. Th
 We accomplish this using a custom R-based routine and the following libraries:
 
 
+```r
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(ghql)
+```
 
 ---
 
@@ -59,6 +66,19 @@ We accomplish this using a custom R-based routine and the following libraries:
 Next, with the data successfully scraped, we read in the R data objects into our local environment and take a look at the raw data. To the rewards data, we add an indicator of the pool name for each.
 
 
+```r
+# Read the objects into the environment
+pools_data &lt;- readRDS("data/pools_data.RDS")
+holders_data &lt;- readRDS("data/holders_data.RDS")
+rewards_data &lt;- readRDS("data/rewards_data.RDS")
+
+# Store the pool name int he rewards data
+for (i in 1:length(rewards_data)) {
+    if (nrow(rewards_data[[i]]) &gt; 0) {
+        rewards_data[[i]]$Pool &lt;- pools_data$Name[i]
+    }
+}
+```
 
 ---
 
@@ -389,9 +409,43 @@ The past rewards for the first pool:
 
 ## Holder Balances
 
-
-
 With the pre-processed data, the first thing we can look at is a distribution of the balances of holders. Here we use free scales, which allows us to better see each panel individually despite the large difference between the different pools. We can clearly see that most of the balances fall in the $100 - $10,000 across the various pools, but there a few holders have very large balances.
+
+
+```r
+## Flatten holders data
+have_holders &lt;- which(sapply(holders_data,nrow)&gt;0)
+
+h_names &lt;- pools_data$Name[have_holders]
+h_val &lt;- pools_data$Ticket_Val_Base_Tok[have_holders]
+h_valusd &lt;- pools_data$Ticket_Val_USD[have_holders]
+h_dec &lt;- pools_data$Base_Tok_Decimals[have_holders]
+h_holders &lt;- holders_data[have_holders]
+
+holders_flat &lt;- do.call(rbind,mapply(function(x,y,z,w,xx) cbind(x,Pool_Name=y,Value=z,USD=w,Dec=xx),h_holders,h_names,h_val,h_valusd,h_dec,SIMPLIFY=FALSE)) %&gt;%
+    as_tibble() %&gt;%
+    mutate(across(c(balance, Value, USD, Dec), as.numeric)) %&gt;%
+    mutate(Price = USD / Value) %&gt;%
+    mutate(Bal = balance / (10^Dec) * Price)
+
+my_dollars &lt;- function(x) {
+    ifelse(x &lt; .01, paste0("$", x), scales::dollar(x))
+}
+```
+
+---
+
+
+```r
+ggplot(holders_flat, aes(x = Bal)) +
+    geom_histogram(aes(fill = Pool_Name), bins=100) +
+    scale_x_log10(labels = my_dollars, breaks = c(1e-16, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1, 100, 10000, 1000000, 100000000)) +
+    facet_wrap(~Pool_Name, scales = "free") +
+    theme(
+        axis.text.x = element_text(angle = 40, hjust = 1),
+        legend.position = "off"
+    )
+```
 
 &lt;img src="pool_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
 
@@ -401,7 +455,21 @@ With the pre-processed data, the first thing we can look at is a distribution of
 
 If we fix the x scales, we can now compare across the pools a little better, when stacking the graph like so. We can see that COMP, UNI, and others tend to have larger balances than the USDC or GUSD pools for example.
 
-&lt;img src="pool_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+```r
+ggplot(holders_flat, aes(x = Bal)) +
+    geom_histogram(aes(fill = Pool_Name), bins=100) +
+    scale_x_log10(labels = my_dollars, breaks = c(1e-16, 1e-14, 1e-12, 1e-10, 1e-8, 1e-6, 1e-4, 1e-2, 1, 100, 10000, 1000000, 100000000)) +
+    facet_wrap(~Pool_Name, scales = "free_y", ncol = 1) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+        legend.position = "off"
+    )
+```
+
+---
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -410,17 +478,44 @@ If we fix the x scales, we can now compare across the pools a little better, whe
 We can compute the mean and median time between rewards by arranging the award time, and then computing the difference between subsequent rows:
 
 
+```r
+rewards_data1 &lt;- rewards_data %&gt;%
+    bind_rows() %&gt;%
+    as_tibble() %&gt;%
+    arrange(Awarded_Time) %&gt;%
+    mutate(TimeBetween = c(NA, diff(Awarded_Time)))
+
+mean(rewards_data1$TimeBetween, na.rm = TRUE)
+```
+
 ```
 ## [1] 2127.506
+```
+
+```r
+median(rewards_data1$TimeBetween, na.rm = TRUE)
 ```
 
 ```
 ## [1] 1450.067
 ```
 
+---
+
 One method to visualize this data is to plot a histogram of the distribution. This allows us to clearly see that the typical time between rewards is around 1500 minutes, or just about a day.
 
-&lt;img src="pool_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+```r
+ggplot(rewards_data1, aes(x = TimeBetween)) +
+    geom_histogram() +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Time between Subsequent Awards",
+        x = "Time (minutes)",
+    )
+```
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -428,25 +523,59 @@ One method to visualize this data is to plot a histogram of the distribution. Th
 
 But, this obscures how the time has decreased since the start. Here we order the rewards from first to last, and plot the time between to see both the oscillating pattern as of late, and how this has settled into the ~1 day value that it is today.
 
-&lt;img src="pool_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+```r
+ggplot(rewards_data1 %&gt;% mutate(ID = 1:nrow(.)), aes(x = ID, y = TimeBetween)) +
+    geom_point() +
+    geom_line()
+```
+
+&lt;img src="pool_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
-## Holders in Pools
-
-#### How many in more than one pool?
+## How many holders in more than one pool?
 
 We can perform some data manipulation in order to compute how many holders are in more than one pool. Doing so shows that about 2000 holders are in more than one pool:
 
+
+```r
+have_holders &lt;- which(sapply(holders_data,nrow)&gt;0)
+h_names &lt;- pools_data$Name[have_holders]
+n_tokens &lt;- pools_data$Base_Tok_Name[have_holders]
+h_holders &lt;- holders_data[have_holders]
+
+
+flat &lt;- do.call(rbind,mapply(function(x,y,z) cbind(x,Pool_Name=y, Token_Name=z),h_holders,h_names,n_tokens,SIMPLIFY=FALSE)) %&gt;%
+    as_tibble()
+
+more_than_one &lt;- flat %&gt;%
+    group_by(id) %&gt;%
+    summarise(Pools = length(unique(Pool_Name))) %&gt;%
+    filter(Pools &gt; 1)
+
+more_than_one %&gt;% count() %&gt;% pull
+```
 
 ```
 ## [1] 2038
 ```
 
-#### How many in exactly one pool?
+---
+
+## How many in exactly one pool?
 
 By checking how many are in exactly one pool, we see that this represents the majority of holders, a bit over 7000 of them.
 
+
+```r
+flat %&gt;%
+    group_by(id) %&gt;%
+    summarise(Pools = length(unique(Pool_Name))) %&gt;%
+    filter(Pools == 1) %&gt;%
+    count() %&gt;%
+    pull()
+```
 
 ```
 ## [1] 7404
@@ -457,6 +586,17 @@ By checking how many are in exactly one pool, we see that this represents the ma
 ## Most Pools
 
 Certain holders are in a large number of pools. At the time of this writing, the addresses below are those in the most pools. One particular holder is in 9 of the pools, and many others are in 8 of them.
+
+
+```r
+flat %&gt;%
+    group_by(id) %&gt;%
+    summarise(Pools = length(unique(Pool_Name))) %&gt;%
+    arrange(desc(Pools)) %&gt;%
+    head(n = 5) %&gt;%
+    kable() %&gt;%
+    kable_styling(bootstrap_options = c("striped", "hover"))
+```
 
 &lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
@@ -486,26 +626,6 @@ Certain holders are in a large number of pools. At the time of this writing, the
    &lt;td style="text-align:left;"&gt; 0x53e17b1d817a625d1eb5817b68cfaddcaa56950b &lt;/td&gt;
    &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
   &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 0x641763fb275dd3418012ee26591a9898360e9d69 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 0x9888428bbafc7d6117d5eb3e46ed2edd1d39cdd6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 0xa4bd0ec4dd0f92c3e3cd9e431bb9085b0dc631a6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 0xdd45ca901067d65860b54d4310e37371cd92fb09 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; 0xe17ae1176c98bd1dd7560c19874e18df3ad0dbd5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 8 &lt;/td&gt;
-  &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
@@ -514,6 +634,31 @@ Certain holders are in a large number of pools. At the time of this writing, the
 ## Computing Pool Diversity
 
 We can compute a metric of pool diversity by, for every holder in more than one pool, seeing the incidence that they occur with one another. From there, we can measure how similar the pools themselves are. The POOL Pool and the DAI pool have a fairly strong similarity, whereas (for example) the DAi pool and the BADGER Pool have very little similarity.
+
+
+```r
+incidence &lt;- flat %&gt;% select(Address = id, Pool_Name) %&gt;%
+    filter(Address %in% more_than_one$id) %&gt;%
+    mutate(Count = 1) %&gt;%
+    spread(key = Pool_Name, value = Count)
+incidence[is.na(incidence)] &lt;- 0
+
+inci &lt;- 1 - dist(incidence %&gt;% select(-Address) %&gt;% t, method = "binary", 
+                 upper = TRUE, diag = TRUE) %&gt;% 
+  as.matrix
+```
+
+---
+
+
+```r
+inci %&gt;%
+    as_tibble() %&gt;%
+    mutate(Pool = rownames(inci)) %&gt;%
+    select(Pool, everything()) %&gt;%
+    kable() %&gt;%
+    kable_styling(bootstrap_options = c("striped", "hover"), font_size = 14)
+```
 
 &lt;table class="table table-striped table-hover" style="font-size: 14px; margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
@@ -647,6 +792,32 @@ We can compute a metric of pool diversity by, for every holder in more than one 
 ## Tokens in Reward Pools
 
 Finally, we can see the occurrences of particular tokens within each reward pool:
+
+
+```r
+res &lt;- sapply(1:nrow(rewards_data1), function(i) {
+    x &lt;- rewards_data1$Prize_External_ERC20[i]
+    do.call(rbind, strsplit(gsub("\\[|\\]", "", 
+                                 strsplit(x, "][", fixed = TRUE)[[1]]), ";")) %&gt;%
+        as_tibble() %&gt;%
+        mutate(Pool = rewards_data1$Pool[i])
+}) %&gt;% bind_rows() %&gt;%
+    rename(Address = V1, Amount = V2, Name = V3, Ticker = V4) %&gt;%
+    mutate(Amount = readr::parse_number(Amount))
+
+final &lt;- res %&gt;% group_by(Pool, Ticker) %&gt;% summarise(Count = n()) %&gt;% 
+  spread(key = Ticker, value = Count)
+final[is.na(final)] &lt;- 0
+```
+
+---
+
+
+```r
+final %&gt;% head(n = 10) %&gt;% select(1:12) %&gt;%
+    kable() %&gt;%
+    kable_styling(bootstrap_options = c("striped", "hover"))
+```
 
 &lt;table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;"&gt;
  &lt;thead&gt;
@@ -794,6 +965,7 @@ Finally, we can see the occurrences of particular tokens within each reward pool
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
