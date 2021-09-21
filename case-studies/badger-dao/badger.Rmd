@@ -16,7 +16,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = "center", dpi=300, fig.width=14)
 
 library(knitr)
 library(kableExtra)
@@ -49,7 +49,7 @@ knitr::include_graphics("images/app.png")
 
 Below is a plot of the number of liquidity pools where at least one token int he pair is a Wrapped Bitcoin. We're going to spruce this up a bit.
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p1 <- wbtc_pairs %>%
     mutate(date = as_date(Pair_Origin_Timestamp),
            week = round_date(date, unit = "week")) %>%
@@ -80,7 +80,7 @@ p1
 
 The first thing we'll do is watermark the image with the Badger DAO yellow badger:
 
-```{r, echo=TRUE, fig.height=6, fig.width=11}
+```{r, echo=TRUE, fig.height=6, fig.width=14}
 p1 + 
     watermark_img("images/yellow_hat_badger.png", location = "center", alpha = 0.1, width = 120)
 ```
@@ -91,7 +91,7 @@ p1 +
 
 You can see from the previous snippet that an arbitrary image can be provided, and parameters such as the alpha and width of the image can be customized. Let's add Mario to this cumulative version of the previous plot!
 
-```{r, fig.height=5, fig.width=11}
+```{r, fig.height=5, fig.width=14}
 p2 <- wbtc_pairs %>%
     mutate(date = as_date(Pair_Origin_Timestamp),
            week = round_date(date, unit = "week")) %>%
@@ -123,7 +123,7 @@ p2 +
 
 ## Alpha (0.05)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p2 +
     watermark_img("images/mario.png", location = "center", alpha = 0.05, width = 150)
 ```
@@ -133,7 +133,7 @@ p2 +
 
 ## Alpha (0.5)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p2 +
     watermark_img("images/mario.png", location = "center", alpha = 0.5, width = 150)
 ```
@@ -142,7 +142,7 @@ p2 +
 
 ## Alpha (1)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p2 +
     watermark_img("images/mario.png", location = "center", alpha = 1, width = 150)
 ```
@@ -151,7 +151,7 @@ p2 +
 
 ## Width (350)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p2 +
     watermark_img("images/mario.png", location = "center", alpha = 1, width = 350)
 ```
@@ -162,7 +162,7 @@ p2 +
 
 We can watermark a graph even outside the center. Here we add the side badger to the top right
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p3 <- wbtc_pairs %>%
         mutate(Pair = paste0(BTC, "/", Token_Symbol)) %>%
         select(Name = Token_Name, Pair, `Liquidity ($)` = Liquidity_USD, `# of Transactions` = Pair_Tx_Count) %>%
@@ -181,7 +181,7 @@ p3 +
 
 ## Varying the Position (Top Left)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p3 +
   watermark_img("images/badger side.png", location = "tl", alpha = 0.2, width = 100)
 ```
@@ -190,7 +190,7 @@ p3 +
 
 ## Varying the Position (Bottom Left)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p3 +
   watermark_img("images/badger side.png", location = "bl", alpha = 0.2, width = 100)
 ```
@@ -199,7 +199,7 @@ p3 +
 
 ## Varying the Position (Bottom Right)
 
-```{r, fig.height=6, fig.width=11}
+```{r, fig.height=6, fig.width=14}
 p3 +
   watermark_img("images/badger side.png", location = "br", alpha = 0.2, width = 100)
 ```
