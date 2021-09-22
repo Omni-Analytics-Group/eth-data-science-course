@@ -245,3 +245,7 @@ monthly_fees[order(my)]
 ```
 
 ---
+
+# Conclusion
+
+Main takeaways: v2 is seeing much more cashflow than v1, strategists get paid very well, and most of the interest earned by Yearn gets re-invested back into the protocol. That is very telling of the confidence, trust, and satisfaction people have. Yearn is proving to be not only a solid place to invest your money, but apps like [alchemix](https://alchemix.fi/) have built on top of yearn, making it the backend of choice for powering never-before-seen business models in crypto.
