@@ -73,7 +73,7 @@ sample_n(valid_raw,5)
 
 The 11 variables are:
 
-* `X1` - The row index of the validator.
+* `...1` - The row index of the validator.
 * `publickey` - The public key identifying the validator.
 * `index` - The index number of the validator.
 * `currentBalance` - The current balance, in ETH, of the validator.
@@ -91,7 +91,7 @@ The 11 variables are:
 
 To be suitable for analysis, this data required some minor data manipulation. We will utilize the <b> stringi </b> package to assist with string processing. The steps are as follows:
 
-1. Remove 'X1' using <b> select(-X1) </b>.
+1. Remove '...1' using <b> select(-`...1`) </b>.
 2. Convert 'proposed' to ASCII using <b> mutate() </b> and <b> stri_trans_general() </b>.
 3. Separate 'proposed' to three separate columns 'assigned', 'executed', and 'skipped' using <b> separate() </b>.
 4. Parse the 'assigned', 'executed', 'skipped''currentBalance' and 'effectiveBalance' using <b> parse_number() </b> so that they become numeric variables.
@@ -102,7 +102,7 @@ To be suitable for analysis, this data required some minor data manipulation. We
 ```{r}
 library(stringi)
 valid <- valid_raw %>%
-    select(-X1) %>%
+    select(-`...1`) %>%
     mutate(proposed = stri_trans_general(proposed, "latin-ascii")) %>%
     separate(proposed, into = c("assigned", "executed", "skipped"),sep = " ", extra = "merge") %>%
     mutate(across(c(assigned, executed, skipped, currentBalance, effectiveBalance), parse_number)) %>%
@@ -133,14 +133,14 @@ skim(valid)
 
 --
 
-.center[![summary1_1](images/summary1_1.PNG)]
+.center[![summary1_1](images/summary1_1.png)]
 
 ---
 
 
 
 
-.center[![summary1_2](images/summary1_2.PNG)]
+.center[![summary1_2](images/summary1_2.png)]
 
 We see that the data consists of 80392 rows and 12 columns (1 character, 1 logical, and 10 numeric), along with various summary statistics. Note that we do have missing data in some of the columns.
 
@@ -272,7 +272,7 @@ exit_time <- valid %>%
 skim(exit_time$timeToExit)
 ```
 
-.center[![summary2](images/summary2.PNG)]
+.center[![summary2](images/summary2.png)]
 
 We see that a total of 6304 validators have exited with an average of 363 hours or around 15.1 days. Also, the fastest exit time is actually less than 1 hour.
 
@@ -315,7 +315,7 @@ sample_n(exits,3)
 skim(exits$count)
 ```
 
-.center[![summary3](images/summary3.PNG)]
+.center[![summary3](images/summary3.png)]
 
 ---
 
@@ -885,7 +885,7 @@ formattable(summary_table)
 
 --
 
-.center[![table1_1](images/table1_1.PNG)]
+.center[![table1_1](images/table1_1.png)]
 
 It looks so much better!
 
@@ -910,7 +910,7 @@ formattable(summary_table, list(
 
 --
 
-.center[![table1_2](images/table1_2.PNG)]
+.center[![table1_2](images/table1_2.png)]
 
 ---
 ## Characteristic Behaviors Of Each Tier
@@ -1010,7 +1010,7 @@ formattable(representative, list(
 
 ```
 
-.center[![table2](images/table2.PNG)]
+.center[![table2](images/table2.png)]
 
 ---
 
