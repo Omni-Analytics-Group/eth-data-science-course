@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Hashmasks Analysis</title>
+    <title>Hashmasks Analysis          </title>
     <meta charset="utf-8" />
     <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="classroom.css" type="text/css" />
@@ -67,14 +68,14 @@ sample_n(hashmasks_raw,5)
 ```
 
 ```
-## # A tibble: 5 x 10
-##      ID X2     Skin  Character Eyes  Mask   Item  Rarity URL   Preview          
-##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;            
-## 1 15007 #NAME? Gray  Female    Green Chine~ No I~  27.0  #NAM~ https://hashmask~
-## 2 10042 #NAME? Light Male      Dark  Doodle No I~   1.85 #NAM~ https://hashmask~
-## 3  1923 #NAME? Gray  Male      Dark  Mexic~ No I~   0    #NAM~ https://hashmask~
-## 4  3792 #NAME? Gray  Male      Dark  Doodle No I~   0.46 #NAM~ https://hashmask~
-## 5  1210 #NAME? Dark  Male      Green Indian No I~  20.1  #NAM~ https://hashmask~
+## # A tibble: 5 × 10
+##      ID ...2   Skin  Character Eyes  Mask     Item         Rarity URL    Preview
+##   &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  
+## 1  3556 #NAME? Gray  Male      Dark  Doodle   No Item        0.46 #NAME? https:…
+## 2  8897 #NAME? Dark  Female    Dark  Hawaiian No Item       13.9  #NAME? https:…
+## 3 15344 #NAME? Blue  Male      Green Basic    No Item       23.7  #NAME? https:…
+## 4  5797 #NAME? Gray  Male      Green Hawaiian No Item       15.5  #NAME? https:…
+## 5  8839 #NAME? Dark  Male      Blue  Basic    Toilet Paper  54.2  #NAME? https:…
 ```
 
 ---
@@ -86,20 +87,20 @@ To make our dataset a little tidier, we will remove the `X2`, `URL` and `Preview
 
 ```r
 hashmasks &lt;- hashmasks_raw %&gt;%
-  select(-X2, -URL, -Preview)
+  select(-`...2`, -URL, -Preview)
 
 sample_n(hashmasks,5)
 ```
 
 ```
-## # A tibble: 5 x 7
-##      ID Skin  Character Eyes  Mask    Item    Rarity
-##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;    &lt;dbl&gt;
-## 1 14473 Dark  Male      Dark  Pixel   No Item   6.51
-## 2 15723 Dark  Female    Dark  Doodle  No Item  12.1 
-## 3 10011 Blue  Female    Freak Basic   Mirror   79.2 
-## 4  1265 Dark  Male      Blue  African No Item  17.4 
-## 5  9672 Dark  Male      Green Basic   No Item  16.7
+## # A tibble: 5 × 7
+##      ID Skin  Character Eyes  Mask     Item    Rarity
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;    &lt;dbl&gt;
+## 1  7148 Gray  Male      Blue  Pixel    No Item   14.6
+## 2 13084 Dark  Male      Blue  Hawaiian No Item   15.7
+## 3 10690 Steel Robot     Glass Mexican  No Item   45.4
+## 4  4429 Dark  Male      Blue  Hawaiian No Item   15.5
+## 5 11808 Dark  Female    Dark  Animal   No Item   12.5
 ```
 
 ---
@@ -134,7 +135,7 @@ hashmasks %&gt;% filter(!is.na(Rarity)) %&gt;% summarise(Mean = mean(Rarity), Me
 ```
 
 ```
-## # A tibble: 1 x 2
+## # A tibble: 1 × 2
 ##    Mean Median
 ##   &lt;dbl&gt;  &lt;dbl&gt;
 ## 1  23.1   15.3
@@ -925,6 +926,8 @@ Our journey into Haskmasks showed us how to plot the rarity of a mask along a cu
 &lt;img src="hashmask_gif.gif"  width="25%" height="25%"&gt;
 
 &lt;/p&gt;
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

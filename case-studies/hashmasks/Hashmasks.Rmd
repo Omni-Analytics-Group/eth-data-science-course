@@ -70,7 +70,7 @@ To make our dataset a little tidier, we will remove the `X2`, `URL` and `Preview
 
 ```{r}
 hashmasks <- hashmasks_raw %>%
-  select(-X2, -URL, -Preview)
+  select(-`...2`, -URL, -Preview)
 
 sample_n(hashmasks,5)
 ```
