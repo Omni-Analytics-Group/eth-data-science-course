@@ -52,10 +52,14 @@ Module 4 - Case Studies
 * [Using R Shiny to explore Numerai tournament data](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/) ([Part 1](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-1-ShinyIntro.html), [Part 2](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-2-ShinyStructure.html), [Part 3](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-3-ShinyTools.html), [Part 4](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-4-BuildShinyAppPart1.html), [Part 5](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-5-BuildShinyAppPart2.html), [Part 6](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-6-BuildShinyAppPart3.html), [Part 7](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-7-BuildShinyAppPart4.html), [Part 8](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-8-BuildShinyAppPart5.html), [Part 9](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/numerai-explorer/9-9-BuildShinyAppFinalPart.html))
 * Crypto Punks NFT Value Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/cryptopunks/cryptopunks.html#1), [Video](https://youtu.be/mhx9dU0DbT8))
 * Hashmask Rarity Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/hashmasks/Hashmasks.html), [Video](https://youtu.be/qeMfaO3wQ1w))
-* Geocoding and Mapping Cryptojobs ([Slides](), [Video](https://www.youtube.com/watch?v=ja7zufUyeG0))
-* Cryptojobs Exploratory Data Analysis ([Slides](), [Video](https://www.youtube.com/watch?v=d8ucLHZ7He8))
+* Geocoding and Mapping Cryptojobs ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/crypto-jobs/crypto_jobs.html#1), [Video](https://www.youtube.com/watch?v=ja7zufUyeG0))
+* Cryptojobs Exploratory Data Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/crypto-jobs-part2/crypto_jobs_part2.html#1), [Video](https://www.youtube.com/watch?v=d8ucLHZ7He8))
+* Making Graphs fun with BadgerDAO ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/badger-dao/badger.html))
+* An Exploratory Data Analysis of PoolTogether ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/pool-together/pool.html#1))
+* An Exploratory Data Analysis of Yearn.Finance ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/yearn/yearn.html#1))
+* Interacting with the Covalent API via httr ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/covalent/covalent.html))
 
-Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks*
+Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance*
 
 ## Updates
 
@@ -96,6 +100,14 @@ Change log
 * 3 New case studies
 * Various copy edits
 
+*Gitcoin Grant Round 12*
+
+Our update for this round is on the smaller side. We have fixed a few links and added a couple of case new case studies.  If you can, be a little patient with us. We're going to try to come back with some big updates for the next round.  Stay tuned!
+
+Change log
+* 2 New case studies
+* Various link fixes and copy edits
+
 ## FAQ
 
 *Do you all have experience in this stuff?*  
@@ -122,3 +134,7 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 * [Tornado Cash](https://tornado.cash/)
 * [Hashmasks](https://www.thehashmasks.com/)
 * [Cryptojobs](https://cryptojobs.com/)
+* [BadgerDAO](https://badger.com/)
+* [Yearn.Finance](https://yearn.finance/)
+* [Covalent](https://www.covalenthq.com/)
+* [PoolTogether](https://pooltogether.com/)
