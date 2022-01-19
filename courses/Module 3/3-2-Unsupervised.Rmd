@@ -1,0 +1,112 @@
+---
+title: "Unsupervised Learning  <br> <br> <br>"
+author: ""
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+```
+
+## Obective
+
+Survey data of adults adapted from the census. We would like to understand characteristics and guess at who might be the ethereum holders in the data!
+
+When given unlabelled data, we use unsupervised methods to try and segment or find groups within the dataset.
+
+---
+
+## Dataset
+
+
+
+```{r}
+load("data/data.RDS")
+
+head(data)
+
+```
+
+## Ethereum holder profile
+
+We can look at online surveys to see what might be an ideal ethereum holder profile. 
+If we do not currently have ituition about the data, this is an easy way to build some background or domain knowledge.
+
+Ideal profile: 
+
+- 70% are Male
+- 58% are aged under 34 or between 18-44
+- 82% have a Bachelor’s degree or higher 
+- 36% have an annual income over US$100k
+
+Let us see what are the different groups of adults in this dataset. In order to do this we will need to learn some unsupervised clustering techniques
+
+---
+
+## K means clustering
+
+K means is a technique that groups data points or observations into k groups in the data. The data is grouped based on feature similarity.
+
+The algorithm allocates k centroids to the tries to minimize the distance from each data point to the centroid. In other words it tries to find the most similar data points around a representative centroid.
+
+The formal algorithm is as follows:
+
+- Choose the number of clusters k
+- Select k random points from the data as cluster centroids
+- Assign all the other surrounding data points to the closest centroid
+- Recompute the centroids of newly formed clusters
+- Repeat the 3rd and 4th steps till the data points remain in the same cluster/ till the centroids do not change. 
+  
+Alternatively we can have a stopping criteria of maximum iterations. For e.g, 100 iterations 
+
+---
+
+## Similarity
+
+The concept of similarity is important in understanding how the input data is grouped. Each data point can be visualized as a vector or a collection of numeric values.
+
+In this example we use a distance metric called euclidean distance which is calculated as follows:
+
+---
+
+## K means
+
+Here we carry out a k means analysis using the numeric variables
+
+```{r}
+# normalize numeric values
+set.seed(1234)
+data_clus <- data %>% 
+  rowid_to_column() %>%
+  filter(owns_ethereum == "TRUE") %>%
+  select(where(is.numeric)) %>%
+  na.omit()
+mymat <- scale(data_clus[,-1])
+
+myclust <- kmeans(x = mymat, centers = 8)
+
+summary(myclust)
+
+data_clus$Cluster <- myclust$cluster
+
+```
+
+---
+
+## Evaluation
