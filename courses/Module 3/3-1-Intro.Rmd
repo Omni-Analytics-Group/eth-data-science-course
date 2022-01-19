@@ -1,0 +1,37 @@
+---
+title: "Introduction to Machine Learning  <br> <br> <br>"
+author: ""
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+## Basics
+
+## Tidymodels
+
+## DDEMA
+
+-	Defining the problem well to create mathematical objective
+-	Data Ingestion - collecting
+-	Exploration and Validation - summary stats, error detection
+  -	Data Wrangling (Cleaning) 
+  -	Data Labeling 
+-	Model Engineering pipeline
+  -	Data splitting into train and test
+  -	Feature engineering
+  -	Hyperparam tuning
+-	Action 
