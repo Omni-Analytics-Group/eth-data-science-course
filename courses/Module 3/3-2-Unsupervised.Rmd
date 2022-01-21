@@ -19,6 +19,12 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ```
 
+# Contents
+
+- Group the ethereum holders dataset using k means clustering
+- Evaluation metrics and analysis of number of clusters
+- Visualization of clusters
+- Other Methods: k means, pam, hclust - dendograms?
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
@@ -37,16 +43,16 @@ When given unlabelled data, we use unsupervised methods to try and segment or fi
 
 
 ```{r}
-load("data/data.RDS")
+load("data_new.RDS")
 
-head(data)
+data <- data_new
 
 ```
 
 ## Ethereum holder profile
 
 We can look at online surveys to see what might be an ideal ethereum holder profile. 
-If we do not currently have ituition about the data, this is an easy way to build some background or domain knowledge.
+If we do not currently have intuition about the data, this is an easy way to build some background or domain knowledge.
 
 Ideal profile: 
 
@@ -81,7 +87,6 @@ Alternatively we can have a stopping criteria of maximum iterations. For e.g, 10
 
 The concept of similarity is important in understanding how the input data is grouped. Each data point can be visualized as a vector or a collection of numeric values.
 
-In this example we use a distance metric called euclidean distance which is calculated as follows:
 
 ---
 
@@ -94,12 +99,12 @@ Here we carry out a k means analysis using the numeric variables
 set.seed(1234)
 data_clus <- data %>% 
   rowid_to_column() %>%
-  filter(owns_ethereum == "TRUE") %>%
+  #filter(owns_ethereum == "TRUE") %>%
   select(where(is.numeric)) %>%
   na.omit()
 mymat <- scale(data_clus[,-1])
 
-myclust <- kmeans(x = mymat, centers = 8)
+myclust <- kmeans(x = mymat, centers = 6)
 
 summary(myclust)
 
@@ -110,3 +115,123 @@ data_clus$Cluster <- myclust$cluster
 ---
 
 ## Evaluation
+
+---
+
+## Viz
+
+```{r}
+mymat <- as.data.frame(sapply(data_clus[,-1], function(x) { (x - min(x)) / (max(x) - min(x)) }))
+mymat$Cluster <- myclust$cluster 
+
+## Produce group averages
+data_clus %>%
+    group_by(Cluster) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean)) %>%
+    round()
+
+```
+
+---
+
+### Principal Coordinate Plot
+
+- Way to create side by side visualizations to compare the average feature values in each cluster
+
+Scaling to create comparable plots
+
+
+```{r}
+scaled_clus_avg <- mymat %>%
+    group_by(Cluster) %>%
+    mutate(Size = n()) %>%
+    unite(col = Cluster, Cluster, Size, sep = " size:") %>%
+    group_by(Cluster) %>%
+    summarise_all(funs(mean))
+
+```
+
+---
+
+```{r}
+#PCP
+melted_df <- scaled_clus_avg %>% 
+    gather(key=variable, value = value, 2:(ncol(.))) %>%
+    mutate(Cluster = factor(Cluster),
+           variable = factor(variable, levels = names(scaled_clus_avg)[-1]))
+
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) + theme_bw() +
+    facet_wrap(~Cluster, labeller = label_both) +
+    scale_color_brewer(palette = "Dark2") +
+    theme(strip.text = element_text(face = "bold"),
+          #strip.background = element_rect(fill = "#edc0af"), 
+          axis.text.x = element_text(angle=30, hjust=1, face = "bold"), 
+          axis.text.y = element_text(face="bold"), 
+          legend.position = "off")
+
+```
+
+
+## Check categorical vars 
+
+Most common profiles
+
+```{r, fig.height=8}
+
+get_mode <- function(v) {
+    uniqv <- unique(v)
+    uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+data_clus %>%
+    select(-rowid) %>%
+    group_by(Cluster) %>%
+    summarise_all(funs(get_mode(.))) %>%
+    data.frame()
+
+
+```
+
+---
+
+```{r}
+data %>%
+    group_by(owns_ethereum) %>%
+    summarise(n = n(), nperc = n/nrow(data)*100)
+
+data %>%
+    group_by(owns_ethereum, donated) %>%
+    summarise(n = n(), nperc = n/nrow(data)*100)
+
+```
+
+---
+
+```{r}
+# % of Male
+data %>%
+ group_by(owns_ethereum, sex) %>%
+ summarise(n = n(), nperc = n/nrow(.)*100) 
+
+data %>%
+  #select(-rowid) %>%
+  count(sex, owns_ethereum) %>%
+  group_by(owns_ethereum) %>% # to find what prop of true are female
+  mutate(prop = n/sum(n))
+
+``` 
+
+---
+
+```{r}
+# viz
+# numerical vars
+library(GGally)
+data_clus %>%
+    select(where(is.numeric)) %>%
+    ggpairs(aes(color = as_factor(Cluster), alpha = 0.5))
+
+```
+

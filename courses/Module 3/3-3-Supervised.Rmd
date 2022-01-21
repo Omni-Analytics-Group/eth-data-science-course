@@ -1,0 +1,368 @@
+---
+title: "Supervised Learning  <br> <br> <br>"
+author: ""
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+
+```
+
+# Contents
+
+- ML workflow using tidymodels
+- Dataset and definitions
+- Exploration and Validation - summary stats, error detection
+- Data Wrangling (Cleaning)
+- Data Labeling, Data Splitting into train and test
+- Modeling: Classify data as ethereum holders vs non holders using machine learning techniques
+- cart, svm, glm, rf, nb
+- Evaluation metrics and class balance accuracy - 
+- Improving model: Feature engineering
+- Variable Importance
+- Other improvements: Cross validation, Tuning for better hyperparameters
+
+---
+
+## Glossary
+
+- Features
+- Hyperparameters
+- Accuracy
+
+---
+
+## Tidymodels metapackage
+
+Each of the packages assist with different aspects of a machine learning workflow. Listed here https://www.tidymodels.org/packages/
+
+The following packages have been used in this analysis:
+
+- recipes: data pre-processing tools for feature engineering
+- parsnip: for model setup and execution
+- yardstick: for model assessment
+- workflows: to bundle pre-processing, modeling and post-processing together
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(tidymodels)
+```
+
+---
+
+## Analysis
+
+```{r}
+load("data_new.RDS")
+
+data <- data_new %>%
+    mutate(across(where(is.character), as_factor))
+data_split <- data %>%
+    initial_split()
+data_train <- training(data_split)
+data_test <- testing(data_split)
+
+```
+
+---
+
+### Exploratory Analysis
+
+Outliers in hours per week and capital gain
+
+```{r}
+summary(data_train)
+
+data_train <- data_train %>%
+    mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
+    mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) 
+
+data_train %>%
+    skimr::skim()
+```
+
+---
+
+Visualization
+
+```{r}
+# numerical vars
+library(GGally)
+data_train %>%
+    select(owns_ethereum, age, education_num, capital_gain, capital_loss, hours_per_week) %>%
+    ggpairs(columns = 2:6, aes(color = owns_ethereum, alpha = 0.5))
+
+# categorical vars - note NAs
+data_train %>%
+    select(
+        workclass, marital_status, occupation,
+        relationship, race, sex, native_country, donated, owns_ethereum
+    ) %>%
+    pivot_longer(workclass:donated) %>%
+    ggplot(aes(y = value, fill = owns_ethereum)) +
+    geom_bar(position = "fill", na.rm = FALSE) +
+    facet_wrap(vars(name), scales = "free") +
+    labs(x = NULL, y = NULL, fill = NULL)
+
+```
+
+---
+
+### Simple model
+
+Creating logistic regression and random forest models.  
+  
+First we create specifications for each model.
+
+
+```{r}
+set.seed(234)
+
+## glm specification 
+glm_spec <- logistic_reg(mode = "classification") %>%
+    set_engine("glm")
+
+## random forest specification
+rf_spec <- rand_forest() %>%
+    set_mode("classification") %>%
+    set_engine("ranger")
+
+```
+
+---
+
+: As an example we also create a workflow object which can hold the modeling pipeline, consisting of specifications, formula and any of the pre-processing or post processing pieces.  
+
+```{r}
+## creating a workflow
+model_wf <- workflow() 
+```
+
+The workflow just holds the framework. For this simple run we will just use the model without using a workflow.
+
+---
+
+```{r}
+
+rf_rs <- rf_spec %>%
+    fit(owns_ethereum ~ . -native_country, data = na.omit(data_train))
+rf_rs
+
+glm_rs <- glm_spec  %>%
+    fit(owns_ethereum ~ . -native_country, data = na.omit(data_train))
+
+```
+
+---
+
+**Evaluation**
+
+Use the yardstick package within tidymodels to find define test metrics eg,accuracy 
+
+```{r}
+predictions_glm <- glm_rs %>%
+  predict(new_data = na.omit(data_test)) %>%
+  bind_cols(na.omit(data_test) %>% select(owns_ethereum))
+head(predictions_glm)
+#confusion matrix
+predictions_glm %>%
+    conf_mat(owns_ethereum, .pred_class)
+```
+
+---
+### Remembering class balance accuracy
+
+From Module 2 Basics, slide 10. Accuracy can be high but precision low
+
+```{r}
+# create a metric set for calculating at once
+class_metrics <- metric_set(accuracy, precision, recall, f_meas)
+predictions_glm %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+---
+
+```{r}
+# RF
+predictions_rf <- rf_rs %>%
+  predict(new_data = na.omit(data_test)) %>%
+  bind_cols(na.omit(data_test) %>% select(owns_ethereum))
+
+predictions_rf %>%
+    conf_mat(owns_ethereum, .pred_class)
+
+predictions_rf %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+---
+
+## Improvements: Pre-processing using Recipes package
+
+Recipe is a sequence of steps defining all the pre-processing like imputation, removing predictors, scaling and one hot encoding.
+We were omitting NAs earlier, now we do some preprocessing to handle it.
+
+Adding: 
+
+- step to impute data for missing
+- step to collapse categories since too many small categories in the occupation and workclass variables
+
+```{r}
+
+# create recipe to preprocess the data
+recipe_simple <- recipe(formula = owns_ethereum ~ ., data = data_train) %>%
+    #update_role(row_id, new_role = "id") %>%
+    step_other(all_nominal_predictors(), threshold = 0.05) %>% # for collapsing infrequent categories 
+    step_unknown(all_nominal_predictors())  # missing values are converted to 'unknown'
+    
+recipe_simple %>%
+    prep()
+# use it on train and test data (prep and then bake)
+train_baked <- recipe_simple %>%
+    prep() %>%
+    bake(new_data = NULL)
+
+test_baked  <- recipe_simple %>%
+    prep() %>%
+    bake(new_data = data_test)
+
+#try earlier spec with newly prepped data
+# glm
+glm_rs_wprep <- glm_spec  %>%
+    fit(owns_ethereum ~ ., data = train_baked)
+glm_rs_wprep
+
+#rf
+rf_rs_wprep <- rf_spec %>%
+    fit(owns_ethereum ~ ., data = train_baked)
+rf_rs_wprep
+
+```
+
+---
+
+Better. Now fit on test data
+
+```{r}
+predictions_glm <- glm_rs_wprep %>%
+  predict(new_data = test_baked) %>%
+  bind_cols(test_baked %>% select(owns_ethereum))
+
+#confusion matrix
+predictions_glm %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_glm %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+predictions_rf <- rf_rs_wprep %>%
+  predict(new_data = test_baked) %>%
+  bind_cols(test_baked %>% select(owns_ethereum))
+
+predictions_rf %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_rf %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+--- 
+
+## Variable Importance
+
+```{r}
+library(vip)
+
+imp_data <- recipe_simple %>%
+  prep() %>%
+  bake(new_data = NULL) 
+
+rf_spec %>%
+  set_engine("ranger", importance = "permutation") %>%
+  fit(owns_ethereum ~ ., data = imp_data) %>%
+  vip(geom = "point")
+```
+
+---
+
+## Other Improvements: Cross validation 
+
+To improve the model's predictive power we use package rsample to create a 10 fold cross validation set on the training data.
+
+Added:
+
+- cross validation
+
+```{r, eval=FALSE}
+set.seed(234)
+data_folds <- vfold_cv(data_train, strata = owns_ethereum)
+data_folds
+
+rf_rs_cv <- model_wf %>%
+   add_recipe(recipe_simple) %>% # no need to prep as the recipe needs to be applied on folds
+   add_model(rf_spec) %>%
+   fit_resamples(
+     resamples = data_folds,
+     metrics = class_metrics,
+     control = control_resamples(save_pred = TRUE)
+   )
+#best model 
+show_best(rf_rs_cv, metric = "recall")
+
+collect_metrics(rf_rs_cv)
+
+collect_predictions(rf_rs_cv) %>%
+  conf_mat(owns_ethereum, .pred_class)
+# collect_predictions(rf_rs_cv) %>%
+#   group_by(id) %>%
+#   roc_curve(owns_ethereum, .pred_class) %>%
+#   autoplot()
+   
+```
+
+**Evaluation**
+
+```{r eval=FALSE}
+
+## as test and train were given separately - making manual splits in order to use last_fit() 
+combined <- bind_rows(data_train, data_test)
+ind <- list(
+  analysis = seq(nrow(data_train)),
+  assessment = nrow(data_train) + seq(nrow(data_test))
+  )
+splits <- make_splits(ind, combined)
+
+## 
+predictions_final <- model_wf %>%
+  add_recipe(recipe_simple) %>%
+  add_model(rf_spec) %>%
+  last_fit(splits)
+
+collect_predictions(predictions_final) %>%
+  conf_mat(owns_ethereum, .pred_class) %>%
+  summary() %>%
+  select(-.estimator) %>%
+  filter(.metric %in%
+    c("accuracy", "precision", "recall", "f_meas"))
+
+## Output
+# .metric  .estimate
+
+# accuracy	0.8637676			
+# precision	0.8867439			
+# recall	0.9419381			
+# f_meas	0.9135080	
+```
+
