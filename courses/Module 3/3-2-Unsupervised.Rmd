@@ -19,49 +19,46 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ```
 
-# Contents
+## Outline
 
 - Group the ethereum holders dataset using k means clustering
 - Evaluation metrics and analysis of number of clusters
 - Visualization of clusters
 - Other Methods: k means, pam, hclust - dendograms?
 
-```{r, message = FALSE, warning = FALSE}
-library(tidyverse)
-```
+---
 
-## Obective
+## Glossary
 
-Survey data of adults adapted from the census. We would like to understand characteristics and guess at who might be the ethereum holders in the data!
+- Observation
+- Cluster
 
-When given unlabelled data, we use unsupervised methods to try and segment or find groups within the dataset.
+---
+
+## Objective
+
+We are given data from a survey of adults adapted from the census. We would like to understand characteristics of the Ethereum holders in the data. One way of understanding the kinds of Ethereum holders is to categorize them into groups based on how similar they are to each other.  
+
+Since we do not currently have the categories, this is an unlabelled dataset. When given unlabelled data, we use unsupervised methods to try and segment or find groups within the dataset.
 
 ---
 
 ## Dataset
 
+Let us read in the dataset, filter it to take only the Ethereum owners and prepare it by removing any NA values
 
 
-```{r}
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+
 load("data_new.RDS")
 
-data <- data_new
+data_clus <- data_new %>%
+  filter(owns_ethereum == "TRUE") %>%
+  select(where(is.numeric)) %>%
+  na.omit()
 
 ```
-
-## Ethereum holder profile
-
-We can look at online surveys to see what might be an ideal ethereum holder profile. 
-If we do not currently have intuition about the data, this is an easy way to build some background or domain knowledge.
-
-Ideal profile: 
-
-- 70% are Male
-- 58% are aged under 34 or between 18-44
-- 82% have a Bachelor’s degree or higher 
-- 36% have an annual income over US$100k
-
-Let us see what are the different groups of adults in this dataset. In order to do this we will need to learn some unsupervised clustering techniques
 
 ---
 
@@ -75,7 +72,7 @@ The formal algorithm is as follows:
 
 - Choose the number of clusters k
 - Select k random points from the data as cluster centroids
-- Assign all the other surrounding data points to the closest centroid
+- Assign all the other surrounding data points to the closest centroid (SSE explanation)
 - Recompute the centroids of newly formed clusters
 - Repeat the 3rd and 4th steps till the data points remain in the same cluster/ till the centroids do not change. 
   
@@ -87,62 +84,61 @@ Alternatively we can have a stopping criteria of maximum iterations. For e.g, 10
 
 The concept of similarity is important in understanding how the input data is grouped. Each data point can be visualized as a vector or a collection of numeric values.
 
-
+TODO 
+SSE-For our clusters to be effective we need the observations in different clusters to be very different and the observations within the same cluster to be very similar. 
 ---
 
 ## K means
 
 Here we carry out a k means analysis using the numeric variables
 
+TODO 
+-assessing number of clusters k
+-why scale
+
 ```{r}
-# normalize numeric values
 set.seed(1234)
-data_clus <- data %>% 
-  rowid_to_column() %>%
-  #filter(owns_ethereum == "TRUE") %>%
-  select(where(is.numeric)) %>%
-  na.omit()
+
+# normalize numeric values
 mymat <- scale(data_clus[,-1])
 
-myclust <- kmeans(x = mymat, centers = 6)
+myclust <- kmeans(x = mymat, centers = 3)
 
 summary(myclust)
-
+# add the cluster assignment
 data_clus$Cluster <- myclust$cluster
 
 ```
 
----
-
-## Evaluation
 
 ---
 
-## Viz
+## Visualize the groups
+
+Since there are multiple features in the data, we can't easily visualize how good the clusters are by using scatterplots. One way to visualize the clusters is by using tables.
 
 ```{r}
-mymat <- as.data.frame(sapply(data_clus[,-1], function(x) { (x - min(x)) / (max(x) - min(x)) }))
-mymat$Cluster <- myclust$cluster 
-
 ## Produce group averages
 data_clus %>%
     group_by(Cluster) %>%
     mutate(Size = n()) %>%
     summarise_all(funs(mean)) %>%
     round()
-
 ```
 
 ---
 
-### Principal Coordinate Plot
+### Parallel Coordinate Plot
 
-- Way to create side by side visualizations to compare the average feature values in each cluster
 
-Scaling to create comparable plots
+This is another way to create side by side visualizations to compare the average feature values in each cluster
+Similar to how we needed to scale the data before clustering, we need to make sure the values are of asimilar scale so that we can compare oroportions
 
 
 ```{r}
+mymat <- as.data.frame(sapply(data_clus[,-1], function(x) { (x - min(x)) / (max(x) - min(x)) }))
+mymat$Cluster <- myclust$cluster 
+
 scaled_clus_avg <- mymat %>%
     group_by(Cluster) %>%
     mutate(Size = n()) %>%
@@ -154,7 +150,7 @@ scaled_clus_avg <- mymat %>%
 
 ---
 
-```{r}
+```{r eval=FALSE}
 #PCP
 melted_df <- scaled_clus_avg %>% 
     gather(key=variable, value = value, 2:(ncol(.))) %>%
@@ -173,8 +169,29 @@ ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
 
 ```
 
+---
+```{r echo=FALSE}
+#PCP
+melted_df <- scaled_clus_avg %>% 
+    gather(key=variable, value = value, 2:(ncol(.))) %>%
+    mutate(Cluster = factor(Cluster),
+           variable = factor(variable, levels = names(scaled_clus_avg)[-1]))
 
-## Check categorical vars 
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) + theme_bw() +
+    facet_wrap(~Cluster, labeller = label_both) +
+    scale_color_brewer(palette = "Dark2") +
+    theme(strip.text = element_text(face = "bold"),
+          #strip.background = element_rect(fill = "#edc0af"), 
+          axis.text.x = element_text(angle=30, hjust=1, face = "bold"), 
+          axis.text.y = element_text(face="bold"), 
+          legend.position = "off")
+
+```
+
+---
+
+## 
 
 Most common profiles
 
@@ -186,42 +203,12 @@ get_mode <- function(v) {
 }
 
 data_clus %>%
-    select(-rowid) %>%
     group_by(Cluster) %>%
     summarise_all(funs(get_mode(.))) %>%
     data.frame()
 
-
 ```
 
----
-
-```{r}
-data %>%
-    group_by(owns_ethereum) %>%
-    summarise(n = n(), nperc = n/nrow(data)*100)
-
-data %>%
-    group_by(owns_ethereum, donated) %>%
-    summarise(n = n(), nperc = n/nrow(data)*100)
-
-```
-
----
-
-```{r}
-# % of Male
-data %>%
- group_by(owns_ethereum, sex) %>%
- summarise(n = n(), nperc = n/nrow(.)*100) 
-
-data %>%
-  #select(-rowid) %>%
-  count(sex, owns_ethereum) %>%
-  group_by(owns_ethereum) %>% # to find what prop of true are female
-  mutate(prop = n/sum(n))
-
-``` 
 
 ---
 

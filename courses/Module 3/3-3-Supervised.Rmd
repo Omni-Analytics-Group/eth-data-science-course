@@ -19,12 +19,15 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ```
 
-# Contents
+## Outline
 
+We should have covered:
 - ML workflow using tidymodels
-- Dataset and definitions
+- Dataset and definition
 - Exploration and Validation - summary stats, error detection
 - Data Wrangling (Cleaning)
+
+We will cover:
 - Data Labeling, Data Splitting into train and test
 - Modeling: Classify data as ethereum holders vs non holders using machine learning techniques
 - cart, svm, glm, rf, nb
@@ -38,6 +41,8 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 ## Glossary
 
 - Features
+- Response/Dependent variable
+- Explanatory/Independent variable
 - Hyperparameters
 - Accuracy
 
@@ -61,7 +66,13 @@ library(tidymodels)
 
 ---
 
-## Analysis
+## Objective
+
+We are given data from a survey of adults adapted from the census. We would like to understand characteristics of the ethereum holders vs non ethereum holders in the data. 
+
+Since we have the label column "owns_ethereum" we can use this as our response variable and create a predictive model. The model will learn how to classify an abservation into owns_ethereum = TRUE or FALSE
+
+
 
 ```{r}
 load("data_new.RDS")
@@ -79,18 +90,11 @@ data_test <- testing(data_split)
 
 ### Exploratory Analysis
 
-Outliers in hours per week and capital gain
-
-```{r}
-summary(data_train)
-
-data_train <- data_train %>%
-    mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
-    mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) 
-
-data_train %>%
-    skimr::skim()
-```
+- Outliers in hours per week and capital gain
+    - summary or use boxplots 
+- See which variables contribute to more (age, edu, donated) or less(workclass, marital status) of a difference between the owners and non owners. which variables are more important
+    - use visualizations
+    - random forest way
 
 ---
 
