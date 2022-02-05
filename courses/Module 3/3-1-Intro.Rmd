@@ -84,27 +84,25 @@ library(tidyverse)
 load("data_new.RDS")
 
 ```
----
+
 Let's look at the dimensions of the data
 ```{r}
 dim(data_new)
 ```
+
+---
+
 and the first few rows
 ```{r}
 head(data_new)
 ```
-notice that the owns_ethereum column is shown as character
+notice that the owns_ethereum column is shown as character, this can be converted to a factor data type to be represented correctly
 
 ---
 
-Look at the summary
-```{r}
-summary(data_new)
-```
----
 ## Assigning data types
 
-Convert owns_ethereum and the character variables to factor data type
+Convert owns_ethereum and other character variables to factor data type
 now try summary again
 
 ```{r}
@@ -119,20 +117,19 @@ summary(data)
 also note max of '99999' in capital_gain colum and '99' in hours_per_week. Let's look at these two columns again.
 
 ---
-## look at a basic histogram 
+## Histogram to see capital gain and hours_per_week
 
 ```{r}
 ggplot(data, aes(x = capital_gain)) +
   geom_histogram()
 ggplot(data, aes(x = hours_per_week)) +
   geom_histogram()
-ggplot(data, aes(x = owns_ethereum, y = capital_gain)) +
-  geom_boxplot()
 ```
+---
 
 ## Missing Values
 
-- 9999 in capital_gain and hours_per_week encoded to denote missing values 
+- 9999 in capital_gain and 99 in hours_per_week were encoded to denote missing values 
 - Code to convert these to NA
 
 ```{r}
@@ -144,6 +141,7 @@ data <- data %>%
 
 # Summary using skimr
 
+skimr is a useful package to view distributions and missing values in columns
 ```{r, eval=FALSE, fig.keep='none'}
 library(skimr)
 data %>%
@@ -160,7 +158,8 @@ data %>%
 
 ## Ask questions
 
-prop of owners
+What is the proportion of owners vs non owners?
+
 ```{r}
 data %>%
     group_by(owns_ethereum) %>%
@@ -169,7 +168,8 @@ data %>%
 
 ---
 
- % of Male
+What is the percentage of Male vs Female owners?
+
 ```{r}
 data %>%
  filter(owns_ethereum == "TRUE") %>%
@@ -179,26 +179,21 @@ data %>%
 
 ---
 
-Donors
+What percentage of ethereum owners are also donors?
 
-find what prop of owners are donors
 ```{r}
-# old syntax
 data %>%
     filter(owns_ethereum == "TRUE") %>%
     group_by(donated) %>%
     summarise(n = n(), nperc = n/nrow(.)*100)
 
-data %>%
-  count(donated, owns_ethereum) %>%
-  group_by(owns_ethereum) %>% mutate(prop = n/sum(n))
 ```
 
 ---
 
-Most common profiles 
-find the mode or the most frequently occurring features-- need to know applying functions
+Most common characteristics or features.
 
+Find the mode or the most frequently occurring features -- need to know applying functions
 
 ```{r, fig.height=8}
 
@@ -215,7 +210,7 @@ data %>%
 
 ```
 
-We see that donors and higher education, lower age, are more in number in the owns_ethereum = TRUE group
+We see that donors, and higher education, lower age, are more in number in the owns_ethereum = TRUE group
 
 ---
 
@@ -226,17 +221,17 @@ We can test these findings for statistical significance. t test to see differenc
 ```{r}
 t.test(age ~ owns_ethereum, data = data)
 ```
-
 ---
 
 ```{r}
 t.test(education_num ~ owns_ethereum, data = data)
 ```
+
+We see that there is a significant difference (p<0.05) between the age, and education of ethereum owners vs non owners
+
 ---
 
 ## Visualizations
-
-We can also look at these variables using boxplots
 
 ```{r}
 ggplot(data, aes(x = owns_ethereum, y = education_num)) +
@@ -245,15 +240,14 @@ ggplot(data, aes(x = owns_ethereum, y = education_num)) +
 ggplot(data, aes(x = owns_ethereum, y = age)) +
   geom_boxplot()
 
-ggplot(data, aes(x = owns_ethereum, y = capital_loss)) +
-  geom_boxplot()
 ggplot(data, aes(x = owns_ethereum, y = hours_per_week)) +
   geom_boxplot()
 ```
 
 ---
 
-One trick to look at multiple variables at the same time
+One trick to look at multiple variables at the same time, is to use pair plots and color the points by the owns_ethereum variable.
+
 Use the GGally package to create pair plots of all the variables
 ```{r, eval=FALSE, fig.show='hold'}
 library(GGally)
@@ -271,6 +265,8 @@ data %>%
     ggpairs(columns = 2:6, aes(color = owns_ethereum, alpha = 0.5))
 ```
 ---
+
+For categorical variables it helps to see the proportions to understand which variables contribute more to the groups
 
 ```{r cat, eval=FALSE, fig.show='hold'}
 # categorical vars - note NAs
@@ -310,7 +306,7 @@ data %>%
  
 Answer the question using visuals and a statistical test
 
-- Do older adults donate more
+- Do older adults donate more?
 
 ---
 
@@ -319,7 +315,11 @@ Answer
 ```{r}
 ggplot(data, aes(x = donated, y = age)) +
   geom_boxplot()
+```
 
+---
+
+```{r}
 t.test(age ~ donated, data)
 ```
 

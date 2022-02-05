@@ -39,7 +39,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 We are given data from a survey of adults adapted from the census. We would like to understand characteristics of the Ethereum holders in the data. One way of understanding the kinds of Ethereum holders is to categorize them into groups based on how similar they are to each other.  
 
-Since we do not currently have the categories, this is an unlabelled dataset. When given unlabelled data, we use unsupervised methods to try and segment or find groups within the dataset.
+Since we do not currently have the categories, this is an unlabelled dataset. When given unlabelled data, we use can unsupervised methods to cluster or find groups within the dataset.
 
 ---
 
@@ -55,7 +55,8 @@ load("data_new.RDS")
 
 data_clus <- data_new %>%
   filter(owns_ethereum == "TRUE") %>%
-  select(where(is.numeric)) %>%
+  mutate(donated = as.numeric(as.logical(donated))) %>% # change to 0 and 1 
+  select(where(is.numeric)) %>% # --TODO save this in a csv so that user doesn't filter
   na.omit()
 
 ```
@@ -93,14 +94,13 @@ SSE-For our clusters to be effective we need the observations in different clust
 Here we carry out a k means analysis using the numeric variables
 
 TODO 
--assessing number of clusters k
--why scale
+- why scale
 
 ```{r}
 set.seed(1234)
 
 # normalize numeric values
-mymat <- scale(data_clus[,-1])
+mymat <- as.data.frame(sapply(data_clus, function(x) { (x - min(x)) / (max(x) - min(x)) }))
 
 myclust <- kmeans(x = mymat, centers = 3)
 
@@ -110,6 +110,32 @@ data_clus$Cluster <- myclust$cluster
 
 ```
 
+---
+
+## Deciding the number of clusters
+
+'k' is commonly decided by trying different numbers of groups. We decide to decrease k if there are many highly similar groups or increase the k if we think there should be more variety of groups.
+
+Another way to visually decide on the number of clusters is to use the elbow method, where we create multiple clusters and extract the total within-cluster sum of squares value from each model. 
+
+We want to know the value of 'k' that decreases the within-cluster sum of squares the most (has the clusters with individuals most like each other), at the same time the clusters are not redundant. This is commonly found at the elbow of the plot, which is the last value of k before the slope levels off.
+
+```{r eval=FALSE}
+# run many models with varying value of k 
+tot_withinss <- map_dbl(1:10,  function(k){
+  model <- kmeans(x = mymat, centers = k)
+  model$tot.withinss
+})
+# Generate a data frame containing both k and tot_withinss
+elbow_df <- data.frame(
+  k = 1:10,
+  tot_withinss = tot_withinss
+)
+# Plot the elbow plot
+ggplot(elbow_df, aes(x = k, y = tot_withinss)) +
+  geom_line() + geom_point()+
+  scale_x_continuous(breaks = 1:10)
+```
 
 ---
 
@@ -136,7 +162,6 @@ Similar to how we needed to scale the data before clustering, we need to make su
 
 
 ```{r}
-mymat <- as.data.frame(sapply(data_clus[,-1], function(x) { (x - min(x)) / (max(x) - min(x)) }))
 mymat$Cluster <- myclust$cluster 
 
 scaled_clus_avg <- mymat %>%
@@ -213,12 +238,87 @@ data_clus %>%
 ---
 
 ```{r}
-# viz
-# numerical vars
 library(GGally)
 data_clus %>%
-    select(where(is.numeric)) %>%
-    ggpairs(aes(color = as_factor(Cluster), alpha = 0.5))
+    ggpairs(columns = 1:6, aes(color = as_factor(Cluster), alpha = 0.5))
+```
 
+---
+
+## HCLUST
+
+```{r}
+
+
+```
+---
+
+## Your Turn
+
+Find well separated groups from the entire dataset.
+
+- How many different clusters have you settled at?
+- Are you able to see which features distinguish the ethereum holders from the non ethereum holders?
+
+---
+
+## Answer
+
+```{r}
+## read in data
+load("data_new.RDS")
+
+data_clus <- data_new %>%
+  mutate(donated = as.numeric(as.logical(donated))) %>% # change to 0 and 1 
+  select(where(is.numeric)) %>% # --TODO save this in a csv so that user doesn't filter
+  na.omit()
+
+## Clustering
+set.seed(234)
+
+# normalize numeric values
+mymat <- as.data.frame(sapply(data_clus, function(x) { (x - min(x)) / (max(x) - min(x)) }))
+
+myclust <- kmeans(x = mymat, centers = 5)
+
+summary(myclust)
+
+# add the cluster assignment
+data_clus$Cluster <- myclust$cluster
+
+## Produce group averages
+data_clus %>%
+  group_by(Cluster) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean)) %>%
+    round()
+## Viz
+#PCP
+mymat$Cluster <- myclust$cluster 
+
+scaled_clus_avg <- mymat %>%
+    group_by(Cluster) %>%
+    mutate(Size = n()) %>%
+    unite(col = Cluster, Cluster, Size, sep = " size:") %>%
+    group_by(Cluster) %>%
+    summarise_all(funs(mean))
+
+melted_df <- scaled_clus_avg %>% 
+    gather(key=variable, value = value, 2:(ncol(.))) %>%
+    mutate(Cluster = factor(Cluster),
+           variable = factor(variable, levels = names(scaled_clus_avg)[-1]))
+
+```
+---
+```{r, echo=FALSE}
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) + theme_bw() +
+    facet_wrap(~Cluster, labeller = label_both) +
+    scale_color_brewer(palette = "Dark2") +
+    theme(strip.text = element_text(face = "bold"),
+          #strip.background = element_rect(fill = "#edc0af"), 
+          axis.text.x = element_text(angle=30, hjust=1, face = "bold"), 
+          axis.text.y = element_text(face="bold"), 
+          legend.position = "off")
 ```
 
