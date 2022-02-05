@@ -495,12 +495,22 @@ dt_fit %>%
 ---
 
 Evaluate
+-- check why more accuracy on test data
 
 ```{r}
 augment(dt_fit, new_data = data_train) %>%
   conf_mat(owns_ethereum, estimate = .pred_class)
 
-# On test data
+augment(dt_fit, new_data = data_train) %>%
+  class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+---
+
+On test data
+
+```{r}
 predictions_dt <- augment(dt_fit, new_data = data_test) 
 
 predictions_dt %>%
@@ -517,8 +527,21 @@ predictions_dt %>%
 ## XGBOOST
 
 xgboost does not have a means to translate factor predictors to grouped splits. Factor/categorical predictors need to be converted to numeric values (e.g., dummy or indicator variables) for this engine. When using the formula method via fit.model_spec(), parsnip will convert factor columns to indicators using a one-hot encoding.
-```{r}
 
+
+```{r}
+library(xgboost) # install.packages("xgboost")
+boost_spec <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+
+boost_fit <- fit(boost_spec, owns_ethereum ~ ., data = data_train)
+```
+---
+
+```{r}
+augment(boost_fit, new_data = data_test) %>%
+  conf_mat(truth = owns_ethereum, estimate = .pred_class)
 ```
 
 
