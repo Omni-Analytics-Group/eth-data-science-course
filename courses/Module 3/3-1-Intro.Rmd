@@ -1,5 +1,6 @@
 ---
-title: "Introduction to Machine Learning  <br> <br> <br>"
+title: "Introduction to Machine Learning <br>"
+subtitle: "Workflow and Data Exploration <br> <br>"
 author: "Omni Analytics Group"
 output:
   xaringan::moon_reader:
@@ -15,11 +16,11 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 5)
 
 ```
 
-## Module 3 Outline
+## Module 3 Outline - < to be Removed from slides >
 
 - Part 1: 
     - Intro to DDEMA: understand each of the steps of the data science process and learn the ML workflow. 
@@ -44,93 +45,118 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ---
 
-## DDEMA
+## Outline:
 
--	Defining the problem well to create mathematical objective
--	Data Ingestion - collecting
--	Exploration and Validation - summary stats, error detection
-  -	Data Wrangling (Cleaning) 
-  -	Data Labeling 
--	Model Engineering pipeline
-  -	Data splitting into train and test
-  -	Feature engineering
-  -	Hyperparam tuning
--	Action 
+- The DDEMA Process
+- Definition - D
+  - Problem statement and objective
+- Data - D
+  - Integrity checks and cleaning
+- Exploration - E
+  - Univariate analysis 
+  - Multivariate analysis
+  - Answering questions via data wrangling, and initial hypotheses
+  - Visualizations 
+- Testing statistical significance
 
 ---
 
-## Outline Data and exploration - DDE
+## The DDEMA Process
 
-- read in data
-- summary stats or using skimr package
-- Your turn: what are possible missing values? 
-    - In the adults dataset there are '?' instead of NA and 9999 encoded to denote missing values 
-    - Code to convert these to NA
-- Asking questions of the data: How many men as a proportion of the total men own ethereum? Same for women
-- T tests
-- Visualizations
+<p align="center">
+
+<img src="images/ddema.png" height="160px" caption="See Appendix">
+
+</p>
+
+-	Definition - define the problem well to create mathematical objective
+-	Data - collection process, completeness,  
+-	Exploration - data integrity, univariate and multivariate analysis
+-	Modeling - map the business problem to an appropriate statistical technique
+-	Action - bring model and results into action 
+
+---
+
+## Definition 
+
+The marketing team of a financial services company has approached us for helping them understand their customers. They would like us to find the characteristics of ethereum holders that differentiate them from non holders. 
+
+They were able to collect responses from some loyal customers, and would like to be able to predict whether a customer owns ethereum so that they can offer reward points in crypto or fiat accordingly.
+
+In this module, our objectives are to -  
+
+- Find distinguishing characteristics of ethereum owners: We will find this using statistical analysis and unsupervised machine learning techniques. 
+- Predict whether a new individual is an ethereum owner or not: We will find this using a number of supervised learning techniques.
 
 ---
 
 ## Data
 
-<data description: Our dataset is an adaptation of the census survey dataset, where we also have answers to the question "Do you own ethereum?" -- make possible joke about $5 attack>
+Our dataset is a survey response dataset containing certain demographic details of adults and whether or not they own ethereum.
 
-- load library for analysis
-- read in data
+Let's 
+
+- load **tidyverse** library for data analysis. It can be installed, if not already done so, using `install.packages("tidyverse")`
+- read in data and look at the dimensions of the data
 
 ```{r echo=TRUE}
 library(tidyverse)
 load("data_new.RDS")
 
-```
-
-Let's look at the dimensions of the data
-```{r}
 dim(data_new)
 ```
 
+There are `r nrow(data_new)` observations, or adults, and `r ncol(data_new)` characteristics collected for each adult
+
 ---
 
-and the first few rows
+Looking at the first few rows
+
 ```{r}
 head(data_new)
 ```
-notice that the owns_ethereum column is shown as character, this can be converted to a factor data type to be represented correctly
+
+Notice that the owns_ethereum column is shown as `<chr>` (character). We will convert it to a factor variable.
 
 ---
 
-## Assigning data types
+### Assigning data types
 
-Convert owns_ethereum and other character variables to factor data type
-now try summary again
+The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data type to represent these columns correctly for modeling.  
 
 ```{r}
 data <- data_new %>%
-    mutate(across(where(is.character), as_factor))
+    mutate(across(where(is.character), as.logical))
 ```
+
+Reminder on data types in R: character used for nominal data, numeric or double for integer data, factor for ordinal data.
+
 ---
+
 ```{r, echo=FALSE, fig.show='hold'}
 summary(data)
 ```
 
-also note max of '99999' in capital_gain colum and '99' in hours_per_week. Let's look at these two columns again.
+Notice max values of '99999' in *capital_gain* and  '99' in *hours_per_week* 
 
 ---
-## Histogram to see capital gain and hours_per_week
+
+### Data Integrity
+
+When we look at the summary statistics for *capital_gain* and *hours_per_week*, we notice max values look suspicious. We can see this clearly using a boxplot.
 
 ```{r}
-ggplot(data, aes(x = capital_gain)) +
-  geom_histogram()
-ggplot(data, aes(x = hours_per_week)) +
-  geom_histogram()
+ggplot(data_new, aes(y = capital_gain)) +
+  geom_boxplot()
 ```
+
 ---
 
-## Missing Values
+### Missing Values
 
-- 9999 in capital_gain and 99 in hours_per_week were encoded to denote missing values 
-- Code to convert these to NA
+On cross checking this with the appropriate data collection team they tell us that 9999 in capital_gain and 99 in hours_per_week were encoded to denote missing values.
+
+Let's correct this discrepancy in the data.
 
 ```{r}
 data <- data %>%
@@ -139,9 +165,10 @@ data <- data %>%
 ```
 ---
 
-# Summary using skimr
+## Summary using skimr
 
-skimr is a useful package to view distributions and missing values in columns
+`skimr` is a useful package to view summary statistics, distributions and missing values
+
 ```{r, eval=FALSE, fig.keep='none'}
 library(skimr)
 data %>%
@@ -149,14 +176,18 @@ data %>%
 ```
 ---
 
-```{r, echo = FALSE, out.height=5, fig.height=5}
+```{r, echo = FALSE, out.height=1}
 data %>%
     skimr::skim()
 ```
 
 ---
 
-## Ask questions
+## Exploration
+
+After the initial summary statistics and integrity checks on the columns, we can look at individual characteristics and see how they vary between the ethereum owner vs non owner groups.
+
+### Univariate analysis
 
 What is the proportion of owners vs non owners?
 
@@ -165,21 +196,107 @@ data %>%
     group_by(owns_ethereum) %>%
     summarise(n = n(), nperc = n/nrow(data)*100)
 ```
-
 ---
 
-What is the percentage of Male vs Female owners?
-
 ```{r}
-data %>%
- filter(owns_ethereum == "TRUE") %>%
- group_by(sex) %>%
- summarise(n = n(), nperc = n/nrow(.)*100)
+ggplot(data, aes(x = owns_ethereum)) +
+  geom_bar()
 ```
 
 ---
 
-What percentage of ethereum owners are also donors?
+Distribution of Age
+
+```{r}
+ggplot(data, aes(x = age)) +
+  geom_histogram()
+
+```
+
+---
+
+What is the percentage of Males vs Females in the data?
+
+```{r}
+data %>%
+ group_by(sex) %>%
+ summarise(n = n(), nperc = n/nrow(data)*100)
+```
+
+---
+
+## Exploration - Multivariate Analysis
+
+Correlations
+
+```{r}
+cor(data %>% select(where(is.numeric), donated, owns_ethereum) %>%
+        mutate(owns_ethereum = as.numeric(owns_ethereum), donated = as.numeric(donated)) ,
+    use = "complete.obs")
+
+```
+
+From the numeric variables - Age, Education and Donations are correlated to *owns_ethereum*
+
+---
+
+We can add in the owns_ethereum variable to understand distributional differences. 
+
+```{r}
+ggplot(data, aes(x = age, fill = owns_ethereum)) +
+  geom_histogram(alpha = 0.5)
+
+```
+
+Ethereum owners seem to be younger. Try using `geom_density()` to make a neater plot!
+
+---
+
+What is the percentage of Male vs Female ethereum owners?
+
+```{r}
+data %>%
+  filter(sex == "Male") %>%
+  group_by(owns_ethereum) %>%
+  summarise(n = n(), nperc = n/nrow(.)*100)
+```
+```{r}
+data %>%
+  filter(sex == "Female") %>%
+  group_by(owns_ethereum) %>%
+  summarise(n = n(), nperc = n/nrow(.)*100)
+```
+
+---
+
+```{r}
+ggplot(data = data) +
+  aes(x = sex, fill = owns_ethereum) +
+  geom_bar()
+```
+
+is this clear enough to answer the question?
+---
+
+## Visualizing Proportions
+
+When visualizing categorical variables, it is useful to look at proportions. Especially if there are more observations in one level compared to the other levels, like this case where there are more Males.
+
+```{r}
+ggplot(data = data) +
+  aes(x = sex, fill = owns_ethereum) +
+  geom_bar(position = "fill")
+```
+
+---
+
+## Your Turn
+
+Find what percentage of ethereum owners are also donors?
+
+---
+
+## Answer
 
 ```{r}
 data %>%
@@ -189,20 +306,52 @@ data %>%
 
 ```
 
+```{r}
+ggplot(data = data) +
+  aes(x = donated, fill = owns_ethereum) +
+  geom_bar(position = "fill")
+```
+
+
 ---
 
-Most common characteristics or features.
+## Mean
 
-Find the mode or the most frequently occurring features -- need to know applying functions
+We can also find the average of each characteristic for ethereum owners vs non owners. Since the mean only works for numeric data types, we first `select` all the numeric columns in the data, and then use the familiar `group` and `summarise` command.
 
 ```{r, fig.height=8}
+data_new %>%
+    select(owns_ethereum, where(is.numeric)) %>%
+    group_by(owns_ethereum) %>%
+    summarise_all(funs(mean(., na.rm = TRUE))) %>%
+    data.frame()
+
+```
+
+---
+
+## Your Turn - Mode
+
+- Find the mode or the most frequently occurring characteristics of the ethereum holders and the non holders. 
+
+  You can use the helper function 'get_mode()' given below 
+
+```{r}
 
 get_mode <- function(v) {
-    uniqv <- unique(v)
-    uniqv[which.max(tabulate(match(v, uniqv)))]
+    all_levels <- unique(v)
+    all_levels[which.max(tabulate(match(v, all_levels)))]
 }
 
+```
 
+- How do the majority characteristics vary between the two groups?
+
+---
+
+## Answer
+
+```{r, fig.height=8}
 data %>%
     group_by(owns_ethereum) %>%
     summarise_all(funs(get_mode(.))) %>%
@@ -210,18 +359,42 @@ data %>%
 
 ```
 
-We see that donors, and higher education, lower age, are more in number in the owns_ethereum = TRUE group
+We see that there are more donors, and more higher educated, lower age adults in the owns_ethereum = TRUE group
 
 ---
 
-## T-test
+## Statistical significance testing
 
-We can test these findings for statistical significance. t test to see difference between ages of ethereum owners and non owners
+Let's test our hypothesis by applying a t test to see difference between ages of ethereum owners and non owners
 
 ```{r}
 t.test(age ~ owns_ethereum, data = data)
 ```
+
 ---
+
+## Chi-square test of independence
+
+Let us test the relationship between sex and ownership
+
+```{r}
+chisq.test(table(data$owns_ethereum, data$sex))
+
+```
+
+as the p < 0.05, we reject the null hypothesis. There is a significant relationship between the variables and knowing the value of one variable helps to predict the value of the other variable.
+
+---
+
+## Your Turn
+
+Is there a statistically significant difference between education levels of ethereum owners and non owners?
+
+Use an appropriate visualization to showcase this difference.
+
+---
+
+## Answer
 
 ```{r}
 t.test(education_num ~ owns_ethereum, data = data)
@@ -231,24 +404,20 @@ We see that there is a significant difference (p<0.05) between the age, and educ
 
 ---
 
-## Visualizations
-
 ```{r}
 ggplot(data, aes(x = owns_ethereum, y = education_num)) +
   geom_boxplot()
 
-ggplot(data, aes(x = owns_ethereum, y = age)) +
-  geom_boxplot()
-
-ggplot(data, aes(x = owns_ethereum, y = hours_per_week)) +
-  geom_boxplot()
 ```
 
 ---
 
-One trick to look at multiple variables at the same time, is to use pair plots and color the points by the owns_ethereum variable.
+## Multivariate Visualizations - Pair plots
 
-Use the GGally package to create pair plots of all the variables
+One way to look at the interactions between multiple variables at the same time, is to use pair plots. When we specify a color variable, the correlation for each level is shown.
+
+We load the GGally package, installed using `install.packages("GGally")`, to create pair plots of all the numeric variables
+
 ```{r, eval=FALSE, fig.show='hold'}
 library(GGally)
 # numerical vars
@@ -258,22 +427,23 @@ data %>%
 ```
 
 ---
+
 ```{r, echo=FALSE, fig.show='asis'}
 library(GGally)
 data %>%
     select(owns_ethereum, age, education_num, capital_gain, capital_loss, hours_per_week) %>%
     ggpairs(columns = 2:6, aes(color = owns_ethereum, alpha = 0.5))
 ```
+
 ---
 
-For categorical variables it helps to see the proportions to understand which variables contribute more to the groups
+Finally we can take a look at all the categorical variables using faceting. The proportions are visualized to understand which variables contribute more to each group
 
 ```{r cat, eval=FALSE, fig.show='hold'}
-# categorical vars - note NAs
 data %>%
     select(
         workclass, marital_status, occupation,
-        relationship, race, sex, native_country, donated, owns_ethereum
+        relationship, race, sex, donated, owns_ethereum
     ) %>%
     pivot_longer(workclass:donated) %>%
     ggplot(aes(y = value, fill = owns_ethereum)) +
@@ -285,14 +455,13 @@ data %>%
 
 ---
 
-```{r eval= TRUE, echo=FALSE}
-# categorical vars - note NAs
+```{r eval= TRUE, echo=FALSE, fig.height=8}
 data %>%
     select(
         workclass, marital_status, occupation,
-        relationship, race, sex, native_country, donated, owns_ethereum
+        relationship, race, sex, donated, owns_ethereum
     ) %>%
-    pivot_longer(workclass:donated) %>%
+    pivot_longer(workclass:sex) %>%
     ggplot(aes(y = value, fill = owns_ethereum)) +
     geom_bar(position = "fill", na.rm = FALSE) +
     facet_wrap(vars(name), scales = "free") +
@@ -300,27 +469,3 @@ data %>%
 
 ```
 
----
-
-## Your Turn 
- 
-Answer the question using visuals and a statistical test
-
-- Do older adults donate more?
-
----
-
-Answer
-
-```{r}
-ggplot(data, aes(x = donated, y = age)) +
-  geom_boxplot()
-```
-
----
-
-```{r}
-t.test(age ~ donated, data)
-```
-
----
