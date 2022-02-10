@@ -101,32 +101,32 @@ Let's
 
 ```{r echo=TRUE}
 library(tidyverse)
-load("data_new.RDS")
+data_raw <- read_csv("data/data_raw.csv")
 
-dim(data_new)
+dim(data_raw)
 ```
 
-There are `r nrow(data_new)` observations, or adults, and `r ncol(data_new)` characteristics collected for each adult
+There are `r nrow(data_raw)` observations, or adults, and `r ncol(data_raw)` characteristics collected for each adult
 
 ---
 
 Looking at the first few rows
 
 ```{r}
-head(data_new)
+head(data_raw)
 ```
 
-Notice that the owns_ethereum column is shown as `<chr>` (character). We will convert it to a factor variable.
+Notice that the columns containing text is shown as `<chr>` (character). We will convert them to factor variable.
 
 ---
 
 ### Assigning data types
 
-The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data type to represent these columns correctly for modeling.  
+The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data type to represent these columns correctly.  
 
 ```{r}
-data <- data_new %>%
-    mutate(across(where(is.character), as.logical))
+data <- data_raw %>%
+    mutate(across(where(is.character), as_factor))
 ```
 
 Reminder on data types in R: character used for nominal data, numeric or double for integer data, factor for ordinal data.
@@ -146,7 +146,7 @@ Notice max values of '99999' in *capital_gain* and  '99' in *hours_per_week*
 When we look at the summary statistics for *capital_gain* and *hours_per_week*, we notice max values look suspicious. We can see this clearly using a boxplot.
 
 ```{r}
-ggplot(data_new, aes(y = capital_gain)) +
+ggplot(data, aes(y = capital_gain)) +
   geom_boxplot()
 ```
 
@@ -230,8 +230,7 @@ data %>%
 Correlations
 
 ```{r}
-cor(data %>% select(where(is.numeric), donated, owns_ethereum) %>%
-        mutate(owns_ethereum = as.numeric(owns_ethereum), donated = as.numeric(donated)) ,
+cor(data %>% select(where(is.numeric), donated, owns_ethereum) ,
     use = "complete.obs")
 
 ```
@@ -252,7 +251,7 @@ Ethereum owners seem to be younger. Try using `geom_density()` to make a neater 
 
 ---
 
-What is the percentage of Male vs Female ethereum owners?
+What is the percentage of men who are ethereum owners?
 
 ```{r}
 data %>%
@@ -260,6 +259,8 @@ data %>%
   group_by(owns_ethereum) %>%
   summarise(n = n(), nperc = n/nrow(.)*100)
 ```
+What about women?
+
 ```{r}
 data %>%
   filter(sex == "Female") %>%
@@ -269,13 +270,16 @@ data %>%
 
 ---
 
+Answering this visually
+
 ```{r}
 ggplot(data = data) +
   aes(x = sex, fill = owns_ethereum) +
   geom_bar()
 ```
 
-is this clear enough to answer the question?
+is the plot useful to answer the question?
+
 ---
 
 ## Visualizing Proportions
@@ -305,6 +309,7 @@ data %>%
     summarise(n = n(), nperc = n/nrow(.)*100)
 
 ```
+---
 
 ```{r}
 ggplot(data = data) +
@@ -320,7 +325,7 @@ ggplot(data = data) +
 We can also find the average of each characteristic for ethereum owners vs non owners. Since the mean only works for numeric data types, we first `select` all the numeric columns in the data, and then use the familiar `group` and `summarise` command.
 
 ```{r, fig.height=8}
-data_new %>%
+data %>%
     select(owns_ethereum, where(is.numeric)) %>%
     group_by(owns_ethereum) %>%
     summarise_all(funs(mean(., na.rm = TRUE))) %>%
@@ -455,7 +460,7 @@ data %>%
 
 ---
 
-```{r eval= TRUE, echo=FALSE, fig.height=8}
+```{r eval= TRUE, echo=FALSE, fig.height=6}
 data %>%
     select(
         workclass, marital_status, occupation,
