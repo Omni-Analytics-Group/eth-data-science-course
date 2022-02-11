@@ -20,31 +20,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align =
 
 ```
 
-## Module 3 Outline - < to be Removed from slides >
-
-- Part 1: 
-    - Intro to DDEMA: understand each of the steps of the data science process and learn the ML workflow. 
-    - D for definition: We want to find characteristics of people who own cryptocurrency
-    - Data and Exploration: 
-          - Explore and find issues in the adult dataset - missing values, outliers values
-          - Answering data questions, t tests, Viz
-- Part 2: 
-    - M for Modeling - Unsupervised Machine Learning techniques: Given an unlabelled dataset, we will learn how to find patterns with minimal effort 
-    - Using k-means
-    - Naming clusters
-    - Evaluate these patterns that were found, and visualize them effectively
-    - Other clustering techniques: hclust, pam
-- Part 3:
-    - M for Modeling - Supervised Learning techniques: Using a labelled dataset to create a model, and predict future trends or categorize unseen data
-    - Using glm, svm, CART, xgboost, randomforests
-    - Evaluation of the models - class metrics and differences
-    - Feature importance
-    - Feature engineering or data prep
-    - A for Action - how might this be useful for us - targeting campaigns, cross selling products
-    - Further Optimizations: Hyperparameter tuning and Cross validation
-
----
-
 ## Outline:
 
 - The DDEMA Process
@@ -90,13 +65,31 @@ In this module, our objectives are to -
 
 ---
 
+## Tidyverse metapackage
+
+We will use the tidyverse set of packages for data reading, manipulations and visualizations.  https://www.tidyverse.org/packages/
+
+The following packages will be used in this analysis:
+
+- readr: for data reading
+- dplyr: for creating, modifying, deleting, grouping and summarising data
+- ggplot2: for data visualisation
+
+Let us first install it by running 
+
+```{r, eval=FALSE}
+install.packages("tidyverse")
+```
+
+---
+
 ## Data
 
 Our dataset is a survey response dataset containing certain demographic details of adults and whether or not they own ethereum.
 
 Let's 
 
-- load **tidyverse** library for data analysis. It can be installed, if not already done so, using `install.packages("tidyverse")`
+- load **tidyverse** library for data analysis. 
 - read in data and look at the dimensions of the data
 
 ```{r echo=TRUE}
@@ -122,14 +115,17 @@ Notice that the columns containing text is shown as `<chr>` (character). We will
 
 ### Assigning data types
 
-The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data type to represent these columns correctly.  
+The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data structure to represent these columns correctly.  
 
 ```{r}
 data <- data_raw %>%
     mutate(across(where(is.character), as_factor))
 ```
 
-Reminder on data types in R: character used for nominal data, numeric or double for integer data, factor for ordinal data.
+Let's now look at the summary statistics
+```{r, eval=FALSE}
+summary(data)
+```
 
 ---
 
@@ -376,18 +372,19 @@ Let's test our hypothesis by applying a t test to see difference between ages of
 t.test(age ~ owns_ethereum, data = data)
 ```
 
+as the p < 0.05, we reject the null hypothesis. The mean ages are significantly different between ethereum owners and non owners.
+
 ---
 
 ## Chi-square test of independence
 
-Let us test the relationship between sex and ownership
+Let us test the relationship between marital_status and ownership
 
 ```{r}
-chisq.test(table(data$owns_ethereum, data$sex))
-
+chisq.test(table(data$owns_ethereum, data$marital_status))
 ```
 
-as the p < 0.05, we reject the null hypothesis. There is a significant relationship between the variables and knowing the value of one variable helps to predict the value of the other variable.
+X squared value is high and as the p < 0.05, we reject the null hypothesis. There is a significant difference between expected and observed data showing a relationship between these variables.
 
 ---
 
@@ -423,7 +420,7 @@ One way to look at the interactions between multiple variables at the same time,
 
 We load the GGally package, installed using `install.packages("GGally")`, to create pair plots of all the numeric variables
 
-```{r, eval=FALSE, fig.show='hold'}
+```{r, eval=FALSE, fig.height=7}
 library(GGally)
 # numerical vars
 data %>%
@@ -433,7 +430,7 @@ data %>%
 
 ---
 
-```{r, echo=FALSE, fig.show='asis'}
+```{r, echo=FALSE, fig.height=7}
 library(GGally)
 data %>%
     select(owns_ethereum, age, education_num, capital_gain, capital_loss, hours_per_week) %>%

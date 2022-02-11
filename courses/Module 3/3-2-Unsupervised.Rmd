@@ -52,7 +52,7 @@ We will go through 3 different clustering techniques to help the marketing team.
 
 ## Dataset Preparation
 
-Let us read in the dataset, filter it to take only the Ethereum owners and prepare it by doing the following:
+Let us read in the dataset, filter it to take only the Ethereum owners, remove outliers, and prepare it by doing the following:
 
 - create a numeric donated column that has a value of 1 if donated == TRUE and 0 if donated == FALSE
 - select only the numeric columns
@@ -66,6 +66,8 @@ data_raw <- read_csv("data/data_raw.csv")
   
 data_clus <- data_raw %>%
   filter(owns_ethereum == "TRUE") %>%
+  mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
+  mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) %>%
   mutate(donated = as.numeric(donated)) %>% # change to 0 and 1 
   select(where(is.numeric)) %>% # select only the numeric values
   na.omit()
@@ -115,6 +117,7 @@ We want to know the value of 'k' that decreases the within-cluster sum of square
 ---
 
 ```{r eval=FALSE}
+set.seed(1234)
 # run many models with varying value of k 
 tot_withinss <- map_dbl(1:10,  function(k){
   model <- kmeans(x = data_clus, centers = k)
@@ -134,6 +137,7 @@ ggplot(elbow_df, aes(x = k, y = tot_withinss)) +
 ---
 
 ```{r echo=FALSE}
+set.seed(1234)
 # run many models with varying value of k 
 tot_withinss <- map_dbl(1:10,  function(k){
   model <- kmeans(x = data_clus, centers = k)
@@ -251,15 +255,15 @@ A common practice is to name the different clusters by a tagline or a persona, t
 
 We find there are 3 distinguishable groups,
 
-- Cluster 1 has no donors, work high hours, and are in their middle to senior ages.
-- Cluster 2 has donors, work few hours, and are the youngest in age.
-- Cluster 3 also has donors, work the average hours, and their age spans early adults to late middle age. They are also the largest in number.
+- Cluster 1 are donors, highly educated, have capital gains, and are in their middle age.
+- Cluster 2 are donors, work few hours, have some capital gains, and are the youngest in age.
+- Cluster 3 not donors, work the highest number of hours per week, have capital losses, and are in their middle to senior ages
 
-Having no other information about these groups, they could be called:
+The personas corresponding to the groups:
 
-- Cluster 1: "Hardworking Speculators"
+- Cluster 1: "Savvy Investors"
 - Cluster 2: "Benevolent Youth"
-- Cluster 3: "Savvy Investors"
+- Cluster 3: "Hardworking Speculators"
 
 ---
 
@@ -294,7 +298,7 @@ ggplot(melted_df, aes(variable, value, color = pam, group = pam)) +
 ## HCLUST
 
 Hierarchical clustering requires a square matrix that represents the distance between samples.
-Caluclated using the `dist()` function.
+Calculated using the `dist()` function.
 
 ```{r}
 hclust_complete <- norm_mat %>%
@@ -305,12 +309,29 @@ hclust_complete <- norm_mat %>%
 
 ---
 
-We use a dendogram to find the best allocation of observations to clusters. 
+### Choosing the number of clusters
 
+We use a dendogram to find the best allocation of observations to clusters. 
 
 ```{r}
 plot(hclust_complete)
+```
+
+---
+
+```{r}
 clusters <- cutree(hclust_complete, k = 4)
+```
+
+Now let's view a cluster summary table
+
+```{r}
+data_clus %>%
+    mutate(hclust = clusters) %>%
+    group_by(hclust) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean)) %>% round() %>%
+    data.frame()
 ```
 
 ---
@@ -324,7 +345,6 @@ melted_df <- norm_mat %>%
 ggplot(melted_df, aes(variable, value, color = hclust, group = hclust)) + 
     geom_line(size = 1.3) + 
     theme_bw() 
-
 ```
 
 ---
@@ -347,7 +367,7 @@ Task: Find well separated groups using the entire dataset.
 data_raw <- read_csv("data/data_raw.csv")
 
 data_clus <- data_raw %>%
-  mutate(donated = as.numeric(as.logical(donated))) %>% # change to 0 and 1 
+  mutate(donated = as.numeric(donated)) %>% # change to 0 and 1 
   select(where(is.numeric)) %>% 
   na.omit()
 
