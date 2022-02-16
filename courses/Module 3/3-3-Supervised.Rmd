@@ -1,6 +1,6 @@
 ---
 title: "Supervised Learning  <br> <br> <br>"
-author: ""
+author: "Omni Analytics Group"
 output:
   xaringan::moon_reader:
     includes:
@@ -18,7 +18,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
-
 ```
 
 ## Outline
@@ -28,7 +27,7 @@ We will cover:
 - Modeling: Classify data as ethereum holders vs non holders using machine learning techniques
 - Evaluation metrics and class balance accuracy - 
 - Improving model: Feature engineering
-- Other models: cart, svm, rf, nb
+- Other models: nb, svm, cart, rf
 - Variable Importance
 - Other improvements: Cross validation, Tuning for better hyperparameters
 
@@ -48,11 +47,13 @@ We will cover:
 
 Similar to the tidyverse set of packages for data cleaning and visualizations, for modeling we will use the tidymodels suite of packages. Each of the packages assist with different aspects of a machine learning workflow. Listed here https://www.tidymodels.org/packages/
 
-The following packages have been used in this analysis:
+The following packages will be used in this analysis:
 
 - recipes: data pre-processing tools for feature engineering
 - parsnip: for model setup and execution
 - yardstick: for model assessment
+
+Let us install it by running `install.packages("tidymodels")` and then load the packages we need for analysis and modeling
 
 ```{r, message = FALSE, warning = FALSE}
 library(tidyverse)
@@ -63,31 +64,38 @@ library(tidymodels)
 
 ## Objective
 
-We are given data from a survey of adults adapted from the census. We would like to understand characteristics of the ethereum holders vs non ethereum holders in the data. 
+*Predict whether a new individual is an ethereum owner or not.*
 
-Since we have the label column "owns_ethereum" we can use this as our response variable and create a predictive model. The model will learn how to classify an abservation into owns_ethereum = TRUE or FALSE
+Since we have the label column "owns_ethereum" we can use this as our response variable and create a predictive model. The model will learn how to classify an observation into owns_ethereum = TRUE or FALSE
+
+We will leverage the **d**ata preparation and **e**xploratory analysis completed earlier in part 1
 
 ---
 
-## Read and check Data types
+## Read and clean data 
+
+Replace the identified outliers in hours per week and capital gain and view the 
 
 ```{r}
-load("data_new.RDS")
+data_raw <- read_csv("data/data_raw.csv") 
 
-str(data_new)
+data <- data_raw %>%
+  mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
+  mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week))
+str(data)
 
 ```
 
 ---
 
-## Convert data type as appropriate
+## Assign the appropriate data types
 
-- donated can be converted into numeric 0 and 1 as we want there to be a value when a person donates
-- all the nominal variables are shown as 'character' type. When modeling we convert these to factor data type.
+- `donated` can be converted into numeric 0 and 1 as we want there to be a value when a person donates
+- all the nominal variables and the outcome variable (`owns_ethereum`) need to be converted to factor data type for modeling
 
 ```{r}
-data <- data_new %>%
-    mutate(donated = ifelse(donated == "TRUE", 1,0)) %>%
+data <- data %>%
+    mutate(donated = as.numeric(donated), owns_ethereum = factor(owns_ethereum, levels = c(TRUE, FALSE))) %>%
     mutate(across(where(is.character), as_factor))
 
 ```
@@ -107,21 +115,9 @@ data_test <- testing(data_split)
 
 ---
 
-### Exploratory Analysis and Visualization
+## Simple logistic regression model
 
-Revision from the Introduction slides where we identified: 
-
-- Outliers in hours per week and capital gain
-- Which variables contribute to more (age, edu, donated) or less(workclass, marital status) of a difference between the owners and non owners. 
-
-In this part we will use models to find the variables that contribute more or less 
-- variable importance using random forest 
-
----
-
-### Simple logistic regression model
-
-First we create specifications 
+First we create model specifications 
 
 ```{r}
 set.seed(234)
@@ -136,18 +132,18 @@ glm_spec
 
 Fit the simple model. 
 
-- We omit the NA rows from the data.
-- Also remove native_country column 
+Note that we need to omit the NA rows from the data. We will see how to handle NAs soon.
 
+Factor/categorical predictors need to be converted to numeric values (e.g., dummy or indicator variables). When using the formula method via fit.model_spec(), parsnip will convert factor columns to indicators.
 ```{r}
-
 glm_rs <- glm_spec  %>%
-    fit(owns_ethereum ~ . -native_country, data = na.omit(data_train))
+    fit.model_spec(owns_ethereum ~ . , data = na.omit(data_train))
 glm_rs
 ```
 
 ---
-TODO significant coefficients?
+
+TODO significant coefficients? and interactions?
 
 ```{r}
 tidy(glm_rs) %>%
@@ -156,26 +152,29 @@ tidy(glm_rs) %>%
 
 ---
 
-**Evaluation**
+## Evaluation
 
 Use the yardstick package within tidymodels to find define test metrics eg,accuracy 
 
 ```{r}
-predictions_glm <- glm_rs %>%
-  predict(new_data = na.omit(data_test)) %>%
-  bind_cols(na.omit(data_test) %>% select(owns_ethereum)) # attach the predictions
+predictions_glm <- augment(glm_rs, new_data = na.omit(data_test))  # attach the predictions
 #confusion matrix
 predictions_glm %>%
     conf_mat(owns_ethereum, .pred_class)
 ```
+How do we decide how good our model performance is?
 
 ---
 
-### Create class metrics
+### Class Metrics
 
-Remembering class balance accuracy
+Remember from Module 2 - Basics, slide 10. Accuracy can be high even if the model is only predicting majority class.
+ 
+- Precision: The ratio of number of correct predictions to the total predictions made by the model. In our case, this is the number of ethereum owners who were correctly predicted out of the total number of ethereum owners predicted. `True Positive/(True Positive + False Positive)`
+- Recall: Also called *sensitivity*, is the ratio of correct predictions to the total number of true ethereum owners in the data. `True Positive/(True Positive + False Negative)`
+- F Measure: The harmonic mean of the Precision and Recall scores. This measure will be low if one the precision metric is improved at the expense of the recall or vice versa. `F1 Score = 2*(Recall * Precision) / (Recall + Precision)` 
 
-From Module 2 Basics, slide 10. Accuracy can be high but precision low
+---
 
 ```{r}
 # create a metric set for calculating at once
@@ -185,9 +184,11 @@ predictions_glm %>%
 
 ```
 
+Let's try to improve the model 
+
 ---
 
-## Improvements: Pre-processing using Recipes package
+## Improvements: Pre-processing
 
 Recipe is a sequence of steps defining all the pre-processing like imputation, removing predictors, scaling and one hot encoding.
 We were omitting NAs earlier, now we do some preprocessing to handle it.
@@ -204,6 +205,7 @@ Adding:
 recipe_simple <- recipe(formula = owns_ethereum ~ ., data = data_train) %>%
     step_other(all_nominal_predictors(), threshold = 0.05) %>% # for collapsing infrequent categories
     step_unknown(all_nominal_predictors())  %>% # missing values are converted to 'unknown'
+    step_impute_mean(all_numeric_predictors())  %>% # missing values are imputed
     step_normalize(all_numeric_predictors())
 ```
 
@@ -211,10 +213,10 @@ recipe_simple <- recipe(formula = owns_ethereum ~ ., data = data_train) %>%
 
 Other steps TODO or Your Turns
 
-Remove predictors suffering from multicollinearity:step_corr()
-Create interaction terms: step_interact().
-Combine variables using principal component analysis: step_pca()
-Imputate missing values using a KNN model: step_knnimpute()
+- Remove predictors suffering from multicollinearity:step_corr()
+- Create interaction terms: step_interact().
+- Combine variables using principal component analysis: step_pca()
+- Imputate missing values using a KNN model: step_knnimpute()
 
 ---
 
@@ -245,25 +247,21 @@ test_baked  <- recipe_simple %>%
 
 ```{r}
 #try earlier spec with newly prepped data
-# glm
 glm_rs_wprep <- glm_spec  %>%
-    fit(owns_ethereum ~ ., data = train_baked)
+    fit.model_spec(owns_ethereum ~ ., data = train_baked)
 glm_rs_wprep
 
 ```
 
 ---
 
-Evaluation
+### Evaluation
 
 Now fit on test data and we see that the precision, and recall measures have improved. 
 
 ```{r}
-predictions_glm <- glm_rs_wprep %>%
-  predict(new_data = test_baked) %>%
-  bind_cols(test_baked %>% select(owns_ethereum))
+predictions_glm <- augment(glm_rs_wprep, new_data = test_baked) 
 
-#confusion matrix
 predictions_glm %>%
     conf_mat(owns_ethereum, .pred_class)
 predictions_glm %>%
@@ -275,44 +273,37 @@ predictions_glm %>%
 
 ## SVM
 
-- Support vector machines attempt to divide the space 
-- removed native-country - might wnat to do for all TODO
-PREPROCESSING REQUIREMENTS
-
-Factor/categorical predictors need to be converted to numeric values (e.g., dummy or indicator variables) for this engine. When using the formula method via fit.model_spec(), parsnip will convert factor columns to indicators.
-
-Predictors should have the same scale. One way to achieve this is to center and scale each so that each predictor has mean zero and a variance of one.
+Support vector machines attempt to divide the space 
 ```{r}
-library(kernlab)
-# svm_spec <- svm_poly(degree = 1) %>%
-#   set_mode("classification") %>%
-#   set_engine("kernlab") # install.packages("kernlab")
-# svm_spec
-
+library(kernlab) # install.packages("kernlab") # if not already installed
 svm_spec <- svm_rbf() %>% 
   set_mode("classification") %>% 
   set_engine("kernlab")
 
 svm_fit <- svm_spec %>% 
-  fit(owns_ethereum ~ . - native_country, data = train_baked)
-
-svm_fit
-
-augment(svm_fit, new_data = train_baked) %>%
-    class_metrics(truth = owns_ethereum, estimate = .pred_class)
-
-augment(svm_fit, new_data = train_baked) %>%
-    conf_mat(owns_ethereum, .pred_class)
+  fit.model_spec(owns_ethereum ~ . , data = train_baked)
 ```
 
 ---
 
 ```{r}
-library(kernlab)
-svm_fit %>%
-  extract_fit_engine() %>%
-  plot()
+svm_fit
 
+```
+
+---
+
+```{r}
+augment(svm_fit, new_data = train_baked) %>%
+    conf_mat(owns_ethereum, .pred_class)
+
+augment(svm_fit, new_data = train_baked) %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+---
+
+```{r}
 predictions_svm <- augment(svm_fit, new_data = test_baked) 
 
 predictions_svm %>%
@@ -366,11 +357,7 @@ nb_fit
 ---
 
 ```{r}
-predictions_nb <- nb_fit %>%
-  predict(new_data = test_baked) %>%
-  bind_cols(test_baked %>% dplyr::select(owns_ethereum))
-
-#confusion matrix
+predictions_nb <- augment(nb_fit, new_data = test_baked)
 predictions_nb %>%
     conf_mat(owns_ethereum, .pred_class)
 predictions_nb %>%
@@ -379,7 +366,8 @@ predictions_nb %>%
 ```
 
 ---
-One key assumption of the naive bayes classifier is that the predictor variables are independent. 
+
+One assumption of the naive bayes classifier is that the predictor variables are independent. 
 We hence remove the variables that are correlated to too many other variables by either removing the highly correlated variable completely or by using a dimension reduction technique. 
 
 We try a dimension reduction technique here called Principal components analysis, and remove the highly correlated variables.
@@ -405,8 +393,6 @@ nb_fit <- nb_spec %>%
 
 ```{r}
 predictions_nb <- augment(nb_fit, new_data = test_pca_baked)
-
-#confusion matrix
 predictions_nb %>%
     conf_mat(owns_ethereum, .pred_class)
 predictions_nb %>%
@@ -416,6 +402,7 @@ predictions_nb %>%
 ---
 
 ## Your Turn
+
 ```{r}
 cor(data_train %>%
       dplyr::select(where(is.numeric)))
@@ -434,7 +421,7 @@ Does including this feature improve the model's predictive power?
 recipe_nocor <- recipe_simple %>% 
   step_mutate(age_edu = age/education_num) %>%
   step_normalize(all_numeric()) %>%
-  #step_pca(all_numeric(), threshold = .99) %>%
+  step_pca(all_numeric(), threshold = .99) %>%
   prep()
 
 train_pca_baked <- recipe_nocor %>%
@@ -451,16 +438,19 @@ nb_fit <- nb_spec %>%
 
 ```{r}
 predictions_nb <- augment(nb_fit, new_data = test_pca_baked) 
-
-#confusion matrix
 predictions_nb %>%
     conf_mat(owns_ethereum, .pred_class)
 predictions_nb %>%
     class_metrics(truth = owns_ethereum, estimate = .pred_class)
-
 ```
 
-If we only care about distinguishing the ethereum owners from the non owners, we would go with this model with higher accuracy and f measure. If our aim is to make the least number of mistakes when targeting ethereum owners, we would use the previous model with higher precision! < TODO > BE VERIFIED >
+---
+
+### Which model would you choose?
+
+If our aim is to make the least number of mistakes or false alarms when targeting ethereum owners, we would use the model with higher precision. An example of acting on a false alarm is mistakenly sending a promotional ethereum reward email to a non-ethereum holder.
+
+If there is a high cost associated with missing true ethereum holders, then we'd care about increasing the sensitivity or recall, and not choose this model.
 
 ---
 
@@ -526,30 +516,27 @@ predictions_dt %>%
 
 ## XGBOOST
 
-xgboost does not have a means to translate factor predictors to grouped splits. Factor/categorical predictors need to be converted to numeric values (e.g., dummy or indicator variables) for this engine. When using the formula method via fit.model_spec(), parsnip will convert factor columns to indicators using a one-hot encoding.
-
-
 ```{r}
 library(xgboost) # install.packages("xgboost")
 boost_spec <- boost_tree() %>%
   set_engine("xgboost") %>%
   set_mode("classification")
 
-boost_fit <- fit(boost_spec, owns_ethereum ~ ., data = data_train)
+boost_fit <- fit.model_spec(boost_spec, owns_ethereum ~ ., data = data_train)
 ```
+
 ---
 
 ```{r}
 augment(boost_fit, new_data = data_test) %>%
   conf_mat(truth = owns_ethereum, estimate = .pred_class)
+augment(boost_fit, new_data = data_test) %>%
+  class_metrics(truth = owns_ethereum, estimate = .pred_class)
 ```
-
-
-## Hyperparameter tuning
 
 ---
 
-### Random Forest model
+## Random Forest 
 
 Random Forest creates multiple CART trees based on "bootstrapped" samples of data and then combines the predictions. 
   
@@ -561,32 +548,35 @@ rf_spec <- rand_forest() %>%
 ## Fot on prepared data 
 rf_rs_wprep <- rf_spec %>%
     fit(owns_ethereum ~ ., data = train_baked)
+
+```
+
+---
+
+```{r}
 rf_rs_wprep
 ```
 
 ---
 
-*Evaluation*
+### Evaluation
 
 ```{r}
-predictions_rf <- rf_rs_wprep %>%
-  predict(new_data = test_baked) %>%
-  bind_cols(owns_ethereum=test_baked$owns_ethereum)# %>% select(owns_ethereum))
+predictions_rf <- augment(rf_rs_wprep, new_data = test_baked)
 
 predictions_rf %>%
     conf_mat(owns_ethereum, .pred_class)
 predictions_rf %>%
     class_metrics(truth = owns_ethereum, estimate = .pred_class)
-
 ```
-
----
 
 --- 
 
+---
+
 ## Variable Importance
 
-```{r}
+```{r, eval=FALSE}
 library(vip)
 
 imp_data <- recipe_simple %>%
@@ -601,14 +591,21 @@ rf_spec %>%
 
 ---
 
-## Final conclusions
+```{r, echo=FALSE}
+library(vip)
 
-Ethereum holders tend to be younger, highly educated and also contribute via donations more than the non holders.
+imp_data <- recipe_simple %>%
+  prep() %>%
+  bake(new_data = NULL) 
 
-The hours worked also contributes 
-
+rf_spec %>%
+  set_engine("ranger", importance = "permutation") %>%
+  fit(owns_ethereum ~ ., data = imp_data) %>%
+  vip(geom = "point")
+```
 
 ---
+
 
 ## Other Improvements: Cross validation, Tuning hyperparameters 
 
@@ -635,11 +632,7 @@ collect_metrics(rf_rs_cv)
 
 collect_predictions(rf_rs_cv) %>%
   conf_mat(owns_ethereum, .pred_class)
-# collect_predictions(rf_rs_cv) %>%
-#   group_by(id) %>%
-#   roc_curve(owns_ethereum, .pred_class) %>%
-#   autoplot()
-   
+
 ```
 
 ---
@@ -648,19 +641,10 @@ collect_predictions(rf_rs_cv) %>%
 
 ```{r eval=FALSE}
 
-## as test and train were given separately - making manual splits in order to use last_fit() 
-combined <- bind_rows(data_train, data_test)
-ind <- list(
-  analysis = seq(nrow(data_train)),
-  assessment = nrow(data_train) + seq(nrow(data_test))
-  )
-splits <- make_splits(ind, combined)
-
-## 
 predictions_final <- model_wf %>%
   add_recipe(recipe_simple) %>%
   add_model(rf_spec) %>%
-  last_fit(splits)
+  last_fit(data_split)
 
 collect_predictions(predictions_final) %>%
   conf_mat(owns_ethereum, .pred_class) %>%
@@ -677,4 +661,11 @@ collect_predictions(predictions_final) %>%
 # recall	0.9419381			
 # f_meas	0.9135080	
 ```
+
+---
+
+## Final conclusions
+
+Given a dataset you are now able to ask the right questions and use a variety of statistical modeling techniques to arrive at results and further action steps! 
+
 
