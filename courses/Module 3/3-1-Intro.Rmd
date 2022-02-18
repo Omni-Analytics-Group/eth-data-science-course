@@ -15,6 +15,13 @@ output:
       countIncrementalSlides: false
 ---
 
+<style type="text/css">
+.remark-slide-content table {
+  font-size: 10px;
+}
+
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 5)
 
@@ -123,17 +130,27 @@ data <- data_raw %>%
 ```
 
 Let's now look at the summary statistics
-```{r, eval=FALSE}
+
+```{r, eval=FALSE, out.height=3}
 summary(data)
 ```
 
 ---
 
+<pre style="font-size:11pt">
 ```{r, echo=FALSE, fig.show='hold'}
 summary(data)
 ```
+</pre>
+
 
 Notice max values of '99999' in *capital_gain* and  '99' in *hours_per_week* 
+
+---
+
+```{r}
+hist(data$hours_per_week)
+```
 
 ---
 
@@ -150,7 +167,7 @@ ggplot(data, aes(y = capital_gain)) +
 
 ### Missing Values
 
-On cross checking this with the appropriate data collection team they tell us that 9999 in capital_gain and 99 in hours_per_week were encoded to denote missing values.
+On cross checking this with the appropriate data collection team they tell us that 99999 in capital_gain and 99 in hours_per_week were encoded to denote missing values.
 
 Let's correct this discrepancy in the data.
 
@@ -170,6 +187,7 @@ library(skimr)
 data %>%
     skim()
 ```
+
 ---
 
 ```{r, echo = FALSE, out.height=1}
