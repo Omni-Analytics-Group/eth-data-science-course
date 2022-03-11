@@ -110,7 +110,7 @@ Change log
 
 *Gitcoin Grant Round 13*
 
-In addition to making progress on Module 3, we've doubled down on our cross-platform initiative to include more Python coded examples. We now have the first two sections of Module 1 translated into Python.  A special shout out to @amelia188! Stay tuned becasue we're actually going to be updating the course throughout this round.
+In addition to making progress on Module 3, we've doubled down on our cross-platform initiative to include more Python coded examples. We now have the first two sections of Module 1 translated into Python.  A special shout out to @JSchoonmaker! Stay tuned becasue we're actually going to be updating the course throughout this round.
 
 Change log
 * Added a Python tutorials for Module 1
