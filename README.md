@@ -108,6 +108,17 @@ Change log
 * 2 New case studies
 * Various link fixes and copy edits
 
+*Gitcoin Grant Round 13*
+
+In addition to making progress on Module 3, we've doubled down on our cross-platform initiative to include more Python coded examples. We now have the first two sections of Module 1 translated into Python.  A special shout out to @amelia188! Stay tuned becasue we're actually going to be updating the course throughout this round.
+
+Change log
+* Added a Python tutorials for Module 1
+* Updates to Module 3 (sit tight!)
+* Various link fixes and copy edits
+
+
+
 ## FAQ
 
 *Do you all have experience in this stuff?*  
@@ -125,6 +136,10 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 ## Testimonials
 
 "This course is like a rain following a drought. It kindly walks you through the process starting from the use of R to introduction of graphs and machine learning concepts with interesting case studies. I strongly recommend it not only to researchers interested in Ethereum blockchain but also to any students or professionals that have interest in learning data analysis and science." - [Will Shin](https://www.linkedin.com/in/wooil-s-51308353/) (Principal Economist at [Klaytn](https://www.klaytn.com))
+
+## Impact and Accolades
+
+March 11th, 2022 - 59 Stars - 16 Forks
 
 ## Featured Projects
 
