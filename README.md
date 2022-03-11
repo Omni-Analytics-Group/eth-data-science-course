@@ -17,7 +17,7 @@ Gitcoin Grant Link: https://gitcoin.co/grants/562/learning-data-science-on-the-e
 ## [Course Outline](https://youtu.be/R0mFo1bPxCc?list=PLaiSf_XWcFZUPa6d__SO3AtQudEjmE8TX)
 
 [Module 1 - Basic Data Structures and Munging](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/courses/Module%201)
-* Motivating Example ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html), [Python Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk Python.html), [Video](https://youtu.be/jlzqAAjeIIE))
+* Motivating Example ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk.html), [Python Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-1-Motivating-Example-Crypto-Punk-Python.html), [Video](https://youtu.be/jlzqAAjeIIE))
 * Reading Files ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading-Files.html), [Python Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-2-Reading Files Python.html), [Video](https://youtu.be/80kccJuFn2s))
 * Basics ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-3-Basics.html), [Video](https://youtu.be/-jVk1F3cSD8))
 * Data structures ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%201/1-4-DataStructures.html), [Video](https://youtu.be/XkQzdhcC0b0))
