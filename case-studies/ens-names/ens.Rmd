@@ -1,0 +1,281 @@
+---
+title: "Analyzing the Ethereum Name Service (ENS) <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=16, dpi=300, cache = TRUE)
+
+## Loading Libraries
+library(knitr)
+library(kableExtra)
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(jsonlite)
+library(dplyr)
+
+## Load Data
+ens <- readRDS("data/ens_domains_data.RDS")
+```
+
+## The Ethereum Name Service
+
+The Ethereum Name Service, or ENS, is a decentralized naming protocol on the Ethereum blockchain which allows you to use attach and resolve wallet addresses, and other personal identifying information, to your ENS name.
+
+![ENS Logo](ens_logo.png)
+
+---
+
+## Analysis Questions
+
+In this case study, we will attempt to answer a handful of questions relating to the service:
+
+1. How many ENS names captured in our pool?
+2. How large is the set of shortest names?
+3. What's the distribution of name character length?
+4. What's the distribution of frequency of the occurrence of individual characters within the names? (How often did the letter "a" appear in a name? "b"?"..."1",...."_"?
+5. How many wallets have more than one domain?
+6. What's the average number of domains per wallet?
+7. What's the distribution of the number of domains per account? (min, max, etc)
+8. What's the earliest and latest block in the dataset?
+9. What timestamps do they correspond to?
+10. What's the distribution of costs in ETH?
+11. At the time of creation, what's the distribution of expiration times? (Do most people register for 1 year, 2 years or 5?)
+
+---
+
+## Unique ENS Names Captured
+
+We can use a simple combination of `length` and `unique` functionality in R to get the number of unique ENS names captured in the data:
+
+```{r}
+length(unique(ens$name))
+```
+
+We immediately see that there are nearly 1.2 million unique names!
+
+---
+
+## Names over Time
+
+We can see how many are registered as a function of time, by aggregating the counts in a particular manner. In this case, we use weekly aggreation like so:
+
+```{r}
+all_ts <- seq(floor_date(min(ens$blocktime),"week"),ceiling_date(max(ens$blocktime),"week"),by="week")
+freg_cnt <- function(stamp,chrcount,ens) sum(nchar(unique(ens$name[ens$blocktime <= stamp]))==chrcount)
+freg_any <- function(stamp,ens) length(unique(ens$name[ens$blocktime <= stamp]))
+reg_data <- cbind(Time=all_ts,as.data.frame(sapply(3:12,function(chrcount,all_ts,ens) sapply(all_ts,freg_cnt,chrcount=chrcount,ens=ens),all_ts=all_ts,ens=ens)))
+names(reg_data)[-1] <- paste0("Domain_ChrLen_",3:12)
+reg_data$Domain_ChrLen_Any <- sapply(all_ts,freg_any,ens=ens)
+
+p0 <- ggplot(reg_data, aes(x = Time, y = Domain_ChrLen_Any)) +
+    geom_line() +
+    scale_x_datetime(date_breaks = "3 months", date_labels = "%b %Y") +
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Number of Names Registered over Time",
+        subtitle = "For the ENS Service"
+    )
+```
+
+---
+
+We can see a steady upward trend that especially accelerated during 2022.
+
+```{r}
+p0
+```
+
+---
+
+## Name Character Length Distribution
+
+We can use `ggplot2` in order to visualize the length in the number of characters in the name, grouping the different categories into various buckets on the large end.
+
+```{r}
+## Character Count of Name
+ens$charcut <- cut(nchar(ens$name), c(seq(2,20,by=1),26,501,40000),right=FALSE)
+
+ens_agg <- ens %>%
+    group_by(charcut) %>%
+    summarise(count = n())
+
+p1 <- ggplot(ens_agg,aes(charcut, count))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label = count), vjust = -.2, size = 2) +
+    xlab("ENS Character Length")+
+    ylab("Count") +
+    labs(
+        title = "Distribution of Name Length for Names",
+        subtitle = "For the ENS Service"
+    ) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    scale_x_discrete(labels=c(seq(3,19,by=1),"20-25","26-500","501-40k")) +
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10))
+```
+
+---
+
+We see that around 5-8 characters is the typical length for the names, but the distribution has a very long upper tail, with some extremely long names being used as well.
+
+```{r}
+p1
+```
+
+---
+
+## Occurrence between Domains
+
+Next, we can look at the frequency of particular characters by splitting the name of every single ENS name, to obtain character vectors with one element per character. We then tabulate, and plot the resulting distribution:
+
+```{r}
+chr_dist <- sort(table(unlist(lapply(unique(ens$name),function(x) unlist(strsplit(x,""))),use.names=FALSE)),decreasing=TRUE)
+
+p2 <- ggplot(as.data.frame(chr_dist[1:15]), aes(Var1, Freq)) +
+    geom_col(position = 'dodge')+
+    geom_text(aes(label = Freq), vjust = -.2, size = 2) +
+    labs(
+        title = "Frequency of Particular Characters in Names",
+        subtitle = "For the ENS Service (Top 15 Characters)"
+    ) +
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+    xlab("Character")+
+    ylab("Count")
+```
+
+---
+
+Common vowels like a, e, and o are unsurprisingly the most common, with "n" being the most common consonant.
+
+```{r}
+p2
+```
+
+---
+
+## Domains per Wallet
+
+We can also see the distribution of the amount of names per wallet address, by using the `owner` field like so:
+
+```{r}
+ens_us <- split(ens,ens$owner)
+
+ens_usc <- data.frame(owner = names(ens_us),count = sapply(ens_us,function(x) length(unique(x$name)),USE.NAMES=FALSE))
+ens_usc$countcut <- cut(ens_usc$count, c(seq(1,10,by=1),21,51,501,2000),right=FALSE)
+
+ens_usc_agg <- ens_usc %>%
+    group_by(countcut) %>%
+    summarise(count = n())
+
+p3 <- ggplot(ens_usc_agg,aes(countcut, count))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label = count), vjust = -.2, size = 2) +
+    xlab("Number of ENS")+
+    ylab("Count of Wallets")+
+    labs(
+        title = "Distribution of the Number of Names per Wallet",
+        subtitle = "For the ENS Service"
+    ) +
+    scale_x_discrete(labels=c(seq(1,9,by=1),"10-20","21-50","51-500","501-2000"))+
+    scale_y_continuous(breaks=pretty_breaks(n = 10), labels = scales::comma)
+```
+
+---
+
+The vast majority of wallets have only a single name, but some have upwards of 500 - In fact, 10-20 is a rather common number to have.
+
+```{r}
+p3
+```
+
+---
+
+## Distribution of Registration Lengths
+
+Based on the difference in the expiration and the block time, we can also observe the distribution of registration lengths for the names:
+
+```{r}
+timedays_df <- data.frame(time = as.numeric(round(difftime(ens$expires,ens$blocktime,units="days"),0)))
+timedays_df$timecut <- cut(timedays_df$time, c(0,45,(1:10)*366,366*100,366*2500),right=FALSE)
+
+timedays_df_agg <- timedays_df %>%
+    group_by(timecut) %>%
+    summarise(count = n())
+
+p4 <- ggplot(timedays_df_agg,aes(timecut, count))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label = count), vjust = -.2, size = 2) +
+    xlab("Registration Length")+
+    ylab("Count")+
+    labs(title = "Distribution of the Registration Length for Names",
+         subtitle = "For the ENS Service") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_discrete(labels=c("0D-45D","45D-1Y",paste0(2:10,"Y"),"10Y-100Y","100Y-2500Y"))
+```
+
+
+---
+
+The most common length of registration is between 45 days and 1 year, but a significant number are registered for 10 years, or even between 10-100 years.
+
+```{r}
+p4
+```
+
+---
+
+## Distribution of Cost Paid
+
+Finally, we can look at the distribution of the amount paid in ETH for the names, breaking the amounts into various bins.
+
+```{r}
+cost_df <- data.frame(cost = round(as.numeric(ens$cost)/10^18,6))
+cost_df$costcut <- cut(cost_df$cost, c(0,.001,.0025,.005,.01,.1,1,5,40),right=FALSE)
+
+cost_df_agg <- cost_df %>%
+    group_by(costcut) %>%
+    summarise(count = n())
+
+p5 <- ggplot(cost_df_agg,aes(costcut, count))+
+    geom_bar(stat="identity")+
+    xlab("Cost Paid in ETH")+
+    ylab("Count")+
+    labs(
+        title = "Distribution of Cost Paid in ETH",
+        subtitle = "For the ENS Service"
+    ) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    scale_x_discrete(labels=paste0(c("<.001",".001 to .0025",".0025 to .005",".005 to .01",".01 to .1",".1 to 1","1 to 5","5 to 40")," ETH"))+
+    scale_y_continuous(breaks=pretty_breaks(n = 10), labels = scales::comma)
+```
+
+---
+
+Costs typically fall under .1 ETH, but on the extreme end, some cost between 5 to 40 ETH!
+
+```{r}
+p5
+```
+
+---
+
+## Conclusion
+
+Ultimately, we can see that with a rather simple set of R-based analysis, we can derive some very interesting insights regarding the ENS. It will be interesting to see how these metrics evolve as the service matures!
+
+![ENS Logo](ens_logo.png)
+

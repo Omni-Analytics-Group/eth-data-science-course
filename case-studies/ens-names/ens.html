@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Analyzing the Ethereum Name Service (ENS)          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Analyzing the Ethereum Name Service (ENS) <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## The Ethereum Name Service
+
+The Ethereum Name Service, or ENS, is a decentralized naming protocol on the Ethereum blockchain which allows you to use attach and resolve wallet addresses, and other personal identifying information, to your ENS name.
+
+![ENS Logo](ens_logo.png)
+
+---
+
+## Analysis Questions
+
+In this case study, we will attempt to answer a handful of questions relating to the service:
+
+1. How many ENS names captured in our pool?
+2. How large is the set of shortest names?
+3. What's the distribution of name character length?
+4. What's the distribution of frequency of the occurrence of individual characters within the names? (How often did the letter "a" appear in a name? "b"?"..."1",...."_"?
+5. How many wallets have more than one domain?
+6. What's the average number of domains per wallet?
+7. What's the distribution of the number of domains per account? (min, max, etc)
+8. What's the earliest and latest block in the dataset?
+9. What timestamps do they correspond to?
+10. What's the distribution of costs in ETH?
+11. At the time of creation, what's the distribution of expiration times? (Do most people register for 1 year, 2 years or 5?)
+
+---
+
+## Unique ENS Names Captured
+
+We can use a simple combination of `length` and `unique` functionality in R to get the number of unique ENS names captured in the data:
+
+
+```r
+length(unique(ens$name))
+```
+
+```
+## [1] 1194619
+```
+
+We immediately see that there are nearly 1.2 million unique names!
+
+---
+
+## Names over Time
+
+We can see how many are registered as a function of time, by aggregating the counts in a particular manner. In this case, we use weekly aggreation like so:
+
+
+```r
+all_ts &lt;- seq(floor_date(min(ens$blocktime),"week"),ceiling_date(max(ens$blocktime),"week"),by="week")
+freg_cnt &lt;- function(stamp,chrcount,ens) sum(nchar(unique(ens$name[ens$blocktime &lt;= stamp]))==chrcount)
+freg_any &lt;- function(stamp,ens) length(unique(ens$name[ens$blocktime &lt;= stamp]))
+reg_data &lt;- cbind(Time=all_ts,as.data.frame(sapply(3:12,function(chrcount,all_ts,ens) sapply(all_ts,freg_cnt,chrcount=chrcount,ens=ens),all_ts=all_ts,ens=ens)))
+names(reg_data)[-1] &lt;- paste0("Domain_ChrLen_",3:12)
+reg_data$Domain_ChrLen_Any &lt;- sapply(all_ts,freg_any,ens=ens)
+
+p0 &lt;- ggplot(reg_data, aes(x = Time, y = Domain_ChrLen_Any)) +
+    geom_line() +
+    scale_x_datetime(date_breaks = "3 months", date_labels = "%b %Y") +
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Number of Names Registered over Time",
+        subtitle = "For the ENS Service"
+    )
+```
+
+---
+
+We can see a steady upward trend that especially accelerated during 2022.
+
+
+```r
+p0
+```
+
+&lt;img src="ens_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Name Character Length Distribution
+
+We can use `ggplot2` in order to visualize the length in the number of characters in the name, grouping the different categories into various buckets on the large end.
+
+
+```r
+## Character Count of Name
+ens$charcut &lt;- cut(nchar(ens$name), c(seq(2,20,by=1),26,501,40000),right=FALSE)
+
+ens_agg &lt;- ens %&gt;%
+    group_by(charcut) %&gt;%
+    summarise(count = n())
+
+p1 &lt;- ggplot(ens_agg,aes(charcut, count))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label = count), vjust = -.2, size = 2) +
+    xlab("ENS Character Length")+
+    ylab("Count") +
+    labs(
+        title = "Distribution of Name Length for Names",
+        subtitle = "For the ENS Service"
+    ) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    scale_x_discrete(labels=c(seq(3,19,by=1),"20-25","26-500","501-40k")) +
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10))
+```
+
+---
+
+We see that around 5-8 characters is the typical length for the names, but the distribution has a very long upper tail, with some extremely long names being used as well.
+
+
+```r
+p1
+```
+
+&lt;img src="ens_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Occurrence between Domains
+
+Next, we can look at the frequency of particular characters by splitting the name of every single ENS name, to obtain character vectors with one element per character. We then tabulate, and plot the resulting distribution:
+
+
+```r
+chr_dist &lt;- sort(table(unlist(lapply(unique(ens$name),function(x) unlist(strsplit(x,""))),use.names=FALSE)),decreasing=TRUE)
+
+p2 &lt;- ggplot(as.data.frame(chr_dist[1:15]), aes(Var1, Freq)) +
+    geom_col(position = 'dodge')+
+    geom_text(aes(label = Freq), vjust = -.2, size = 2) +
+    labs(
+        title = "Frequency of Particular Characters in Names",
+        subtitle = "For the ENS Service (Top 15 Characters)"
+    ) +
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+    xlab("Character")+
+    ylab("Count")
+```
+
+---
+
+Common vowels like a, e, and o are unsurprisingly the most common, with "n" being the most common consonant.
+
+
+```r
+p2
+```
+
+&lt;img src="ens_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Domains per Wallet
+
+We can also see the distribution of the amount of names per wallet address, by using the `owner` field like so:
+
+
+```r
+ens_us &lt;- split(ens,ens$owner)
+
+ens_usc &lt;- data.frame(owner = names(ens_us),count = sapply(ens_us,function(x) length(unique(x$name)),USE.NAMES=FALSE))
+ens_usc$countcut &lt;- cut(ens_usc$count, c(seq(1,10,by=1),21,51,501,2000),right=FALSE)
+
+ens_usc_agg &lt;- ens_usc %&gt;%
+    group_by(countcut) %&gt;%
+    summarise(count = n())
+
+p3 &lt;- ggplot(ens_usc_agg,aes(countcut, count))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label = count), vjust = -.2, size = 2) +
+    xlab("Number of ENS")+
+    ylab("Count of Wallets")+
+    labs(
+        title = "Distribution of the Number of Names per Wallet",
+        subtitle = "For the ENS Service"
+    ) +
+    scale_x_discrete(labels=c(seq(1,9,by=1),"10-20","21-50","51-500","501-2000"))+
+    scale_y_continuous(breaks=pretty_breaks(n = 10), labels = scales::comma)
+```
+
+---
+
+The vast majority of wallets have only a single name, but some have upwards of 500 - In fact, 10-20 is a rather common number to have.
+
+
+```r
+p3
+```
+
+&lt;img src="ens_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Distribution of Registration Lengths
+
+Based on the difference in the expiration and the block time, we can also observe the distribution of registration lengths for the names:
+
+
+```r
+timedays_df &lt;- data.frame(time = as.numeric(round(difftime(ens$expires,ens$blocktime,units="days"),0)))
+timedays_df$timecut &lt;- cut(timedays_df$time, c(0,45,(1:10)*366,366*100,366*2500),right=FALSE)
+
+timedays_df_agg &lt;- timedays_df %&gt;%
+    group_by(timecut) %&gt;%
+    summarise(count = n())
+
+p4 &lt;- ggplot(timedays_df_agg,aes(timecut, count))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label = count), vjust = -.2, size = 2) +
+    xlab("Registration Length")+
+    ylab("Count")+
+    labs(title = "Distribution of the Registration Length for Names",
+         subtitle = "For the ENS Service") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_discrete(labels=c("0D-45D","45D-1Y",paste0(2:10,"Y"),"10Y-100Y","100Y-2500Y"))
+```
+
+
+---
+
+The most common length of registration is between 45 days and 1 year, but a significant number are registered for 10 years, or even between 10-100 years.
+
+
+```r
+p4
+```
+
+&lt;img src="ens_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Distribution of Cost Paid
+
+Finally, we can look at the distribution of the amount paid in ETH for the names, breaking the amounts into various bins.
+
+
+```r
+cost_df &lt;- data.frame(cost = round(as.numeric(ens$cost)/10^18,6))
+cost_df$costcut &lt;- cut(cost_df$cost, c(0,.001,.0025,.005,.01,.1,1,5,40),right=FALSE)
+
+cost_df_agg &lt;- cost_df %&gt;%
+    group_by(costcut) %&gt;%
+    summarise(count = n())
+
+p5 &lt;- ggplot(cost_df_agg,aes(costcut, count))+
+    geom_bar(stat="identity")+
+    xlab("Cost Paid in ETH")+
+    ylab("Count")+
+    labs(
+        title = "Distribution of Cost Paid in ETH",
+        subtitle = "For the ENS Service"
+    ) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    scale_x_discrete(labels=paste0(c("&lt;.001",".001 to .0025",".0025 to .005",".005 to .01",".01 to .1",".1 to 1","1 to 5","5 to 40")," ETH"))+
+    scale_y_continuous(breaks=pretty_breaks(n = 10), labels = scales::comma)
+```
+
+---
+
+Costs typically fall under .1 ETH, but on the extreme end, some cost between 5 to 40 ETH!
+
+
+```r
+p5
+```
+
+&lt;img src="ens_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Conclusion
+
+Ultimately, we can see that with a rather simple set of R-based analysis, we can derive some very interesting insights regarding the ENS. It will be interesting to see how these metrics evolve as the service matures!
+
+![ENS Logo](ens_logo.png)
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
