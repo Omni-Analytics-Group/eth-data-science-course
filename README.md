@@ -62,7 +62,7 @@ Module 4 - Case Studies
 * Forecasting the Trend in Bitcoin Dominance ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/bitcoin-dominance/dominance.html))
 * An Analysis of the Uniswap Platform ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/uniswap/report.html))
 
-Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance*
+Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
 
 ## Updates
 
@@ -117,10 +117,17 @@ In addition to making progress on Module 3, we've doubled down on our cross-plat
 
 Change log
 * Added a Python tutorials for Module 1
-* Updates to Module 3 (sit tight!)
+* Updates to Module 3
 * Various link fixes and copy edits
 
+*Gitcoin Grant Round 14*
 
+We’re bouncing all around for this season! The new case studies for this round touch on forecasting L2 contract deployment, exploring ENS domain names, characterizing Filecoin miners, understanding Unlock Protocol contract interactions, and analyzing Uniswap with the uniswappeR package. We’ll be updating throughout the period so don’t be too surprised if a few new case studies or additional content pops up out of nowhere! Also, we don't want to forget to extend kudos to [@NadiaAntony](https://github.com/NadiaAntony) for her course content contributions!
+
+Change log
+* 5+ new Case Studies
+* Various link fixes and copy edits
+* Minor updates to Module 3
 
 ## FAQ
 
@@ -143,6 +150,8 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 ## Impact and Accolades
 
 March 11th, 2022 - 59 Stars - 16 Forks
+June   8th, 2022 - 76 Stars - 17 forks
+
 
 ## Featured Projects
 
@@ -156,3 +165,10 @@ March 11th, 2022 - 59 Stars - 16 Forks
 * [Yearn.Finance](https://yearn.finance/)
 * [Covalent](https://www.covalenthq.com/)
 * [PoolTogether](https://pooltogether.com/)
+* [ENS](https://ens.domains/) 
+* [Unlock Protocol](https://unlock-protocol.com/)
+* [Filecoin](https://filecoin.io/)
+* [Optimism](https://www.optimism.io/)
+* [Polygon](https://polygon.technology/)
+* [Uniswap](https://uniswap.org/)
+* [Gitcoin](https://gitcoin.co/)
