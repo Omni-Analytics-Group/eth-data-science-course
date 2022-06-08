@@ -150,7 +150,7 @@ Sure! Once we flesh out the initial course material. If funding persists, we'd b
 ## Impact and Accolades
 
 * March 11th, 2022 - 59 Stars - 16 Forks
-* June   8th, 2022 - 76 Stars - 17 forks
+* June   8th, 2022 - 76 Stars - 17 Forks
 
 
 ## Featured Projects
