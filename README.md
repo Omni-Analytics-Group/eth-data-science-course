@@ -59,6 +59,8 @@ Module 4 - Case Studies
 * An Exploratory Data Analysis of Yearn.Finance ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/yearn/yearn.html#1))
 * Interacting with the Covalent API via httr ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/covalent/covalent.html))
 * Analyzing the Ethereum Name Service (ENS) ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/ens-names/ens.html))
+* Forecasting the Trend in Bitcoin Dominance ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/bitcoin-dominance/dominance.html))
+* An Analysis of the Uniswap Platform ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/uniswap/report.html))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance*
 
