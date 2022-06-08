@@ -1,0 +1,111 @@
+---
+title: "ForeFront Social Token Analysis <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=14, dpi=300)
+
+library(knitr)
+library(kableExtra)
+```
+
+## Introduction
+
+Social Tokens are Cryptocurrency tokens which enable a direct share of value between content creators, artists, or creative professionals, and community members with a shared interest. This can allow content creators to monetize access to their content, but also can simply provide a community with a currency that, due to their shared interests, has inherent value to each of them.
+
+ForeFront aggregates news, insights, and other exclusive content about Social Tokens and DAOs. ForeFront provides a free weekly newsletter with updates on the latest social tokens. The social tokens that ForeFront follows include:
+
+![](token_list.png)
+
+---
+
+## Goals of the Tokens
+
+These tokens vary in terms of the communities they cater to and the goals of each. For example, MetaGame bills itself as “a weird combination of a social network, a freelancing platform & an MMO-RPG.” Harrison First, as the name suggests, is a creator-based token tied to the DJ Harrison First. Finally, Bankless DAO focuses on raising awareness of bankless money systems. This sample alone illustrates the range and span of the mission statement of various social tokens on the ForeFront platform.
+
+Because the variation in these tokens is so large, ForeFront attempts to categorize them by using a method of tagging. For example, the previously mentioned MetaGame is tagged as Metaverse, but also Tooling, Community, and Membership. Harrison First is tagged as, among other things, NFTs and Entertainment. These tags help to see, at a glance, the community or communities a particular social token is targetting. In addition to tags, social tokens are broken down by utilities. In the case of MetaGame, its utility is in terms of Access, Governance, and Servicing. Harrison First also has access and servicing as listed utilities, while some other tokens have NFTs, Payments, and more. This categorization in terms of tags and utilities helps to break down the list of social tokens into relevant characteristics and highlight those that might appeal to a certain individual or group.
+
+---
+
+## Network Analysis
+
+Network Analysis
+Since we have a break-down of the tags and utilities associated with particular social tokens on ForeFront, we can actually perform a network analysis by using the shared tags and utilities to derive a metric of similarity. This can allow us to visually represent how inter-related a set of social tokens are based on these characteristics. In order to do that, we needed to scrape and collect the tags and utility data.
+
+To perform the data collection, we called the ForeFront API, retrieving data for the coins tracked on the site. This loop was done in the program R, using supporting packages tidyverse for data manipulation, and httr for making synchronous API calls.
+
+To create the utilities network graph, we needed to create a graph structure out of the data. Graphs are represented by nodes, in this case the social tokens themselves as well as the utilities, and edges. The edges between nodes are defined by sharing a utility. The graph is shown below. We immediately see that Governance is a utility that binds many of the social tokens together. We also see that certain Social Tokens are more interconnected by virtue of having a wide variety of utility, such as Meta Game.
+
+---
+
+## The Graph - Utility
+
+![](util_plot-1.png)
+
+---
+
+## The Graph - Tags
+
+![](tag_plot-1.png)
+
+---
+
+## Interactive Versions
+
+We have produced interactive versions of these charts here. You can interact with the graphs yourself and see what interesting or unexpected connections or relationships you find!
+
+- [Utilities Network Graph](https://crypto.omnianalytics.io/forefront/Utils_NodeName.html)
+- [Tags Network Graph](https://crypto.omnianalytics.io/forefront/Tags_NodeName.html)
+
+---
+
+## Benefits Analysis
+
+Next, we collected data on the benefits that each social token provides to its holders. The benefits are roughly broken down into three distinct categories:
+
+- Access: Being granted access to exclusive content or a community
+- Earn: The ability to earn more of that token by doing some task
+- Redeem: The ability to redeem that token for items or content
+
+---
+
+## Benefits Explanation
+
+While many of the tokens offer some form of access or earnings, very few offer the ability to redeem, which was a distinguishing characteristic of just a handful. Because of the hierarchical nature of this data, we were able to break it down into a dendrogram which traces the three different types of benefits, to the tokens that offer them, and then a description of what specifically those benefits are. 
+
+The dendrogram is shown on the next slide. We immediately see that Access is the benefit given by the largest number of social tokens, where only three provide the ability to redeem for rewards. Interestingly, some tokens break down their benefits even within a particular category at a more fine-grained level. For example, SKULL lists four separate access benefits that are all related to discord access tiers.
+
+---
+
+## Dendrogram (Version 1)
+
+![](benefits1.png)
+
+---
+
+## Dendrogram (Version 2)
+
+We can restructure this view in a slightly different format, flipping the token to the beginning and then splitting into the benefits offered by that token from there. That graph is shown below. This representation allows us to better analyze the benefits offered by a specific token and see them in the chart together. For example, the Swagg Network we immediately see offers one benefit from each category in this representation of the data.
+
+![](benefits2.png)
+
+---
+
+## Conclusion
+
+This analysis highlights the way data science and analytics can be used to better understand characterstics of interest. In this case, we were able to use simple tags, utilities, and benefits data in order to tokens with shared characteristics, and visually represent these characteristics in a simple yet appealing way.
+
+As the website continues to grow, we look forward to performing a reprise of this analysis. If you have any further suggestions or ideas about what can be done in a future iteration of this analysis, please share and we will see what can be done!
