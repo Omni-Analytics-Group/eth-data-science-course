@@ -58,6 +58,7 @@ Module 4 - Case Studies
 * An Exploratory Data Analysis of PoolTogether ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/pool-together/pool.html#1))
 * An Exploratory Data Analysis of Yearn.Finance ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/yearn/yearn.html#1))
 * Interacting with the Covalent API via httr ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/covalent/covalent.html))
+* Analyzing the Ethereum Name Service (ENS) ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/ens-names/ens.html))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance*
 
