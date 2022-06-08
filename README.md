@@ -61,6 +61,7 @@ Module 4 - Case Studies
 * Analyzing the Ethereum Name Service (ENS) ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/ens-names/ens.html))
 * Forecasting the Trend in Bitcoin Dominance ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/bitcoin-dominance/dominance.html))
 * An Analysis of the Uniswap Platform ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/uniswap/report.html))
+* Forefront Social Token Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/forefront/forefront.html))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
 
