@@ -34,9 +34,9 @@ Data Sources: [*CryptoPunks*](https://www.larvalabs.com/cryptopunks), [*Crypto A
 Data Sources: *Omni Analytics Group*, [*CryptoPunks*](https://www.larvalabs.com/cryptopunks)
 
 Module 3 - Supervised and Unsupervised Machine Learning
-* The ML workflow
-* Supervised learning for classification
-* Unsupervised learning for grouping
+* [The ML workflow](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%203/3-1-Intro.html)
+* [Supervised learning for classification](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%203/3-2-Unsupervised.html)
+* [Unsupervised learning for grouping](https://crypto.omnianalytics.io/eth-data-science-course/courses/Module%203/3-3-Supervised.html)
 * Forecasting what's next
 * Deep learning for sequences
 
