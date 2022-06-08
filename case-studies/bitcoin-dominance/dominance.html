@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Forecasting the Trend in Bitcoin Dominance          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Forecasting the Trend in Bitcoin Dominance <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Dominance
+
+- The "Dominance" of Bitcoin is effectively a measure of the overall Market Capitalization of Bitcoin, relative to the overall Cryptocurrency Market 
+- In the early years of Cryptocurrency, this metric was typically over 90% as Bitcoin was the pre-eminent and, no pun intended, dominating force.
+- As Ethereum and other "Altcoins" grew more prominent, this metric has slowly but consistently dropped, subject to various fluctuations depending on overall market conditions
+
+In this case study, we will pull CoinMarketCap data on Bitcoin Dominance, and apply two machine learning models to the data to forecast the trend!
+
+---
+
+## Required Libraries
+
+We start by loading a number of libraries in R to aid our analysis:
+
+
+```r
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(forecast)
+library(xts)
+library(cowplot)
+library(omnitheme) # devtools::install_github("erichare/omnitheme")
+library(httr)
+
+set.seed(20190131)
+```
+
+---
+
+## Fetching Historical BTC Market Capitalization
+
+We next load up the historical BTC MCap data by using `httr` in order to pull from the CMC API:
+
+
+```r
+x &lt;- GET("https://web-api.coinmarketcap.com/v1.1/global-metrics/quotes/historical?format=chart&amp;interval=1d&amp;time_end=1614063600&amp;time_start=2013-04-28")
+btc &lt;- content(x, "parsed")
+
+mcaps &lt;- lapply(btc$data, function(x) c(Volume = x[[2]], Marketcap = x[[1]], Date = names(x)))
+
+btc_mcaps &lt;- tibble(
+    Date = names(mcaps),
+    Marketcap = sapply(mcaps, `[`, 2)
+) %&gt;%
+    mutate(Date = as_date(ymd_hms(Date)))
+
+kable(head(btc_mcaps, n = 4))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Marketcap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1583440000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1686950016 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1637389952 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1333880064 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Fetching Historical Altcoin Market Capitalization
+
+To compute dominance, we must do a similar routine with other coins:
+
+
+```r
+x &lt;- GET("https://web-api.coinmarketcap.com/v1.1/global-metrics/quotes/historical?format=chart_altcoin&amp;interval=1d&amp;time_end=1614063600&amp;time_start=2013-04-28")
+alt &lt;- content(x, "parsed")
+
+mcaps &lt;- lapply(alt$data, function(x) c(Volume = x[[2]], Marketcap = x[[1]], Date = names(x)))
+
+alt_mcaps &lt;- tibble(
+    Date = names(mcaps),
+    MarketcapAlt = sapply(mcaps, `[`, 2)
+) %&gt;%
+    mutate(Date = as_date(ymd_hms(Date)))
+
+kable(head(alt_mcaps, n = 4))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; MarketcapAlt &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 91876704 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 94716304 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 92358096 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78998704 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Performing the Join
+
+We are ready now to join by date, which allows us to compute the Dominance value as a function of time:
+
+`\(D = \frac{(MCap_{btc} - MCap_{alt})}{MCap_{btc}}\)`
+
+
+```r
+dom &lt;- btc_mcaps %&gt;%
+    left_join(alt_mcaps) %&gt;%
+    mutate(Dominance_bitcoin = (Marketcap - MarketcapAlt) / (Marketcap)) %&gt;%
+    select(Date, Dominance = Dominance_bitcoin)
+
+kable(head(dom))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Dominance &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9419765 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9438535 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9435943 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9407753 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9415975 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9387870 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Choosing a Cutoff Date
+
+While not strictly necessary for the forecasts, our experiments suggested that filtering the data to only consider dominance values computed since 2017 yielded a more accurate assessment prediction for future dominance. This is likely largely due to the fact that the Cryptocurrency ecosystem evolved and grew so drastically during this time frame. To perform the filter, simply select the cutoff date:
+
+
+```r
+dom_data &lt;- dom %&gt;%
+    filter(Date &lt;= ymd("2017-01-01"))
+
+kable(head(dom_data))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Dominance &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-29 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9419765 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9438535 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9435943 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9407753 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9415975 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9387870 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Visualizing the Dominance over Time
+
+Now we can make a quick plot to see how the trend looks - steadily decreasing!
+
+
+```r
+ggplot(data = dom_data, aes(x = Date, y = Dominance)) +
+    geom_line() +
+    scale_y_continuous(limits = c(.5, 1), breaks = seq(0, 1, by = .1), labels = scales::percent)
+```
+
+&lt;img src="dominance_files/figure-html/unnamed-chunk-6-1.png" width="800" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Linear Model
+
+Our first of two models is a simple linear model, which we fit using the code below:
+
+
+```r
+newdata &lt;- data.frame(Date = seq.Date(ymd("2014-01-01"), ymd("2023-01-01"), by = "1 day"))
+
+btc_ts &lt;- ts(dom_data$Dominance, start = c(2013, 4), frequency = 365)
+
+btc_lm &lt;- lm(Dominance ~ Date, data = dom_data)
+btc_lm_preds &lt;- predict(btc_lm, newdata = newdata, interval = "confidence") %&gt;%
+    as.data.frame() %&gt;%
+    cbind(Method = "Linear Model", Date = newdata$Date)
+names(btc_lm_preds) &lt;- c("Prediction", "Lower", "Upper", "Method", "Date")
+
+kable(head(btc_lm_preds, n = 4))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Prediction &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Lower &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Upper &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Method &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.9142752 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9116095 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9169409 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-01 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.9141818 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9115195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9168440 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-02 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.9140883 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9114294 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9167471 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-03 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.9139948 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9113394 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9166503 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-04 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Brownian Motion
+
+Brownian motion differs in that it does not assume a linear trend, but rather randomly samples from the observed distribution of dominance changes over time.
+
+
+```r
+cap &lt;- 10
+btc_brownian &lt;- dom_data %&gt;%
+    mutate(Returns = c(1, Dominance[-1] / lag(Dominance, 1)[-1])) %&gt;%
+    mutate(Returns = pmin(cap, pmax(1 / cap, Returns)),
+           ScaledReturns = Returns - 1)
+
+simulated_returns &lt;- as.data.frame(do.call(cbind, lapply(1:1000, function(i) {
+    sample(btc_brownian$Returns, size = nrow(newdata), replace = TRUE)
+})))
+
+kable(head(simulated_returns[,1:5], n = 4))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; V1 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; V2 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; V3 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; V4 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; V5 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1.0005587 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.029509 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9991042 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9993317 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0070749 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.9865010 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.004628 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0010026 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9976180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9972244 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 0.9973319 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.000847 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0020122 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0003154 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0054039 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1.0049976 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.003120 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.0025538 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9946208 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9935754 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Brownian Motion (Continued)
+
+Once our simulation is complete, we aggregate together the results like so:
+
+
+```r
+btc_brownian_preds &lt;- cbind(Date = newdata$Date, simulated_returns) %&gt;%
+    gather(key = Simulation, value = Value, 2:ncol(.)) %&gt;%
+    group_by(Simulation) %&gt;%
+    mutate(CumeValue = cumprod(Value),
+           Future = CumeValue * dom_data$Dominance[length(dom_data$Dominance)]) %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Prediction = mean(Future),
+              Upper = quantile(Future, .975),
+              Lower = quantile(Future, .025),
+              Method = "Brownian Motion")
+
+kable(head(btc_brownian_preds, n = 4))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Prediction &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Upper &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Lower &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Method &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-01 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8737708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8833834 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8625872 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-02 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8734809 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8864654 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8581507 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-03 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8732396 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8892569 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8549329 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2014-01-04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8735028 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8914603 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.8534365 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Binding the Results
+
+Finally, for purposes of visualization, we bind together the results from both the Linear Model and the Brownian Motion model:
+
+
+```r
+btc_forecasts &lt;- btc_lm_preds %&gt;%
+    gather(key = Type, value = Dominance, 1:3) %&gt;%
+    rbind(
+        btc_brownian_preds %&gt;%
+            gather(key = Type, value = Dominance, 2:4)
+    ) %&gt;%
+    rbind(
+        dom %&gt;%
+            mutate(Method = "Linear Model", Type = "Actual")
+    ) %&gt;%
+    rbind(
+        dom %&gt;%
+            mutate(Method = "Brownian Motion", Type = "Actual")
+    ) %&gt;%
+    arrange(Date, Method) %&gt;%
+    mutate(Type2 = ifelse(Type == "Actual", Type, "Prediction"))
+```
+
+---
+
+## Final Plotting Data
+
+To prepare for plotting, we ensure that all the data is properly encoded to indicate whether it is real (observed) data, or predictions from the models:
+
+
+```r
+plot_dat &lt;- btc_forecasts %&gt;% 
+    mutate(Type3 = ifelse(Type %in% c("Lower", "Upper"), "Confidence Bounds", Type)) %&gt;%
+    mutate(Type3 = factor(Type3, levels = c("Actual", "Prediction", "Confidence Bounds")),
+           Type = factor(factor(Type, levels = c("Actual", "Prediction", "Lower", "Upper")), 
+                         labels = c("Actual", "Prediction", "Confidence Bounds", "Upper"))) %&gt;%
+               filter(Type != "Confidence Bounds", Type != "Upper")
+
+kable(head(plot_dat))
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Method &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Type &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Dominance &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Type2 &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Type3 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9419765 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9419765 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-30 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9438535 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-04-30 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9438535 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9435943 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Linear Model &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2013-05-01 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.9435943 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Actual &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Plotting Code
+
+And we obtain our predictions with the code below!
+
+
+```r
+p1 &lt;- ggplot(data = plot_dat %&gt;% filter(Date &lt; ymd("2023-01-01"), Date &gt;= ymd("2014-01-01")), aes(x = Date, y = Dominance)) +
+    geom_line(aes(linetype = Type2, color = Type)) +
+    scale_color_manual(values = c("black", "red"), breaks = c("Actual", "Prediction")) +
+    scale_linetype_manual(guide = "none", values = c("solid", "solid")) +
+    scale_y_continuous(labels = function(.) scales::percent(., accuracy = 1), limits = c(0, 1), breaks = seq(0, 1, by = .1)) +
+    scale_x_date(date_breaks = "6 months", date_labels = "%b %y") +
+    facet_wrap(~Method, ncol = 3, scales = "free") +
+    theme_minimal(14) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+    ) +
+    labs(
+        title = "Machine Learning based Bitcoin Dominance Projections",
+        subtitle = "Through the end of the year"
+    ) +
+    watermark_img(system.file("images", "OAG_CLR_web_big.png", package = "omnitheme"), 
+                  location = "bl", alpha = .35, width = 60)
+```
+
+---
+
+## Final Prediction!
+
+As you can see, the linear model seems to capture the observed trend a little bit better, whereas Brownian Motion tends to reduce the overall slope of the projection such that the projections lie above what we have seen in the past data.
+
+
+```r
+p1
+```
+
+&lt;img src="dominance_files/figure-html/unnamed-chunk-13-1.png" width="700" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

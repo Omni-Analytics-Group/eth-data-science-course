@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Uniswap Analysis          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Uniswap Analysis <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Introduction
+
+This brief README/tutorial will walk you through the process we took in order to produce the individual Uniswap Report Plots, and ultimately the final report! To produce this report, you need a recent version of R, as well as the following R packages:
+
+
+```r
+## Load Libraries
+library(tidyverse)
+library(lubridate)
+library(patchwork)
+library(grid)
+library(ggnetwork)
+library(scales)
+library(magick)
+```
+
+We also recommend the use of RStudio as your R IDE, as this will ease the process of debugging any coding issues and saving the state of your R session. Once R, RStudio, and the above packages are installed, we're ready to begin!
+
+---
+
+## Data
+
+The very first step is to process the raw data and ensure it is suitable for the analysis. The data is provided as RDS files, which is an R binary storage format that can be directly read into your session via the `readRDS()` call:
+
+
+```r
+## Load Uniswap Pair Info Dataset
+uni &lt;- readRDS("pairs_info.rds") %&gt;%
+    as_tibble() %&gt;%
+    mutate(across(where(is.character), readr:::parse_guess))
+```
+
+---
+
+## Outliers
+
+There is one extreme outlier in the data (`LAWA`) that we will remove in order to ensure that the remaining results are interpretable:
+
+
+```r
+## Remove Outlier
+uni &lt;- uni[!(uni$Pr_Token1_Ticker %in% c("LAWA")),]
+uni &lt;- uni[!(uni$Pr_Token0_Ticker %in% c("LAWA")),]
+```
+
+---
+
+## Data Pre-Processing
+
+Next, we do a little pre-processing of the dates so that we can track the date and time at which the report was generated:
+
+
+```r
+## Get the day of infographic and split data set to the new one
+current_time &lt;- Sys.time()-hours(1)
+attr(current_time,"tzone") &lt;- "GMT"
+current_date &lt;- as_date(current_time)
+uni$Pr_Date &lt;- as_date(uni$Pr_Created)
+new &lt;- uni[uni$Pr_Date == current_date,]
+uni &lt;- uni[uni$Pr_Date &lt;= current_date,]
+```
+
+We are now ready to begin with the analysis!
+
+---
+
+## Aggregate Metrics
+
+We next produce the code required to produce a handful of important metrics:
+
+---
+
+## Average daily contracts deployed
+
+
+```r
+avg_cont &lt;- uni %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    group_by(Day = day(Date), Month = month(Date), Year = year(Date)) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ungroup() %&gt;%
+    summarise(`Average Daily Count` = mean(Count)) %&gt;%
+    pull(`Average Daily Count`)
+
+avg_cont
+```
+
+```
+## [1] 94.28861
+```
+
+---
+
+## Average amount of liquidity
+
+
+```r
+avg_liq &lt;- uni %&gt;%
+    summarise(`Average Liquidity` = mean(Pr_Liquidity_USD)) %&gt;%
+    pull(`Average Liquidity`)
+
+avg_liq
+```
+
+```
+## [1] 257845.9
+```
+
+---
+
+## Median amount of liquidity
+
+
+```r
+med_liq &lt;- uni %&gt;%
+    summarise(`Average Liquidity` = median(Pr_Liquidity_USD)) %&gt;%
+    pull(`Average Liquidity`)
+
+med_liq
+```
+
+```
+## [1] 20656.6
+```
+
+---
+
+## Average daily liquidity
+
+
+```r
+daily_liq &lt;- uni %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    group_by(Day = day(Date), Month = month(Date), Year = year(Date)) %&gt;%
+    summarise(Liq = sum(Pr_Liquidity_USD)) %&gt;%
+    ungroup() %&gt;%
+    summarise(`Average Daily Liquidity` = mean(Liq)) %&gt;%
+    pull(`Average Daily Liquidity`)
+
+daily_liq
+```
+
+```
+## [1] 24311935
+```
+
+---
+
+## Median daily liquidity
+
+
+```r
+daily_liq_med &lt;- uni %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    group_by(Day = day(Date), Month = month(Date), Year = year(Date)) %&gt;%
+    summarise(Liq = sum(Pr_Liquidity_USD)) %&gt;%
+    ungroup() %&gt;%
+    summarise(`Average Daily Liquidity` = median(Liq)) %&gt;%
+    pull(`Average Daily Liquidity`)
+
+daily_liq_med
+```
+
+```
+## [1] 7979155
+```
+
+---
+
+## Final Steps
+
+Finally, to prepare for the visualization stage, we produce some pairs datasets:
+
+
+```r
+v1 &lt;- uni %&gt;%
+    select(Pr_Token0_Reserve, Pr_Token0_Ticker) %&gt;%
+    filter(!(Pr_Token0_Ticker %in% c("WETH", "ETH", "WBTC", "renBTC", "USDC", "USDT", "DAI", "USDN")))
+
+v2 &lt;- uni %&gt;%
+    select(Pr_Token1_Reserve, Pr_Token1_Ticker) %&gt;%
+    filter(!(Pr_Token1_Ticker %in% c("WETH", "ETH", "WBTC", "renBTC", "USDC", "USDT", "DAI", "USDN")))
+
+v3 &lt;- v1 %&gt;%
+    rename(reserve = Pr_Token0_Reserve, ticker = Pr_Token0_Ticker) %&gt;%
+    bind_rows(v2 %&gt;% rename(ticker = Pr_Token1_Ticker, reserve = Pr_Token1_Reserve))
+```
+
+And now, we are ready for the exciting part. The plots!
+
+---
+
+## Visualizations
+
+One important concept that you may have picked up on by now is the fact that, rather than just returning the result in this README, we are storing the results in variables for later use. That is how we will ultimately produce the full report. We will keep up that theme in this section, where every plot we produce will be stored in a variable for later reference.
+
+To start, we compute the daily distribution of contracts deployed on Uniswap.
+
+---
+
+
+```r
+p1 &lt;- uni %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    group_by(Day = day(Date), Month = month(Date), Year = year(Date)) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ungroup() %&gt;%
+    ggplot(aes(x = Count)) +
+    geom_histogram(colour = "grey60", fill = "purple") +
+    scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+    scale_x_continuous(breaks = seq(0, 400, by = 20)) +
+    labs(
+        title = "Distribution of Daily Contracts Deployed on Uniswap",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d")),
+        caption = paste0("New Contracts Deployed: ", nrow(new), "\nDaily Average Contracts Deployed: ", round(avg_cont, digits = 2)),
+        y = "Count",
+        x = "New Contracts Deployed"
+    )
+```
+
+---
+
+
+```r
+p1
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Next, we look at the daily contracts deployed as a function of time, in a time series format, once again storing the variable so we can later refer to it.
+
+
+```r
+p2 &lt;- uni %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    group_by(Day = day(Date), Month = month(Date), Year = year(Date)) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ungroup() %&gt;%
+    mutate(Day = ymd(paste(Year, Month, Day, sep = "/"))) %&gt;%
+    ggplot(aes(x = Day, y = Count)) +
+    geom_point(colour = "purple") +
+    geom_line() +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_date(breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Daily Contracts Deployed on Uniswap over Time",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d"))
+    ) +
+    theme(axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+---
+
+
+```r
+p2
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+We can look, at a log scale, the distribution of the total liquidity per contract at deployment, which spans quite a range (from near zero, to well into the millions)
+
+
+```r
+p3 &lt;- uni %&gt;%
+    ggplot(aes(x = Pr_Liquidity_USD)) +
+    geom_histogram(colour = "grey60", fill = "green4",breaks = c(10^(seq(-15,-3,by=3)),10^(seq(0,10,by=1)))) +
+    scale_y_continuous() +
+    scale_x_log10( breaks = c(10^(seq(-15,-3,by=3)),10^(seq(0,8,by=1))),
+                labels = c("$1e-15","$1e-12","$1e-9","$1e-6","$1e-3","$1","$10","$100","$1000","$10,000","$100,000","$1 Million","$10 Million","$100 Million")) +
+    labs(
+        title = "Amount of Daily Total Liquidity per Contract at Deployment",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d")),
+        y = "Count",
+        x = "Liquidity ($)",
+        caption = paste0("Average Liquidity per Contract: ", scales::dollar(avg_liq), "\nMedian Liquidity per Contract: ", scales::dollar(med_liq))
+    ) +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+---
+
+
+```r
+p3
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+The daily total added liquidity as a function of time is shown next:
+
+
+```r
+p4 &lt;- uni %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    group_by(Day = day(Date), Month = month(Date), Year = year(Date)) %&gt;%
+    summarise(Pr_Liquidity_USD = sum(Pr_Liquidity_USD)) %&gt;%
+    ungroup() %&gt;%
+    mutate(Day = ymd(paste(Year, Month, Day, sep = "/"))) %&gt;%
+    filter(Pr_Liquidity_USD &lt;= 500000000) %&gt;%
+    ggplot(aes(x = Day, y = Pr_Liquidity_USD)) +
+    geom_point(colour = "green4") +
+    geom_line() +
+    scale_y_continuous(labels = scales::dollar, breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Daily Total Added Liquidity from Deployed Contracts on Uniswap over Time",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d")),
+        x = "Date",
+        y = "Liquidity ($)",
+        caption = paste0("Average Daily Liquidity Added: ", scales::dollar(daily_liq), "\nMedian Daily Liquidity Added: ", scales::dollar(daily_liq_med))
+    )
+```
+
+---
+
+
+```r
+p4
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Similar to the previous histogram, we produce a logged version of the token amounts, which also spawns a significant range from near zero to trillions.
+
+
+```r
+p5 &lt;- ggplot(v3, aes(x = reserve)) +
+    geom_histogram(colour = "grey60", fill = "red4") +
+    scale_y_continuous() +
+    scale_x_log10(labels = c("1e-12", "1e-3", "1", "1,000", "1 Million", "1 Billion", "1 Quadrillion"),
+                       breaks = c(1e-12, 1e-3, 1, 1000, 1000000, 1000000000, 10^15)) +
+    labs(
+        title = "Distribution of Token Amounts per Deployment",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d")),
+        y = "Count",
+        x = "Reserve"
+    )
+```
+
+---
+
+
+```r
+p5
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+The distribution of transaction counts is a bit more normal and is produced with the following code:
+
+
+```r
+p6 &lt;- ggplot(data = uni, aes(x = Pr_Tx_Count)) +
+    geom_histogram() +
+    scale_x_log10() +
+    geom_histogram(colour = "grey60", fill = "orangered3") +
+    labs(
+        title = "Distribution of Uniswap Transaction Count",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d")),
+        x = "Transaction Count"
+    )
+```
+
+---
+
+
+```r
+p6
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Next, we produce two side by side plots, showing the number of Uniswap contracts over time deployed with a WETH and USDC pair respectively.
+
+
+```r
+p71 &lt;- uni %&gt;%
+    mutate(first = ifelse(Pr_Token0_Ticker &lt; Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker),
+           second = ifelse(Pr_Token0_Ticker &gt;= Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker)) %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    select(Date, first, second) %&gt;%
+    filter(first == "WETH" | second == "WETH") %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ggplot(aes(x = Date, y = Count)) +
+    geom_point() + 
+    geom_line() +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_date(date_breaks = "1 months", date_labels = "%b %y") +
+    labs(
+        title = "Uniswap Contracts Deployed with a WETH Pairing",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d"))
+    ) +
+    theme(axis.text.x = element_text(size = 6))
+```
+
+---
+
+
+```r
+p72 &lt;- uni %&gt;%
+    mutate(first = ifelse(Pr_Token0_Ticker &lt; Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker),
+           second = ifelse(Pr_Token0_Ticker &gt;= Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker)) %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    select(Date, first, second) %&gt;%
+    filter(first == "USDC" | second == "USDC") %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ungroup() %&gt;%
+    complete(Date = seq.Date(min(Date), max(Date), by="day"), fill = list(Count = 0)) %&gt;%
+    ggplot(aes(x = Date, y = Count)) +
+    geom_point() + 
+    geom_line() +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    scale_x_date(date_breaks = "1 months", date_labels = "%b %y") +
+    labs(
+        title = "Uniswap Contracts Deployed with a USDC Pairing",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d"))
+    ) +
+    theme(axis.text.x = element_text(size = 6))
+```
+
+---
+
+
+```r
+p71
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-25-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+p72
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-26-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+And now we do something similar, producing two side by side plots, showing the number of Uniswap contracts over time deployed with a USDT and DAI pair respectively.
+
+
+```r
+p73 &lt;- uni %&gt;%
+    mutate(first = ifelse(Pr_Token0_Ticker &lt; Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker),
+           second = ifelse(Pr_Token0_Ticker &gt;= Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker)) %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    select(Date, first, second) %&gt;%
+    filter(first == "USDT" | second == "USDT") %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ungroup() %&gt;%
+    complete(Date = seq.Date(min(Date), max(Date), by="day"), fill = list(Count = 0)) %&gt;%
+    ggplot(aes(x = Date, y = Count)) +
+    geom_point() + 
+    geom_line() +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    scale_x_date(date_breaks = "1 months", date_labels = "%b %y") +
+    labs(
+        title = "Uniswap Contracts Deployed with a USDT Pairing",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d"))
+    ) +
+    theme(axis.text.x = element_text(size = 6))
+```
+
+---
+
+
+```r
+p74 &lt;- uni %&gt;%
+    mutate(first = ifelse(Pr_Token0_Ticker &lt; Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker),
+           second = ifelse(Pr_Token0_Ticker &gt;= Pr_Token1_Ticker, Pr_Token0_Ticker, Pr_Token1_Ticker)) %&gt;%
+    mutate(Date = as_date(Pr_Created)) %&gt;%
+    select(Date, first, second) %&gt;%
+    filter(first == "DAI" | second == "DAI") %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Count = n()) %&gt;%
+    ungroup() %&gt;%
+    complete(Date = seq.Date(min(Date), max(Date), by="day"), fill = list(Count = 0)) %&gt;%
+    ggplot(aes(x = Date, y = Count)) +
+    geom_point() + 
+    geom_line() +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 3)) +
+    scale_x_date(date_breaks = "1 months", date_labels = "%b %y") +
+    labs(
+        title = "Uniswap Contracts Deployed with a DAI Pairing",
+        subtitle = paste0("For contracts deployed between ",format(min(as_date(uni$Pr_Created)),"%m/%d")," - ", format(current_date, "%m/%d"))
+    ) +
+    theme(axis.text.x = element_text(size = 6))
+```
+
+---
+
+
+```r
+p73
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+p74
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-30-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Report
+
+And now we can produce the final report! To do so, we use `patchwork` in order to "add" the plots together and form a basic report layout, using arithmetical operations. We append some annotations and details to it to further the design.
+
+
+```r
+res &lt;- (p1 + p2) / (p3 + p4) / p5 / p6 / (p71 + p72) / (p73 + p74) + plot_annotation(
+    title = "Uniswap Daily Contract Deployment Report",
+    subtitle = NULL,
+    caption = NULL,
+    tag_levels = NULL,
+    tag_prefix = NULL,
+    tag_suffix = NULL,
+    tag_sep = NULL,
+    theme = theme(plot.title = element_text(size = 30, hjust = 0.5))
+)
+```
+
+---
+
+
+```r
+res
+```
+
+&lt;img src="report_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+The last step is that we use the `magick` package to produce a slightly cooler version of the report - we simply write out the report as an image, read it in with the `image_read()` function, and perform a negation operation. With that, we have our final report!
+
+
+```r
+ggsave(res, filename = "uniswap.png", dpi = 300, height = 30, width = 10)
+im &lt;- image_read("uniswap.png") %&gt;% image_negate()
+image_write(im, "uniswap_invert.png")
+# file.remove("uniswap.png")
+```
+
+---
+
+
+```r
+knitr::include_graphics("uniswap_invert.png")
+```
+
+&lt;img src="uniswap_invert.png" width="4000" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Deployment
+
+This document is fully self-contained as an RMarkdown. Because the final step in the code up above is the output of the final report image, the steps for deploying this report creation process as a service or an automated procedure is very simple:
+
+1. Copy `report.Rmd` and all associated data and image dependencies to the server location of your choosing
+2. Install all R dependency packages on the server listed at the start of this document
+3. Confirm you can successfully compile the report with the following command: `rmarkdown::render('foo.Rmd', 'html_document')`
+4. If successful, you are able to schedule the execution of this procedure at an interval. You can use the `Rscript` binary to execute the command from the unix command line: `Rscript -e "rmarkdown::render('foo.Rmd', 'html_document')"`. Simply set up a CRON job at the specified interval to re-rendering the report automatically!
+
+---
+
+## Conclusion
+
+We hope you enjoyed this quick tutorial / walkthrough of how to produce our Uniswap Report. Please contact us if you have any questions, and be on the lookout for more analysis of this nature in the near future!
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,273 @@
+---
+title: "Forecasting the Trend in Bitcoin Dominance <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=14, dpi=300)
+
+library(knitr)
+library(kableExtra)
+```
+
+## Dominance
+
+- The "Dominance" of Bitcoin is effectively a measure of the overall Market Capitalization of Bitcoin, relative to the overall Cryptocurrency Market 
+- In the early years of Cryptocurrency, this metric was typically over 90% as Bitcoin was the pre-eminent and, no pun intended, dominating force.
+- As Ethereum and other "Altcoins" grew more prominent, this metric has slowly but consistently dropped, subject to various fluctuations depending on overall market conditions
+
+In this case study, we will pull CoinMarketCap data on Bitcoin Dominance, and apply two machine learning models to the data to forecast the trend!
+
+---
+
+## Required Libraries
+
+We start by loading a number of libraries in R to aid our analysis:
+
+```{r}
+library(tidyverse)
+library(rvest)
+library(lubridate)
+library(forecast)
+library(xts)
+library(cowplot)
+library(omnitheme) # devtools::install_github("erichare/omnitheme")
+library(httr)
+
+set.seed(20190131)
+```
+
+---
+
+## Fetching Historical BTC Market Capitalization
+
+We next load up the historical BTC MCap data by using `httr` in order to pull from the CMC API:
+
+```{r}
+x <- GET("https://web-api.coinmarketcap.com/v1.1/global-metrics/quotes/historical?format=chart&interval=1d&time_end=1614063600&time_start=2013-04-28")
+btc <- content(x, "parsed")
+
+mcaps <- lapply(btc$data, function(x) c(Volume = x[[2]], Marketcap = x[[1]], Date = names(x)))
+
+btc_mcaps <- tibble(
+    Date = names(mcaps),
+    Marketcap = sapply(mcaps, `[`, 2)
+) %>%
+    mutate(Date = as_date(ymd_hms(Date)))
+
+kable(head(btc_mcaps, n = 4))
+```
+
+---
+
+## Fetching Historical Altcoin Market Capitalization
+
+To compute dominance, we must do a similar routine with other coins:
+
+```{r}
+x <- GET("https://web-api.coinmarketcap.com/v1.1/global-metrics/quotes/historical?format=chart_altcoin&interval=1d&time_end=1614063600&time_start=2013-04-28")
+alt <- content(x, "parsed")
+
+mcaps <- lapply(alt$data, function(x) c(Volume = x[[2]], Marketcap = x[[1]], Date = names(x)))
+
+alt_mcaps <- tibble(
+    Date = names(mcaps),
+    MarketcapAlt = sapply(mcaps, `[`, 2)
+) %>%
+    mutate(Date = as_date(ymd_hms(Date)))
+
+kable(head(alt_mcaps, n = 4))
+```
+
+---
+
+## Performing the Join
+
+We are ready now to join by date, which allows us to compute the Dominance value as a function of time:
+
+$D = \frac{(MCap_{btc} - MCap_{alt})}{MCap_{btc}}$
+
+```{r}
+dom <- btc_mcaps %>%
+    left_join(alt_mcaps) %>%
+    mutate(Dominance_bitcoin = (Marketcap - MarketcapAlt) / (Marketcap)) %>%
+    select(Date, Dominance = Dominance_bitcoin)
+
+kable(head(dom))
+```
+
+---
+
+## Choosing a Cutoff Date
+
+While not strictly necessary for the forecasts, our experiments suggested that filtering the data to only consider dominance values computed since 2017 yielded a more accurate assessment prediction for future dominance. This is likely largely due to the fact that the Cryptocurrency ecosystem evolved and grew so drastically during this time frame. To perform the filter, simply select the cutoff date:
+
+```{r}
+dom_data <- dom %>%
+    filter(Date <= ymd("2017-01-01"))
+
+kable(head(dom_data))
+```
+
+---
+
+## Visualizing the Dominance over Time
+
+Now we can make a quick plot to see how the trend looks - steadily decreasing!
+
+```{r, out.width=800}
+ggplot(data = dom_data, aes(x = Date, y = Dominance)) +
+    geom_line() +
+    scale_y_continuous(limits = c(.5, 1), breaks = seq(0, 1, by = .1), labels = scales::percent)
+```
+
+---
+
+## Linear Model
+
+Our first of two models is a simple linear model, which we fit using the code below:
+
+```{r}
+newdata <- data.frame(Date = seq.Date(ymd("2014-01-01"), ymd("2023-01-01"), by = "1 day"))
+
+btc_ts <- ts(dom_data$Dominance, start = c(2013, 4), frequency = 365)
+
+btc_lm <- lm(Dominance ~ Date, data = dom_data)
+btc_lm_preds <- predict(btc_lm, newdata = newdata, interval = "confidence") %>%
+    as.data.frame() %>%
+    cbind(Method = "Linear Model", Date = newdata$Date)
+names(btc_lm_preds) <- c("Prediction", "Lower", "Upper", "Method", "Date")
+
+kable(head(btc_lm_preds, n = 4))
+```
+
+---
+
+## Brownian Motion
+
+Brownian motion differs in that it does not assume a linear trend, but rather randomly samples from the observed distribution of dominance changes over time.
+
+```{r}
+cap <- 10
+btc_brownian <- dom_data %>%
+    mutate(Returns = c(1, Dominance[-1] / lag(Dominance, 1)[-1])) %>%
+    mutate(Returns = pmin(cap, pmax(1 / cap, Returns)),
+           ScaledReturns = Returns - 1)
+
+simulated_returns <- as.data.frame(do.call(cbind, lapply(1:1000, function(i) {
+    sample(btc_brownian$Returns, size = nrow(newdata), replace = TRUE)
+})))
+
+kable(head(simulated_returns[,1:5], n = 4))
+```
+
+---
+
+## Brownian Motion (Continued)
+
+Once our simulation is complete, we aggregate together the results like so:
+
+```{r}
+btc_brownian_preds <- cbind(Date = newdata$Date, simulated_returns) %>%
+    gather(key = Simulation, value = Value, 2:ncol(.)) %>%
+    group_by(Simulation) %>%
+    mutate(CumeValue = cumprod(Value),
+           Future = CumeValue * dom_data$Dominance[length(dom_data$Dominance)]) %>%
+    group_by(Date) %>%
+    summarise(Prediction = mean(Future),
+              Upper = quantile(Future, .975),
+              Lower = quantile(Future, .025),
+              Method = "Brownian Motion")
+
+kable(head(btc_brownian_preds, n = 4))
+```
+
+---
+
+## Binding the Results
+
+Finally, for purposes of visualization, we bind together the results from both the Linear Model and the Brownian Motion model:
+
+```{r}
+btc_forecasts <- btc_lm_preds %>%
+    gather(key = Type, value = Dominance, 1:3) %>%
+    rbind(
+        btc_brownian_preds %>%
+            gather(key = Type, value = Dominance, 2:4)
+    ) %>%
+    rbind(
+        dom %>%
+            mutate(Method = "Linear Model", Type = "Actual")
+    ) %>%
+    rbind(
+        dom %>%
+            mutate(Method = "Brownian Motion", Type = "Actual")
+    ) %>%
+    arrange(Date, Method) %>%
+    mutate(Type2 = ifelse(Type == "Actual", Type, "Prediction"))
+```
+
+---
+
+## Final Plotting Data
+
+To prepare for plotting, we ensure that all the data is properly encoded to indicate whether it is real (observed) data, or predictions from the models:
+
+```{r}
+plot_dat <- btc_forecasts %>% 
+    mutate(Type3 = ifelse(Type %in% c("Lower", "Upper"), "Confidence Bounds", Type)) %>%
+    mutate(Type3 = factor(Type3, levels = c("Actual", "Prediction", "Confidence Bounds")),
+           Type = factor(factor(Type, levels = c("Actual", "Prediction", "Lower", "Upper")), 
+                         labels = c("Actual", "Prediction", "Confidence Bounds", "Upper"))) %>%
+               filter(Type != "Confidence Bounds", Type != "Upper")
+
+kable(head(plot_dat))
+```
+
+---
+
+## Plotting Code
+
+And we obtain our predictions with the code below!
+
+```{r}
+p1 <- ggplot(data = plot_dat %>% filter(Date < ymd("2023-01-01"), Date >= ymd("2014-01-01")), aes(x = Date, y = Dominance)) +
+    geom_line(aes(linetype = Type2, color = Type)) +
+    scale_color_manual(values = c("black", "red"), breaks = c("Actual", "Prediction")) +
+    scale_linetype_manual(guide = "none", values = c("solid", "solid")) +
+    scale_y_continuous(labels = function(.) scales::percent(., accuracy = 1), limits = c(0, 1), breaks = seq(0, 1, by = .1)) +
+    scale_x_date(date_breaks = "6 months", date_labels = "%b %y") +
+    facet_wrap(~Method, ncol = 3, scales = "free") +
+    theme_minimal(14) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+    ) +
+    labs(
+        title = "Machine Learning based Bitcoin Dominance Projections",
+        subtitle = "Through the end of the year"
+    ) +
+    watermark_img(system.file("images", "OAG_CLR_web_big.png", package = "omnitheme"), 
+                  location = "bl", alpha = .35, width = 60)
+```
+
+---
+
+## Final Prediction!
+
+As you can see, the linear model seems to capture the observed trend a little bit better, whereas Brownian Motion tends to reduce the overall slope of the projection such that the projections lie above what we have seen in the past data.
+
+```{r, out.width=700}
+p1
+```
