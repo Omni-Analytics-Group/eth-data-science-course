@@ -1,0 +1,415 @@
+---
+title: "Unsupervised Learning  <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 6, fig.align = "center")
+
+```
+
+## Outline
+
+- Objective
+- Data preparation
+- Normalization
+- K means clustering
+- 3 ways of visualizing clusters
+- Naming clusters
+- Other methods: pam, hclust 
+
+---
+
+## Glossary
+
+- Observation
+- Cluster
+
+---
+
+## Objective
+
+The marketing team for our fictional crypto project would like to understand more about the kinds of Ethereum holders in their survey. They are wondering if there are specific profiles within the Etherem holder base that distinguish them from each other. 
+
+*One way of understanding the kinds of Ethereum holders is to categorize them into groups, based on the similarity of characteristics between customers.*  
+
+Since the marketing team do not already have defined profiles that they are looking to identify, they will be attempting to solve a `latent varible` problem where the unobserved variable are the proposed groups of holders. When given unlabelled data such as this, we use unsupervised methods to cluster individual observations within the dataset.
+
+We will go through 3 different clustering techniques to help the marketing team!
+
+---
+
+## Dataset Preparation
+
+Let us read in the dataset, filter it to take only the Ethereum owners, remove outliers, and prepare it by doing the following:
+
+- create a numeric donated column that has a value of 1 if donated == TRUE and 0 if donated == FALSE
+- select only the numeric columns
+- omit all rows that have NA values
+
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+
+data_raw <- read_csv("data/data_raw.csv")
+  
+data_clus <- data_raw %>%
+  filter(owns_ethereum == "TRUE") %>%
+  mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
+  mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) %>%
+  mutate(donated = as.numeric(donated)) %>% # change to 0 and 1 
+  select(where(is.numeric)) %>% # select only the numeric values
+  na.omit()
+
+```
+
+---
+
+## Normalization
+
+The variables are of differing units. For e.g, age has a range of ~17 to 90 years, where as donated is just an indicator variable of 0 and 1. When using analysis techniques like clustering we need to make sure each variable has the same influence.
+
+Hence, we normalize all the numeric values.
+
+```{r}
+norm_mat <- as.data.frame(sapply(data_clus, function(x) { (x - min(x)) / (max(x) - min(x)) }))
+```
+
+---
+
+## K means clustering
+
+K means is a technique that groups data points or observations into k groups in the data. The data is grouped based on feature similarity.
+
+The algorithm allocates k centroids to the data, and tries to minimize the distance from each data point to the centroid. In other words it tries to find the most similar data points around a representative centroid.
+
+The formal algorithm is as follows:
+
+- Choose the number of clusters k
+- Select k random points from the data as cluster centroids
+- Assign all the other surrounding data points to the closest centroid 
+- Recompute the centroids of newly formed clusters
+- Repeat the 3rd and 4th steps till the data points remain in the same cluster/ till the centroids do not change. 
+  
+Alternatively we can have a stopping criteria of maximum iterations. For e.g, 100 iterations 
+
+---
+
+## Deciding the number of clusters
+
+'k' is commonly decided by trying different numbers of groups. We decide to decrease k if there are many highly similar groups or increase the k if we think there should be more variety of groups.
+
+Another way to visually decide on the number of clusters is to use the 'elbow method', where we create multiple clusters and extract the total within-cluster sum of squares value from each model. 
+
+We want to know the value of 'k' that decreases the within-cluster sum of squares the most (has the clusters with individuals most like each other), at the same time the k clusters are not redundant. This is commonly found at the elbow of the plot, which is the last value of k before the slope levels off.
+
+---
+
+```{r eval=FALSE}
+set.seed(1234)
+# run many models with varying value of k 
+tot_withinss <- map_dbl(1:10,  function(k){
+  model <- kmeans(x = data_clus, centers = k)
+  model$tot.withinss
+})
+# create a data frame containing both k and tot_withinss
+elbow_df <- data.frame(
+  k = 1:10,
+  tot_withinss = tot_withinss
+)
+# make the elbow plot
+ggplot(elbow_df, aes(x = k, y = tot_withinss)) +
+  geom_line() + geom_point()+
+  scale_x_continuous(breaks = 1:10)
+```
+
+---
+
+```{r echo=FALSE}
+set.seed(1234)
+# run many models with varying value of k 
+tot_withinss <- map_dbl(1:10,  function(k){
+  model <- kmeans(x = data_clus, centers = k)
+  model$tot.withinss
+})
+# create a data frame containing both k and tot_withinss
+elbow_df <- data.frame(
+  k = 1:10,
+  tot_withinss = tot_withinss
+)
+# make the elbow plot
+ggplot(elbow_df, aes(x = k, y = tot_withinss)) +
+  geom_line() + geom_point()+
+  scale_x_continuous(breaks = 1:10)
+```
+
+---
+
+## Running K means algorithm
+
+Now using the optimal k value, we carry out a k means cluster analysis on the customer dataset.
+
+```{r}
+set.seed(1234)
+
+myclust <- kmeans(x = norm_mat, centers = 3)
+
+```
+
+---
+## Visualizations
+
+### Tabular Cluster Summary
+
+One way to visualize the clusters is by using tables to display group averages. 
+
+```{r}
+data_clus %>%
+    mutate(kmeans = myclust$cluster) %>%
+    group_by(kmeans) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean)) %>% round() %>%
+    data.frame()
+```
+
+---
+
+### Parallel Coordinate Plot
+
+This is another way to create side by side visualizations to compare the average feature values in each cluster
+Similar to how we needed to scale the data before clustering, we need to make sure the values are of asimilar scale so that we can compare oroportions
+
+
+```{r}
+scaled_clus_avg <- norm_mat %>%
+    mutate(kmeans = myclust$cluster) %>%
+    group_by(kmeans) %>%
+    mutate(Size = n()) %>%
+    unite(col = kmeans, kmeans, Size, sep = " size:") %>%
+    group_by(kmeans) %>%
+    summarise_all(funs(mean))
+
+```
+
+---
+
+```{r eval=FALSE}
+melted_df <- scaled_clus_avg %>%
+    gather(key = variable, value = value, 2:(ncol(.))) %>%
+    mutate(Cluster = factor(kmeans))
+
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) +
+    theme_bw()
+
+```
+
+---
+```{r echo=FALSE}
+melted_df <- scaled_clus_avg %>% 
+    gather(key = variable, value = value, 2:(ncol(.))) %>%
+    mutate(Cluster = factor(kmeans))
+
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) + theme_bw() 
+```
+
+---
+
+### Pair plots
+
+We can also use pair plots to visualize groups that are well separated.
+
+```{r eval = FALSE}
+library(GGally)
+data_clus %>%
+    mutate(kmeans = myclust$cluster) %>%
+    ggpairs(columns = 1:6, aes(color = as_factor(kmeans), alpha = 0.5))
+```
+
+---
+
+```{r, echo = FALSE}
+library(GGally)
+data_clus %>%
+    mutate(kmeans = myclust$cluster) %>%
+    ggpairs(columns = 1:6, aes(color = as_factor(kmeans), alpha = 0.5))
+```
+
+---
+
+## Naming Clusters
+
+A common practice is to name the different clusters by a tagline or a persona, that characterizes the group of people well.
+
+We find there are 3 distinguishable groups,
+
+- Cluster 1 are donors, highly educated, have capital gains, and are in their middle age.
+- Cluster 2 are donors, work few hours, have some capital gains, and are the youngest in age.
+- Cluster 3 not donors, work the highest number of hours per week, have capital losses, and are in their middle to senior ages
+
+The personas corresponding to the groups:
+
+- Cluster 1: "Savvy Investors"
+- Cluster 2: "Benevolent Youth"
+- Cluster 3: "Hardworking Speculators"
+
+---
+
+## PAM
+
+The k-medoids algorithm is a clustering algorithm related to the k-means algorithm. It is more robust to noise and outliers as compared to k-means because it minimizes a sum of pairwise dissimilarities instead of a sum of squared Euclidean distances.
+
+```{r}
+library(cluster)
+myclust <- pam(norm_mat, k = 3)
+
+scaled_clus_avg <- norm_mat %>%
+    mutate(pam = factor(myclust$cluster)) %>%
+    group_by(pam) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean))
+
+```
+
+---
+
+```{r}
+melted_df <- scaled_clus_avg %>%
+    gather(key = variable, value = value, 2:(ncol(.) - 1)) 
+ggplot(melted_df, aes(variable, value, color = pam, group = pam)) + 
+    geom_line(size = 1.3) + 
+    theme_bw() 
+```
+
+---
+
+## HCLUST
+
+Hierarchical clustering requires a square matrix that represents the distance between samples.
+Calculated using the `dist()` function.
+
+```{r}
+hclust_complete <- norm_mat %>%
+  dist() %>%
+  hclust()
+
+```
+
+---
+
+### Choosing the number of clusters
+
+We use a dendogram to find the best allocation of observations to clusters. 
+
+```{r}
+plot(hclust_complete)
+```
+
+---
+
+```{r}
+clusters <- cutree(hclust_complete, k = 4)
+```
+
+Now let's view a cluster summary table
+
+```{r}
+data_clus %>%
+    mutate(hclust = clusters) %>%
+    group_by(hclust) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean)) %>% round() %>%
+    data.frame()
+```
+
+---
+
+```{r}
+melted_df <- norm_mat %>%
+    mutate(hclust = factor(clusters)) %>%
+    gather(key = variable, value = value, 1:(ncol(.) - 1)) %>%
+    group_by(hclust, variable) %>%
+    summarise(value = mean(value))
+ggplot(melted_df, aes(variable, value, color = hclust, group = hclust)) + 
+    geom_line(size = 1.3) + 
+    theme_bw() 
+```
+
+---
+
+## Your Turn
+
+The marketing team loved the groups of ethereum holders. Now they want to segment the entire customer base to find unique groups. 
+
+Task: Find well separated groups using the entire dataset.
+
+- How many different clusters have you settled at?
+- Are you able to see which features distinguish the ethereum holders from the non ethereum holders?
+
+---
+
+## Answer
+
+```{r}
+## read in data
+data_raw <- read_csv("data/data_raw.csv")
+
+data_clus <- data_raw %>%
+  mutate(donated = as.numeric(donated)) %>% # change to 0 and 1 
+  select(where(is.numeric)) %>% 
+  na.omit()
+
+# normalize numeric values
+norm_mat <- as.data.frame(sapply(data_clus, function(x) { (x - min(x)) / (max(x) - min(x)) }))
+
+## Clustering
+set.seed(1234)
+myclust <- kmeans(x = norm_mat, centers = 5)
+
+# add the cluster assignment
+data_clus$Cluster <- myclust$cluster
+## Produce group averages
+data_clus %>%
+    group_by(Cluster) %>%
+    mutate(Size = n()) %>%
+    summarise_all(funs(mean)) %>%
+    round()
+```
+
+---
+
+````{r}
+norm_mat$Cluster <- myclust$cluster 
+
+scaled_clus_avg <- norm_mat %>%
+    group_by(Cluster) %>%
+    mutate(Size = n()) %>%
+    unite(col = Cluster, Cluster, Size, sep = " size:") %>%
+    group_by(Cluster) %>%
+    summarise_all(funs(mean))
+
+melted_df <- scaled_clus_avg %>% 
+    gather(key=variable, value = value, 2:(ncol(.))) %>%
+    mutate(Cluster = factor(Cluster))
+
+```
+
+---
+
+```{r, echo=FALSE}
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) + theme_bw() 
+```
+

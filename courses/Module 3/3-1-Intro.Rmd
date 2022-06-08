@@ -1,0 +1,471 @@
+---
+title: "Introduction to Machine Learning <br>"
+subtitle: "Workflow and Data Exploration <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.height = 5)
+
+```
+
+## Outline:
+
+- Framing ML Projects with the DDEMA Process
+- Definition - D - Problem statement and objective
+- Data - D - Integrity checks and cleaning
+- Exploration - E - Answering questions via data wrangling, and initial hypotheses
+- Action - A - Being Productive
+
+---
+
+## The DDEMA Process
+
+Value extraction from a data science project doesn't come just from a few printed out reports, but during the entire process where the problem is defined, structured, the data is procured, analyzed and insights are put into action.  This module on supervised and unsupervised learning will help you to apply these techniques to data projects and expose you to a few interesting crypto concepts in the process.
+
+<p align="center">
+
+<img src="images/ddema.png" height="160px" caption="See Appendix">
+
+</p>
+
+-	Definition - define the problem well to create mathematical objective
+-	Data - collection process, completeness,  
+-	Exploration - data integrity, univariate and multivariate analysis
+-	Modeling - map the business problem to an appropriate statistical technique
+-	Action - bring model and results into action 
+
+---
+
+## Definition 
+
+Let's imagine for a moment the marketing team of a fictional crypto project has approached us to help them understand Ethereum holders. They would like us to find the characteristics of Ethereum holders that differentiate them from non-holders. 
+
+They were able to collect responses from some loyal Ethereum enthusiasts, and would like to be able to predict whether someone is likely to own Ethereum given their survey answers so that they can target them with rewards and other adoption incentivization methods.
+
+In this module, our objectives are to -  
+
+- Find distinguishing characteristics of Ethereum owners: We will find this using statistical analysis and unsupervised machine learning techniques. 
+- Predict whether a new individual is an Ethereum owner or not: We will find this using a number of supervised learning techniques.
+
+---
+
+## Tidyverse metapackage
+
+As our main tool, we will use the tidyverse set of packages for data reading, manipulations and visualizations.  https://www.tidyverse.org/packages/
+
+The following packages will be used in this analysis:
+
+- readr: for data reading
+- dplyr: for creating, modifying, deleting, grouping and summarising data
+- ggplot2: for data visualisation
+
+Let us first install it by running 
+
+```{r, eval=FALSE}
+install.packages("tidyverse")
+```
+
+---
+
+## Data
+
+Our dataset is a survey response dataset containing certain demographic details of adults and an indicator to whether or not they own Ethereum.
+
+Let's 
+
+- load **tidyverse** library for data analysis. 
+- read in data and look at the dimensions of the data
+
+```{r echo=TRUE}
+library(tidyverse)
+data_raw <- read_csv("data/data_raw.csv")
+
+dim(data_raw)
+```
+
+There are `r nrow(data_raw)` observations, or adults, and `r ncol(data_raw)` characteristics collected for each adult
+
+---
+
+Looking at the first few rows
+
+```{r}
+head(data_raw)
+```
+
+Notice that the columns containing text are shown as `<chr>` (character) variables. We will convert these to factors so that we can more easily create tables and graphs.
+
+---
+
+### Assigning data types
+
+The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data structure to represent these columns correctly.  
+
+```{r}
+data <- data_raw %>%
+    mutate(across(where(is.character), as_factor))
+```
+
+Let's now look at the summary statistics
+```{r, eval=FALSE}
+summary(data)
+```
+
+---
+
+```{r, echo=FALSE, fig.show='hold'}
+summary(data)
+```
+
+Notice max values of '99999' in *capital_gain* and  '99' in *hours_per_week* 
+
+---
+
+### Data Integrity
+
+When we look at the summary statistics for *capital_gain* and *hours_per_week*, we notice max values look suspicious. We can see this clearly using a boxplot.
+
+```{r}
+ggplot(data, aes(y = capital_gain)) +
+  geom_boxplot()
+```
+
+---
+
+### Missing Values
+
+On cross checking this with the appropriate data collection team they tell us that 9999 in capital_gain and 99 in hours_per_week were encoded to denote missing values.
+
+Let's correct this discrepancy in the data.
+
+```{r}
+data <- data %>%
+    mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
+    mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) 
+```
+---
+
+## Summary using skimr
+
+`skimr` is a useful package to view summary statistics, distributions and missing values
+
+```{r, eval=FALSE, fig.keep='none'}
+library(skimr)
+data %>%
+    skim()
+```
+---
+
+```{r, echo = FALSE, out.height=1}
+data %>%
+    skimr::skim()
+```
+
+---
+
+## Exploration
+
+After the initial summary statistics and integrity checks on the columns, we can look at individual characteristics and see how they vary between the Ethereum owner vs non owner groups.
+
+### Univariate analysis
+
+What is the proportion of owners vs non owners?
+
+```{r}
+data %>%
+    group_by(owns_ethereum) %>%
+    summarise(n = n(), nperc = n/nrow(data)*100)
+```
+---
+
+For every 2 non-Ethereum holders, there is a single Ethereum holder.
+
+```{r}
+ggplot(data, aes(x = owns_ethereum)) +
+  geom_bar()
+```
+
+---
+
+Distribution of Respondent Age
+
+```{r}
+ggplot(data, aes(x = age)) +
+  geom_histogram()
+
+```
+
+---
+
+What is the percentage of Males vs Females in the data?
+
+```{r}
+data %>%
+ group_by(sex) %>%
+ summarise(n = n(), nperc = n/nrow(data)*100)
+```
+
+---
+
+## Exploration - Multivariate Analysis
+
+Correlations
+
+```{r}
+cor(data %>% select(where(is.numeric), donated, owns_ethereum) ,
+    use = "complete.obs")
+
+```
+
+From the numeric variables - Age, Education and Donations are correlated to *owns_ethereum*
+
+---
+
+We can add in the owns_ethereum variable to understand distributional differences. 
+
+```{r}
+ggplot(data, aes(x = age, fill = owns_ethereum)) +
+  geom_histogram(alpha = 0.5)
+
+```
+
+Ethereum owners seem to be younger. Try using `geom_density()` to make a neater plot!
+
+---
+
+What is the percentage of men who are Ethereum owners?
+
+```{r}
+data %>%
+  filter(sex == "Male") %>%
+  group_by(owns_ethereum) %>%
+  summarise(n = n(), nperc = n/nrow(.)*100)
+```
+What about women?
+
+```{r}
+data %>%
+  filter(sex == "Female") %>%
+  group_by(owns_ethereum) %>%
+  summarise(n = n(), nperc = n/nrow(.)*100)
+```
+
+---
+
+Answering this visually
+
+```{r}
+ggplot(data = data) +
+  aes(x = sex, fill = owns_ethereum) +
+  geom_bar()
+```
+
+is the plot useful to answer the question?
+
+---
+
+## Visualizing Proportions
+
+When visualizing categorical variables, it is useful to look at proportions. Especially if there are more observations in one level compared to the other levels, like this case where there are more males.
+
+```{r}
+ggplot(data = data) +
+  aes(x = sex, fill = owns_ethereum) +
+  geom_bar(position = "fill")
+```
+
+---
+
+## Your Turn
+
+Find what percentage of ethereum owners are also donors?
+
+---
+
+## Answer
+
+```{r}
+data %>%
+    filter(owns_ethereum == "TRUE") %>%
+    group_by(donated) %>%
+    summarise(n = n(), nperc = n/nrow(.)*100)
+
+```
+---
+
+```{r}
+ggplot(data = data) +
+  aes(x = donated, fill = owns_ethereum) +
+  geom_bar(position = "fill")
+```
+
+
+---
+
+## Mean
+
+We can also find the average of each characteristic for ethereum owners vs non owners. Since the mean only works for numeric data types, we first `select` all the numeric columns in the data, and then use the familiar `group` and `summarise` command.
+
+```{r, fig.height=8}
+data %>%
+    select(owns_ethereum, where(is.numeric)) %>%
+    group_by(owns_ethereum) %>%
+    summarise_all(funs(mean(., na.rm = TRUE))) %>%
+    data.frame()
+
+```
+
+---
+
+## Your Turn - Mode
+
+- Find the mode or the most frequently occurring characteristics of the ethereum holders and the non holders. 
+
+  You can use the helper function 'get_mode()' given below 
+
+```{r}
+
+get_mode <- function(v) {
+    all_levels <- unique(v)
+    all_levels[which.max(tabulate(match(v, all_levels)))]
+}
+
+```
+
+- How do the majority characteristics vary between the two groups?
+
+---
+
+## Answer
+
+```{r, fig.height=8}
+data %>%
+    group_by(owns_ethereum) %>%
+    summarise_all(funs(get_mode(.))) %>%
+    data.frame()
+
+```
+
+We see that there are more donors, and more higher educated, lower age adults in the owns_ethereum = TRUE group
+
+---
+
+## Statistical significance testing
+
+Let's test our hypothesis by applying a t test to see difference between ages of Ethereum owners and non owners
+
+```{r}
+t.test(age ~ owns_ethereum, data = data)
+```
+
+as the p < 0.05, we reject the null hypothesis. The mean ages are significantly different between Ethereum owners and non-owners.
+
+---
+
+## Chi-square test of independence
+
+Let us test the relationship between marital_status and ownership
+
+```{r}
+chisq.test(table(data$owns_ethereum, data$marital_status))
+```
+
+X squared value is high and as the p < 0.05, we reject the null hypothesis. There is a significant difference between expected and observed data showing a relationship between these variables.
+
+---
+
+## Your Turn
+
+Is there a statistically significant difference between education levels of ethereum owners and non owners?
+
+Use an appropriate visualization to showcase this difference.
+
+---
+
+## Answer
+
+```{r}
+t.test(education_num ~ owns_ethereum, data = data)
+```
+
+We see that there is a significant difference (p<0.05) between the age, and education of ethereum owners vs non owners
+
+---
+
+```{r}
+ggplot(data, aes(x = owns_ethereum, y = education_num)) +
+  geom_boxplot()
+
+```
+
+---
+
+## Multivariate Visualizations - Pair plots
+
+One way to look at the interactions between multiple variables at the same time, is to use pair plots. When we specify a color variable, the correlation for each level is shown.
+
+We load the GGally package, installed using `install.packages("GGally")`, to create pair plots of all the numeric variables
+
+```{r, eval=FALSE, fig.height=7}
+library(GGally)
+# numerical vars
+data %>%
+    select(owns_ethereum, age, education_num, capital_gain, capital_loss, hours_per_week) %>%
+    ggpairs(columns = 2:6, aes(color = owns_ethereum, alpha = 0.5))
+```
+
+---
+
+```{r, echo=FALSE, fig.height=7}
+library(GGally)
+data %>%
+    select(owns_ethereum, age, education_num, capital_gain, capital_loss, hours_per_week) %>%
+    ggpairs(columns = 2:6, aes(color = owns_ethereum, alpha = 0.5))
+```
+
+---
+
+Finally we can take a look at all the categorical variables using faceting. The proportions are visualized to understand which variables contribute more to each group
+
+```{r cat, eval=FALSE, fig.show='hold'}
+data %>%
+    select(
+        workclass, marital_status, occupation,
+        relationship, race, sex, donated, owns_ethereum
+    ) %>%
+    pivot_longer(workclass:donated) %>%
+    ggplot(aes(y = value, fill = owns_ethereum)) +
+    geom_bar(position = "fill", na.rm = FALSE) +
+    facet_wrap(vars(name), scales = "free") +
+    labs(x = NULL, y = NULL, fill = NULL)
+
+```
+
+---
+
+```{r eval= TRUE, echo=FALSE, fig.height=6}
+data %>%
+    select(
+        workclass, marital_status, occupation,
+        relationship, race, sex, donated, owns_ethereum
+    ) %>%
+    pivot_longer(workclass:sex) %>%
+    ggplot(aes(y = value, fill = owns_ethereum)) +
+    geom_bar(position = "fill", na.rm = FALSE) +
+    facet_wrap(vars(name), scales = "free") +
+    labs(x = NULL, y = NULL, fill = NULL)
+
+```
+

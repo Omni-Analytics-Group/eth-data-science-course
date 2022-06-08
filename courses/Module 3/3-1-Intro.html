@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Introduction to Machine Learning  </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Introduction to Machine Learning <br>
+]
+.subtitle[
+## Workflow and Data Exploration <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Outline:
+
+- Framing ML Projects with the DDEMA Process
+- Definition - D - Problem statement and objective
+- Data - D - Integrity checks and cleaning
+- Exploration - E - Answering questions via data wrangling, and initial hypotheses
+- Action - A - Being Productive
+
+---
+
+## The DDEMA Process
+
+Value extraction from a data science project doesn't come just from a few printed out reports, but during the entire process where the problem is defined, structured, the data is procured, analyzed and insights are put into action.  This module on supervised and unsupervised learning will help you to apply these techniques to data projects and expose you to a few interesting crypto concepts in the process.
+
+&lt;p align="center"&gt;
+
+&lt;img src="images/ddema.png" height="160px" caption="See Appendix"&gt;
+
+&lt;/p&gt;
+
+-	Definition - define the problem well to create mathematical objective
+-	Data - collection process, completeness,  
+-	Exploration - data integrity, univariate and multivariate analysis
+-	Modeling - map the business problem to an appropriate statistical technique
+-	Action - bring model and results into action 
+
+---
+
+## Definition 
+
+Let's imagine for a moment the marketing team of a fictional crypto project has approached us to help them understand Ethereum holders. They would like us to find the characteristics of Ethereum holders that differentiate them from non-holders. 
+
+They were able to collect responses from some loyal Ethereum enthusiasts, and would like to be able to predict whether someone is likely to own Ethereum given their survey answers so that they can target them with rewards and other adoption incentivization methods.
+
+In this module, our objectives are to -  
+
+- Find distinguishing characteristics of Ethereum owners: We will find this using statistical analysis and unsupervised machine learning techniques. 
+- Predict whether a new individual is an Ethereum owner or not: We will find this using a number of supervised learning techniques.
+
+---
+
+## Tidyverse metapackage
+
+As our main tool, we will use the tidyverse set of packages for data reading, manipulations and visualizations.  https://www.tidyverse.org/packages/
+
+The following packages will be used in this analysis:
+
+- readr: for data reading
+- dplyr: for creating, modifying, deleting, grouping and summarising data
+- ggplot2: for data visualisation
+
+Let us first install it by running 
+
+
+```r
+install.packages("tidyverse")
+```
+
+---
+
+## Data
+
+Our dataset is a survey response dataset containing certain demographic details of adults and an indicator to whether or not they own Ethereum.
+
+Let's 
+
+- load **tidyverse** library for data analysis. 
+- read in data and look at the dimensions of the data
+
+
+```r
+library(tidyverse)
+data_raw &lt;- read_csv("data/data_raw.csv")
+
+dim(data_raw)
+```
+
+```
+## [1] 48842    13
+```
+
+There are 48842 observations, or adults, and 13 characteristics collected for each adult
+
+---
+
+Looking at the first few rows
+
+
+```r
+head(data_raw)
+```
+
+```
+## # A tibble: 6 × 13
+##     age workclass     education_num marital_status occupation relationship race 
+##   &lt;dbl&gt; &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt;          &lt;chr&gt;      &lt;chr&gt;        &lt;chr&gt;
+## 1    39 State-gov                13 Never-married  Adm-cleri… Not-in-fami… White
+## 2    50 Self-emp-not…            13 Married-civ-s… Exec-mana… Husband      White
+## 3    38 Private                   9 Divorced       Handlers-… Not-in-fami… White
+## 4    53 Private                   7 Married-civ-s… Handlers-… Husband      Black
+## 5    28 Private                  13 Married-civ-s… Prof-spec… Wife         Black
+## 6    37 Private                  14 Married-civ-s… Exec-mana… Wife         White
+## # … with 6 more variables: sex &lt;chr&gt;, capital_gain &lt;dbl&gt;, capital_loss &lt;dbl&gt;,
+## #   hours_per_week &lt;dbl&gt;, owns_ethereum &lt;lgl&gt;, donated &lt;lgl&gt;
+```
+
+Notice that the columns containing text are shown as `&lt;chr&gt;` (character) variables. We will convert these to factors so that we can more easily create tables and graphs.
+
+---
+
+### Assigning data types
+
+The columns which have categorical data are not represented well by the 'character' data type. In R we use the 'factor' data structure to represent these columns correctly.  
+
+
+```r
+data &lt;- data_raw %&gt;%
+    mutate(across(where(is.character), as_factor))
+```
+
+Let's now look at the summary statistics
+
+```r
+summary(data)
+```
+
+---
+
+
+```
+##       age                   workclass     education_num  
+##  Min.   :17.00   Private         :33906   Min.   : 1.00  
+##  1st Qu.:28.00   Self-emp-not-inc: 3862   1st Qu.: 9.00  
+##  Median :37.00   Local-gov       : 3136   Median :10.00  
+##  Mean   :38.64   State-gov       : 1981   Mean   :10.08  
+##  3rd Qu.:48.00   Self-emp-inc    : 1695   3rd Qu.:12.00  
+##  Max.   :90.00   (Other)         : 1463   Max.   :16.00  
+##                  NA's            : 2799                  
+##                marital_status            occupation            relationship  
+##  Never-married        :16117   Prof-specialty : 6172   Not-in-family :12583  
+##  Married-civ-spouse   :22379   Craft-repair   : 6112   Husband       :19716  
+##  Divorced             : 6633   Exec-managerial: 6086   Wife          : 2331  
+##  Married-spouse-absent:  628   Adm-clerical   : 5611   Own-child     : 7581  
+##  Separated            : 1530   Sales          : 5504   Unmarried     : 5125  
+##  Married-AF-spouse    :   37   (Other)        :16548   Other-relative: 1506  
+##  Widowed              : 1518   NA's           : 2809                         
+##                  race           sex         capital_gain    capital_loss   
+##  White             :41762   Male  :32650   Min.   :    0   Min.   :   0.0  
+##  Black             : 4685   Female:16192   1st Qu.:    0   1st Qu.:   0.0  
+##  Asian-Pac-Islander: 1519                  Median :    0   Median :   0.0  
+##  Amer-Indian-Eskimo:  470                  Mean   : 1079   Mean   :  87.5  
+##  Other             :  406                  3rd Qu.:    0   3rd Qu.:   0.0  
+##                                            Max.   :99999   Max.   :4356.0  
+##                                                                            
+##  hours_per_week  owns_ethereum    donated       
+##  Min.   : 1.00   Mode :logical   Mode :logical  
+##  1st Qu.:40.00   FALSE:32562     FALSE:29501    
+##  Median :40.00   TRUE :16280     TRUE :19341    
+##  Mean   :40.42                                  
+##  3rd Qu.:45.00                                  
+##  Max.   :99.00                                  
+## 
+```
+
+Notice max values of '99999' in *capital_gain* and  '99' in *hours_per_week* 
+
+---
+
+### Data Integrity
+
+When we look at the summary statistics for *capital_gain* and *hours_per_week*, we notice max values look suspicious. We can see this clearly using a boxplot.
+
+
+```r
+ggplot(data, aes(y = capital_gain)) +
+  geom_boxplot()
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Missing Values
+
+On cross checking this with the appropriate data collection team they tell us that 9999 in capital_gain and 99 in hours_per_week were encoded to denote missing values.
+
+Let's correct this discrepancy in the data.
+
+
+```r
+data &lt;- data %&gt;%
+    mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %&gt;%
+    mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) 
+```
+---
+
+## Summary using skimr
+
+`skimr` is a useful package to view summary statistics, distributions and missing values
+
+
+```r
+library(skimr)
+data %&gt;%
+    skim()
+```
+---
+
+
+Table: Data summary
+
+|                         |           |
+|:------------------------|:----------|
+|Name                     |Piped data |
+|Number of rows           |48842      |
+|Number of columns        |13         |
+|_______________________  |           |
+|Column type frequency:   |           |
+|factor                   |6          |
+|logical                  |2          |
+|numeric                  |5          |
+|________________________ |           |
+|Group variables          |None       |
+
+
+**Variable type: factor**
+
+|skim_variable  | n_missing| complete_rate|ordered | n_unique|top_counts                                   |
+|:--------------|---------:|-------------:|:-------|--------:|:--------------------------------------------|
+|workclass      |      2799|          0.94|FALSE   |        8|Pri: 33906, Sel: 3862, Loc: 3136, Sta: 1981  |
+|marital_status |         0|          1.00|FALSE   |        7|Mar: 22379, Nev: 16117, Div: 6633, Sep: 1530 |
+|occupation     |      2809|          0.94|FALSE   |       14|Pro: 6172, Cra: 6112, Exe: 6086, Adm: 5611   |
+|relationship   |         0|          1.00|FALSE   |        6|Hus: 19716, Not: 12583, Own: 7581, Unm: 5125 |
+|race           |         0|          1.00|FALSE   |        5|Whi: 41762, Bla: 4685, Asi: 1519, Ame: 470   |
+|sex            |         0|          1.00|FALSE   |        2|Mal: 32650, Fem: 16192                       |
+
+
+**Variable type: logical**
+
+|skim_variable | n_missing| complete_rate| mean|count                  |
+|:-------------|---------:|-------------:|----:|:----------------------|
+|owns_ethereum |         0|             1| 0.33|FAL: 32562, TRU: 16280 |
+|donated       |         0|             1| 0.40|FAL: 29501, TRU: 19341 |
+
+
+**Variable type: numeric**
+
+|skim_variable  | n_missing| complete_rate|   mean|      sd| p0| p25| p50| p75|  p100|hist  |
+|:--------------|---------:|-------------:|------:|-------:|--:|---:|---:|---:|-----:|:-----|
+|age            |         0|             1|  38.64|   13.71| 17|  28|  37|  48|    90|▇▇▅▂▁ |
+|education_num  |         0|             1|  10.08|    2.57|  1|   9|  10|  12|    16|▁▁▇▃▁ |
+|capital_gain   |       244|             1| 582.41| 2536.65|  0|   0|   0|   0| 41310|▇▁▁▁▁ |
+|capital_loss   |         0|             1|  87.50|  403.00|  0|   0|   0|   0|  4356|▇▁▁▁▁ |
+|hours_per_week |       137|             1|  40.26|   12.01|  1|  40|  40|  45|    98|▁▂▇▁▁ |
+
+---
+
+## Exploration
+
+After the initial summary statistics and integrity checks on the columns, we can look at individual characteristics and see how they vary between the Ethereum owner vs non owner groups.
+
+### Univariate analysis
+
+What is the proportion of owners vs non owners?
+
+
+```r
+data %&gt;%
+    group_by(owns_ethereum) %&gt;%
+    summarise(n = n(), nperc = n/nrow(data)*100)
+```
+
+```
+## # A tibble: 2 × 3
+##   owns_ethereum     n nperc
+##   &lt;lgl&gt;         &lt;int&gt; &lt;dbl&gt;
+## 1 FALSE         32562  66.7
+## 2 TRUE          16280  33.3
+```
+---
+
+For every 2 non-Ethereum holders, there is a single Ethereum holder.
+
+
+```r
+ggplot(data, aes(x = owns_ethereum)) +
+  geom_bar()
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Distribution of Respondent Age
+
+
+```r
+ggplot(data, aes(x = age)) +
+  geom_histogram()
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+What is the percentage of Males vs Females in the data?
+
+
+```r
+data %&gt;%
+ group_by(sex) %&gt;%
+ summarise(n = n(), nperc = n/nrow(data)*100)
+```
+
+```
+## # A tibble: 2 × 3
+##   sex        n nperc
+##   &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt;
+## 1 Male   32650  66.8
+## 2 Female 16192  33.2
+```
+
+---
+
+## Exploration - Multivariate Analysis
+
+Correlations
+
+
+```r
+cor(data %&gt;% select(where(is.numeric), donated, owns_ethereum) ,
+    use = "complete.obs")
+```
+
+```
+##                        age education_num capital_gain capital_loss
+## age             1.00000000    0.02781145   0.11393840   0.05814910
+## education_num   0.02781145    1.00000000   0.14492726   0.08265118
+## capital_gain    0.11393840    0.14492726   1.00000000  -0.04997409
+## capital_loss    0.05814910    0.08265118  -0.04997409   1.00000000
+## hours_per_week  0.06692050    0.14313917   0.08546265   0.05783405
+## donated         0.14561433    0.27445697  -0.04772665  -0.17546048
+## owns_ethereum  -0.24821172    0.34212081  -0.04179162   0.14265086
+##                hours_per_week     donated owns_ethereum
+## age                0.06692050  0.14561433   -0.24821172
+## education_num      0.14313917  0.27445697    0.34212081
+## capital_gain       0.08546265 -0.04772665   -0.04179162
+## capital_loss       0.05783405 -0.17546048    0.14265086
+## hours_per_week     1.00000000 -0.39189907   -0.04060555
+## donated           -0.39189907  1.00000000    0.48975608
+## owns_ethereum     -0.04060555  0.48975608    1.00000000
+```
+
+From the numeric variables - Age, Education and Donations are correlated to *owns_ethereum*
+
+---
+
+We can add in the owns_ethereum variable to understand distributional differences. 
+
+
+```r
+ggplot(data, aes(x = age, fill = owns_ethereum)) +
+  geom_histogram(alpha = 0.5)
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+Ethereum owners seem to be younger. Try using `geom_density()` to make a neater plot!
+
+---
+
+What is the percentage of men who are Ethereum owners?
+
+
+```r
+data %&gt;%
+  filter(sex == "Male") %&gt;%
+  group_by(owns_ethereum) %&gt;%
+  summarise(n = n(), nperc = n/nrow(.)*100)
+```
+
+```
+## # A tibble: 2 × 3
+##   owns_ethereum     n nperc
+##   &lt;lgl&gt;         &lt;int&gt; &lt;dbl&gt;
+## 1 FALSE         22674  69.4
+## 2 TRUE           9976  30.6
+```
+What about women?
+
+
+```r
+data %&gt;%
+  filter(sex == "Female") %&gt;%
+  group_by(owns_ethereum) %&gt;%
+  summarise(n = n(), nperc = n/nrow(.)*100)
+```
+
+```
+## # A tibble: 2 × 3
+##   owns_ethereum     n nperc
+##   &lt;lgl&gt;         &lt;int&gt; &lt;dbl&gt;
+## 1 FALSE          9888  61.1
+## 2 TRUE           6304  38.9
+```
+
+---
+
+Answering this visually
+
+
+```r
+ggplot(data = data) +
+  aes(x = sex, fill = owns_ethereum) +
+  geom_bar()
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+
+is the plot useful to answer the question?
+
+---
+
+## Visualizing Proportions
+
+When visualizing categorical variables, it is useful to look at proportions. Especially if there are more observations in one level compared to the other levels, like this case where there are more males.
+
+
+```r
+ggplot(data = data) +
+  aes(x = sex, fill = owns_ethereum) +
+  geom_bar(position = "fill")
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Your Turn
+
+Find what percentage of ethereum owners are also donors?
+
+---
+
+## Answer
+
+
+```r
+data %&gt;%
+    filter(owns_ethereum == "TRUE") %&gt;%
+    group_by(donated) %&gt;%
+    summarise(n = n(), nperc = n/nrow(.)*100)
+```
+
+```
+## # A tibble: 2 × 3
+##   donated     n nperc
+##   &lt;lgl&gt;   &lt;int&gt; &lt;dbl&gt;
+## 1 FALSE    4335  26.6
+## 2 TRUE    11945  73.4
+```
+---
+
+
+```r
+ggplot(data = data) +
+  aes(x = donated, fill = owns_ethereum) +
+  geom_bar(position = "fill")
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Mean
+
+We can also find the average of each characteristic for ethereum owners vs non owners. Since the mean only works for numeric data types, we first `select` all the numeric columns in the data, and then use the familiar `group` and `summarise` command.
+
+
+```r
+data %&gt;%
+    select(owns_ethereum, where(is.numeric)) %&gt;%
+    group_by(owns_ethereum) %&gt;%
+    summarise_all(funs(mean(., na.rm = TRUE))) %&gt;%
+    data.frame()
+```
+
+```
+##   owns_ethereum      age education_num capital_gain capital_loss hours_per_week
+## 1         FALSE 41.01317      9.464069     658.1090     47.41358       40.59572
+## 2          TRUE 33.90412     11.306204     430.9576    167.68471       39.57719
+```
+
+---
+
+## Your Turn - Mode
+
+- Find the mode or the most frequently occurring characteristics of the ethereum holders and the non holders. 
+
+  You can use the helper function 'get_mode()' given below 
+
+
+```r
+get_mode &lt;- function(v) {
+    all_levels &lt;- unique(v)
+    all_levels[which.max(tabulate(match(v, all_levels)))]
+}
+```
+
+- How do the majority characteristics vary between the two groups?
+
+---
+
+## Answer
+
+
+```r
+data %&gt;%
+    group_by(owns_ethereum) %&gt;%
+    summarise_all(funs(get_mode(.))) %&gt;%
+    data.frame()
+```
+
+```
+##   owns_ethereum age workclass education_num     marital_status     occupation
+## 1         FALSE  36   Private             9 Married-civ-spouse   Craft-repair
+## 2          TRUE  23   Private            13      Never-married Prof-specialty
+##   relationship  race  sex capital_gain capital_loss hours_per_week donated
+## 1      Husband White Male            0            0             40   FALSE
+## 2      Husband White Male            0            0             40    TRUE
+```
+
+We see that there are more donors, and more higher educated, lower age adults in the owns_ethereum = TRUE group
+
+---
+
+## Statistical significance testing
+
+Let's test our hypothesis by applying a t test to see difference between ages of Ethereum owners and non owners
+
+
+```r
+t.test(age ~ owns_ethereum, data = data)
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  age by owns_ethereum
+## t = 59.084, df = 38110, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
+## 95 percent confidence interval:
+##  6.873225 7.344894
+## sample estimates:
+## mean in group FALSE  mean in group TRUE 
+##            41.01317            33.90412
+```
+
+as the p &lt; 0.05, we reject the null hypothesis. The mean ages are significantly different between Ethereum owners and non-owners.
+
+---
+
+## Chi-square test of independence
+
+Let us test the relationship between marital_status and ownership
+
+
+```r
+chisq.test(table(data$owns_ethereum, data$marital_status))
+```
+
+```
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  table(data$owns_ethereum, data$marital_status)
+## X-squared = 2617.6, df = 6, p-value &lt; 2.2e-16
+```
+
+X squared value is high and as the p &lt; 0.05, we reject the null hypothesis. There is a significant difference between expected and observed data showing a relationship between these variables.
+
+---
+
+## Your Turn
+
+Is there a statistically significant difference between education levels of ethereum owners and non owners?
+
+Use an appropriate visualization to showcase this difference.
+
+---
+
+## Answer
+
+
+```r
+t.test(education_num ~ owns_ethereum, data = data)
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  education_num by owns_ethereum
+## t = -80.107, df = 33443, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
+## 95 percent confidence interval:
+##  -1.887208 -1.797063
+## sample estimates:
+## mean in group FALSE  mean in group TRUE 
+##            9.464069           11.306204
+```
+
+We see that there is a significant difference (p&lt;0.05) between the age, and education of ethereum owners vs non owners
+
+---
+
+
+```r
+ggplot(data, aes(x = owns_ethereum, y = education_num)) +
+  geom_boxplot()
+```
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-29-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Multivariate Visualizations - Pair plots
+
+One way to look at the interactions between multiple variables at the same time, is to use pair plots. When we specify a color variable, the correlation for each level is shown.
+
+We load the GGally package, installed using `install.packages("GGally")`, to create pair plots of all the numeric variables
+
+
+```r
+library(GGally)
+# numerical vars
+data %&gt;%
+    select(owns_ethereum, age, education_num, capital_gain, capital_loss, hours_per_week) %&gt;%
+    ggpairs(columns = 2:6, aes(color = owns_ethereum, alpha = 0.5))
+```
+
+---
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-31-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Finally we can take a look at all the categorical variables using faceting. The proportions are visualized to understand which variables contribute more to each group
+
+
+```r
+data %&gt;%
+    select(
+        workclass, marital_status, occupation,
+        relationship, race, sex, donated, owns_ethereum
+    ) %&gt;%
+    pivot_longer(workclass:donated) %&gt;%
+    ggplot(aes(y = value, fill = owns_ethereum)) +
+    geom_bar(position = "fill", na.rm = FALSE) +
+    facet_wrap(vars(name), scales = "free") +
+    labs(x = NULL, y = NULL, fill = NULL)
+```
+
+---
+
+&lt;img src="3-1-Intro_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

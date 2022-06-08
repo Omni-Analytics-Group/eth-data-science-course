@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Unsupervised Learning      </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Unsupervised Learning <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Outline
+
+- Objective
+- Data preparation
+- Normalization
+- K means clustering
+- 3 ways of visualizing clusters
+- Naming clusters
+- Other methods: pam, hclust 
+
+---
+
+## Glossary
+
+- Observation
+- Cluster
+
+---
+
+## Objective
+
+The marketing team for our fictional crypto project would like to understand more about the kinds of Ethereum holders in their survey. They are wondering if there are specific profiles within the Etherem holder base that distinguish them from each other. 
+
+*One way of understanding the kinds of Ethereum holders is to categorize them into groups, based on the similarity of characteristics between customers.*  
+
+Since the marketing team do not already have defined profiles that they are looking to identify, they will be attempting to solve a `latent varible` problem where the unobserved variable are the proposed groups of holders. When given unlabelled data such as this, we use unsupervised methods to cluster individual observations within the dataset.
+
+We will go through 3 different clustering techniques to help the marketing team!
+
+---
+
+## Dataset Preparation
+
+Let us read in the dataset, filter it to take only the Ethereum owners, remove outliers, and prepare it by doing the following:
+
+- create a numeric donated column that has a value of 1 if donated == TRUE and 0 if donated == FALSE
+- select only the numeric columns
+- omit all rows that have NA values
+
+
+
+```r
+library(tidyverse)
+
+data_raw &lt;- read_csv("data/data_raw.csv")
+  
+data_clus &lt;- data_raw %&gt;%
+  filter(owns_ethereum == "TRUE") %&gt;%
+  mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %&gt;%
+  mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week)) %&gt;%
+  mutate(donated = as.numeric(donated)) %&gt;% # change to 0 and 1 
+  select(where(is.numeric)) %&gt;% # select only the numeric values
+  na.omit()
+```
+
+---
+
+## Normalization
+
+The variables are of differing units. For e.g, age has a range of ~17 to 90 years, where as donated is just an indicator variable of 0 and 1. When using analysis techniques like clustering we need to make sure each variable has the same influence.
+
+Hence, we normalize all the numeric values.
+
+
+```r
+norm_mat &lt;- as.data.frame(sapply(data_clus, function(x) { (x - min(x)) / (max(x) - min(x)) }))
+```
+
+---
+
+## K means clustering
+
+K means is a technique that groups data points or observations into k groups in the data. The data is grouped based on feature similarity.
+
+The algorithm allocates k centroids to the data, and tries to minimize the distance from each data point to the centroid. In other words it tries to find the most similar data points around a representative centroid.
+
+The formal algorithm is as follows:
+
+- Choose the number of clusters k
+- Select k random points from the data as cluster centroids
+- Assign all the other surrounding data points to the closest centroid 
+- Recompute the centroids of newly formed clusters
+- Repeat the 3rd and 4th steps till the data points remain in the same cluster/ till the centroids do not change. 
+  
+Alternatively we can have a stopping criteria of maximum iterations. For e.g, 100 iterations 
+
+---
+
+## Deciding the number of clusters
+
+'k' is commonly decided by trying different numbers of groups. We decide to decrease k if there are many highly similar groups or increase the k if we think there should be more variety of groups.
+
+Another way to visually decide on the number of clusters is to use the 'elbow method', where we create multiple clusters and extract the total within-cluster sum of squares value from each model. 
+
+We want to know the value of 'k' that decreases the within-cluster sum of squares the most (has the clusters with individuals most like each other), at the same time the k clusters are not redundant. This is commonly found at the elbow of the plot, which is the last value of k before the slope levels off.
+
+---
+
+
+```r
+set.seed(1234)
+# run many models with varying value of k 
+tot_withinss &lt;- map_dbl(1:10,  function(k){
+  model &lt;- kmeans(x = data_clus, centers = k)
+  model$tot.withinss
+})
+# create a data frame containing both k and tot_withinss
+elbow_df &lt;- data.frame(
+  k = 1:10,
+  tot_withinss = tot_withinss
+)
+# make the elbow plot
+ggplot(elbow_df, aes(x = k, y = tot_withinss)) +
+  geom_line() + geom_point()+
+  scale_x_continuous(breaks = 1:10)
+```
+
+---
+
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Running K means algorithm
+
+Now using the optimal k value, we carry out a k means cluster analysis on the customer dataset.
+
+
+```r
+set.seed(1234)
+
+myclust &lt;- kmeans(x = norm_mat, centers = 3)
+```
+
+---
+## Visualizations
+
+### Tabular Cluster Summary
+
+One way to visualize the clusters is by using tables to display group averages. 
+
+
+```r
+data_clus %&gt;%
+    mutate(kmeans = myclust$cluster) %&gt;%
+    group_by(kmeans) %&gt;%
+    mutate(Size = n()) %&gt;%
+    summarise_all(funs(mean)) %&gt;% round() %&gt;%
+    data.frame()
+```
+
+```
+##   kmeans age education_num capital_gain capital_loss hours_per_week donated
+## 1      1  37            13          670            1             42       1
+## 2      2  23             9           89            0             20       1
+## 3      3  40            10          371          645             56       0
+##   Size
+## 1 7445
+## 2 4415
+## 3 4224
+```
+
+---
+
+### Parallel Coordinate Plot
+
+This is another way to create side by side visualizations to compare the average feature values in each cluster
+Similar to how we needed to scale the data before clustering, we need to make sure the values are of asimilar scale so that we can compare oroportions
+
+
+
+```r
+scaled_clus_avg &lt;- norm_mat %&gt;%
+    mutate(kmeans = myclust$cluster) %&gt;%
+    group_by(kmeans) %&gt;%
+    mutate(Size = n()) %&gt;%
+    unite(col = kmeans, kmeans, Size, sep = " size:") %&gt;%
+    group_by(kmeans) %&gt;%
+    summarise_all(funs(mean))
+```
+
+---
+
+
+```r
+melted_df &lt;- scaled_clus_avg %&gt;%
+    gather(key = variable, value = value, 2:(ncol(.))) %&gt;%
+    mutate(Cluster = factor(kmeans))
+
+ggplot(melted_df, aes(variable, value, color = Cluster, group = Cluster)) +
+    geom_line(size = 1.3) +
+    theme_bw()
+```
+
+---
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Pair plots
+
+We can also use pair plots to visualize groups that are well separated.
+
+
+```r
+library(GGally)
+data_clus %&gt;%
+    mutate(kmeans = myclust$cluster) %&gt;%
+    ggpairs(columns = 1:6, aes(color = as_factor(kmeans), alpha = 0.5))
+```
+
+---
+
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Naming Clusters
+
+A common practice is to name the different clusters by a tagline or a persona, that characterizes the group of people well.
+
+We find there are 3 distinguishable groups,
+
+- Cluster 1 are donors, highly educated, have capital gains, and are in their middle age.
+- Cluster 2 are donors, work few hours, have some capital gains, and are the youngest in age.
+- Cluster 3 not donors, work the highest number of hours per week, have capital losses, and are in their middle to senior ages
+
+The personas corresponding to the groups:
+
+- Cluster 1: "Savvy Investors"
+- Cluster 2: "Benevolent Youth"
+- Cluster 3: "Hardworking Speculators"
+
+---
+
+## PAM
+
+The k-medoids algorithm is a clustering algorithm related to the k-means algorithm. It is more robust to noise and outliers as compared to k-means because it minimizes a sum of pairwise dissimilarities instead of a sum of squared Euclidean distances.
+
+
+```r
+library(cluster)
+myclust &lt;- pam(norm_mat, k = 3)
+
+scaled_clus_avg &lt;- norm_mat %&gt;%
+    mutate(pam = factor(myclust$cluster)) %&gt;%
+    group_by(pam) %&gt;%
+    mutate(Size = n()) %&gt;%
+    summarise_all(funs(mean))
+```
+
+---
+
+
+```r
+melted_df &lt;- scaled_clus_avg %&gt;%
+    gather(key = variable, value = value, 2:(ncol(.) - 1)) 
+ggplot(melted_df, aes(variable, value, color = pam, group = pam)) + 
+    geom_line(size = 1.3) + 
+    theme_bw() 
+```
+
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-13-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## HCLUST
+
+Hierarchical clustering requires a square matrix that represents the distance between samples.
+Calculated using the `dist()` function.
+
+
+```r
+hclust_complete &lt;- norm_mat %&gt;%
+  dist() %&gt;%
+  hclust()
+```
+
+---
+
+### Choosing the number of clusters
+
+We use a dendogram to find the best allocation of observations to clusters. 
+
+
+```r
+plot(hclust_complete)
+```
+
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+clusters &lt;- cutree(hclust_complete, k = 4)
+```
+
+Now let's view a cluster summary table
+
+
+```r
+data_clus %&gt;%
+    mutate(hclust = clusters) %&gt;%
+    group_by(hclust) %&gt;%
+    mutate(Size = n()) %&gt;%
+    summarise_all(funs(mean)) %&gt;% round() %&gt;%
+    data.frame()
+```
+
+```
+##   hclust age education_num capital_gain capital_loss hours_per_week donated
+## 1      1  32            12          391            1             34       1
+## 2      2  41            10            0         1855             41       0
+## 3      3  39            10          555           41             64       0
+## 4      4  40            13        29012            0             41       1
+##    Size
+## 1 11834
+## 2  1406
+## 3  2818
+## 4    26
+```
+
+---
+
+
+```r
+melted_df &lt;- norm_mat %&gt;%
+    mutate(hclust = factor(clusters)) %&gt;%
+    gather(key = variable, value = value, 1:(ncol(.) - 1)) %&gt;%
+    group_by(hclust, variable) %&gt;%
+    summarise(value = mean(value))
+ggplot(melted_df, aes(variable, value, color = hclust, group = hclust)) + 
+    geom_line(size = 1.3) + 
+    theme_bw() 
+```
+
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Your Turn
+
+The marketing team loved the groups of ethereum holders. Now they want to segment the entire customer base to find unique groups. 
+
+Task: Find well separated groups using the entire dataset.
+
+- How many different clusters have you settled at?
+- Are you able to see which features distinguish the ethereum holders from the non ethereum holders?
+
+---
+
+## Answer
+
+
+```r
+## read in data
+data_raw &lt;- read_csv("data/data_raw.csv")
+
+data_clus &lt;- data_raw %&gt;%
+  mutate(donated = as.numeric(donated)) %&gt;% # change to 0 and 1 
+  select(where(is.numeric)) %&gt;% 
+  na.omit()
+
+# normalize numeric values
+norm_mat &lt;- as.data.frame(sapply(data_clus, function(x) { (x - min(x)) / (max(x) - min(x)) }))
+
+## Clustering
+set.seed(1234)
+myclust &lt;- kmeans(x = norm_mat, centers = 5)
+
+# add the cluster assignment
+data_clus$Cluster &lt;- myclust$cluster
+## Produce group averages
+data_clus %&gt;%
+    group_by(Cluster) %&gt;%
+    mutate(Size = n()) %&gt;%
+    summarise_all(funs(mean)) %&gt;%
+    round()
+```
+
+```
+## # A tibble: 5 × 8
+##   Cluster   age education_num capital_gain capital_loss hours_per_week donated
+##     &lt;dbl&gt; &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;          &lt;dbl&gt;   &lt;dbl&gt;
+## 1       1    48             6          722          128             41       0
+## 2       2    35            10         1313          148             45       0
+## 3       3    22             9          183            0             20       1
+## 4       4    56            10          649            1             36       1
+## 5       5    36            13         1516            1             41       1
+## # … with 1 more variable: Size &lt;dbl&gt;
+```
+
+---
+
+
+```r
+norm_mat$Cluster &lt;- myclust$cluster 
+
+scaled_clus_avg &lt;- norm_mat %&gt;%
+    group_by(Cluster) %&gt;%
+    mutate(Size = n()) %&gt;%
+    unite(col = Cluster, Cluster, Size, sep = " size:") %&gt;%
+    group_by(Cluster) %&gt;%
+    summarise_all(funs(mean))
+
+melted_df &lt;- scaled_clus_avg %&gt;% 
+    gather(key=variable, value = value, 2:(ncol(.))) %&gt;%
+    mutate(Cluster = factor(Cluster))
+```
+
+---
+
+&lt;img src="3-2-Unsupervised_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,671 @@
+---
+title: "Supervised Learning  <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    toc: true
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
+```
+
+## Outline
+
+We will cover:
+- Data Labeling, Data Splitting into train and test
+- Modeling: Classify data as ethereum holders vs non holders using machine learning techniques
+- Evaluation metrics and class balance accuracy - 
+- Improving model: Feature engineering
+- Other models: nb, svm, cart, rf
+- Variable Importance
+- Other improvements: Cross validation, Tuning for better hyperparameters
+
+---
+
+## Glossary
+
+- Features
+- Response/Dependent variable
+- Explanatory/Independent variable
+- Hyperparameters
+- Accuracy
+
+---
+
+## Tidymodels metapackage
+
+Similar to the tidyverse set of packages for data cleaning and visualizations, for modeling we will use the tidymodels suite of packages. Each of the packages assist with different aspects of a machine learning workflow. Listed here https://www.tidymodels.org/packages/
+
+The following packages will be used in this analysis:
+
+- recipes: data pre-processing tools for feature engineering
+- parsnip: for model setup and execution
+- yardstick: for model assessment
+
+Let us install it by running `install.packages("tidymodels")` and then load the packages we need for analysis and modeling
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(tidymodels)
+```
+
+---
+
+## Objective
+
+*Predict whether a new individual is an ethereum owner or not.*
+
+Since we have the label column "owns_ethereum" we can use this as our response variable and create a predictive model. The model will learn how to classify an observation into owns_ethereum = TRUE or FALSE
+
+We will leverage the **d**ata preparation and **e**xploratory analysis completed earlier in part 1
+
+---
+
+## Read and clean data 
+
+Replace the identified outliers in hours per week and capital gain and view the 
+
+```{r}
+data_raw <- read_csv("data/data_raw.csv") 
+
+data <- data_raw %>%
+  mutate(capital_gain = ifelse(capital_gain == 99999, NA, capital_gain)) %>%
+  mutate(hours_per_week = ifelse(hours_per_week == 99, NA, hours_per_week))
+str(data)
+
+```
+
+---
+
+## Assign the appropriate data types
+
+- `donated` can be converted into numeric 0 and 1 as we want there to be a value when a person donates
+- all the nominal variables and the outcome variable (`owns_ethereum`) need to be converted to factor data type for modeling
+
+```{r}
+data <- data %>%
+    mutate(donated = as.numeric(donated), owns_ethereum = factor(owns_ethereum, levels = c(TRUE, FALSE))) %>%
+    mutate(across(where(is.character), as_factor))
+
+```
+
+---
+
+## Data splitting
+
+We split the data to create an unbiased testing dataset. 
+
+```{r}
+data_split <- data %>%
+    initial_split()
+data_train <- training(data_split)
+data_test <- testing(data_split)
+```
+
+---
+
+## Simple logistic regression model
+
+First we create model specifications 
+
+```{r}
+set.seed(234)
+
+## glm specification 
+glm_spec <- logistic_reg(mode = "classification") %>%
+    set_engine("glm")
+glm_spec
+```
+
+---
+
+Fit the simple model. 
+
+Note that we need to omit the NA rows from the data. We will see how to handle NAs soon.
+
+Factor/categorical predictors need to be converted to numeric values (e.g., dummy or indicator variables). When using the formula method via fit.model_spec(), parsnip will convert factor columns to indicators.
+```{r}
+glm_rs <- glm_spec  %>%
+    fit.model_spec(owns_ethereum ~ . , data = na.omit(data_train))
+glm_rs
+```
+
+---
+
+TODO significant coefficients? and interactions?
+
+```{r}
+tidy(glm_rs) %>%
+  filter(p.value < 0.05)
+```
+
+---
+
+## Evaluation
+
+Use the yardstick package within tidymodels to find define test metrics eg,accuracy 
+
+```{r}
+predictions_glm <- augment(glm_rs, new_data = na.omit(data_test))  # attach the predictions
+#confusion matrix
+predictions_glm %>%
+    conf_mat(owns_ethereum, .pred_class)
+```
+How do we decide how good our model performance is?
+
+---
+
+### Class Metrics
+
+Remember from Module 2 - Basics, slide 10. Accuracy can be high even if the model is only predicting majority class.
+ 
+- Precision: The ratio of number of correct predictions to the total predictions made by the model. In our case, this is the number of ethereum owners who were correctly predicted out of the total number of ethereum owners predicted. `True Positive/(True Positive + False Positive)`
+- Recall: Also called *sensitivity*, is the ratio of correct predictions to the total number of true ethereum owners in the data. `True Positive/(True Positive + False Negative)`
+- F Measure: The harmonic mean of the Precision and Recall scores. This measure will be low if one the precision metric is improved at the expense of the recall or vice versa. `F1 Score = 2*(Recall * Precision) / (Recall + Precision)` 
+
+---
+
+```{r}
+# create a metric set for calculating at once
+class_metrics <- metric_set(accuracy, precision, recall, f_meas)
+predictions_glm %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+Let's try to improve the model 
+
+---
+
+## Improvements: Pre-processing
+
+Recipe is a sequence of steps defining all the pre-processing like imputation, removing predictors, scaling and one hot encoding.
+We were omitting NAs earlier, now we do some preprocessing to handle it.
+
+Adding: 
+
+- step to impute data for missing values
+- step to collapse categories since too many small categories in the occupation and workclass variables
+- step to normalize the numeric data since the variances of the numeric variables vary by orders of magnitude. for eg, capital_gain  is very different from age
+
+```{r}
+
+# create recipe to preprocess the data
+recipe_simple <- recipe(formula = owns_ethereum ~ ., data = data_train) %>%
+    step_other(all_nominal_predictors(), threshold = 0.05) %>% # for collapsing infrequent categories
+    step_unknown(all_nominal_predictors())  %>% # missing values are converted to 'unknown'
+    step_impute_mean(all_numeric_predictors())  %>% # missing values are imputed
+    step_normalize(all_numeric_predictors())
+```
+
+---
+
+Other steps TODO or Your Turns
+
+- Remove predictors suffering from multicollinearity:step_corr()
+- Create interaction terms: step_interact().
+- Combine variables using principal component analysis: step_pca()
+- Imputate missing values using a KNN model: step_knnimpute()
+
+---
+
+```{r}
+recipe_simple %>%
+    prep()
+
+```
+
+---
+
+Pre process the data
+
+```{r}
+# use the recipe on train and test data (prep and then bake)
+train_baked <- recipe_simple %>%
+    prep() %>%
+    bake(new_data = NULL)
+
+test_baked  <- recipe_simple %>%
+    prep() %>%
+    bake(new_data = data_test)
+```
+
+---
+
+## Model with simple data preparation
+
+```{r}
+#try earlier spec with newly prepped data
+glm_rs_wprep <- glm_spec  %>%
+    fit.model_spec(owns_ethereum ~ ., data = train_baked)
+glm_rs_wprep
+
+```
+
+---
+
+### Evaluation
+
+Now fit on test data and we see that the precision, and recall measures have improved. 
+
+```{r}
+predictions_glm <- augment(glm_rs_wprep, new_data = test_baked) 
+
+predictions_glm %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_glm %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+---
+
+## SVM
+
+Support vector machines attempt to divide the space 
+```{r}
+library(kernlab) # install.packages("kernlab") # if not already installed
+svm_spec <- svm_rbf() %>% 
+  set_mode("classification") %>% 
+  set_engine("kernlab")
+
+svm_fit <- svm_spec %>% 
+  fit.model_spec(owns_ethereum ~ . , data = train_baked)
+```
+
+---
+
+```{r}
+svm_fit
+
+```
+
+---
+
+```{r}
+augment(svm_fit, new_data = train_baked) %>%
+    conf_mat(owns_ethereum, .pred_class)
+
+augment(svm_fit, new_data = train_baked) %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+---
+
+```{r}
+predictions_svm <- augment(svm_fit, new_data = test_baked) 
+
+predictions_svm %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_svm %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+---
+
+roc
+
+```{r}
+predictions_svm %>%
+  roc_curve(truth = owns_ethereum, estimate = .pred_TRUE) %>%
+  autoplot()
+
+```
+
+```{r}
+predictions_svm %>%
+  roc_auc(truth = owns_ethereum, estimate = .pred_TRUE)
+
+```
+
+---
+
+## Naive Bayes
+
+- probab    listic
+- library(discrim) for naive bayes
+
+```{r}
+library(discrim) ## installed using install.packages("discrim")
+library(klaR) ## installed using install.packages("klaR")
+nb_spec <- naive_Bayes() %>% 
+  set_mode("classification") %>% 
+  set_engine("klaR") %>% #"klaR" more commonly used
+  set_args(usekernel = FALSE)  
+
+nb_fit <- nb_spec %>% 
+  fit(owns_ethereum ~ ., data = train_baked)
+```
+
+---
+
+```{r}
+nb_fit
+```
+
+---
+
+```{r}
+predictions_nb <- augment(nb_fit, new_data = test_baked)
+predictions_nb %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_nb %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+---
+
+One assumption of the naive bayes classifier is that the predictor variables are independent. 
+We hence remove the variables that are correlated to too many other variables by either removing the highly correlated variable completely or by using a dimension reduction technique. 
+
+We try a dimension reduction technique here called Principal components analysis, and remove the highly correlated variables.
+
+```{r}
+recipe_nocor <- recipe_simple %>% 
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), threshold = .99) %>%
+  prep()
+
+train_pca_baked <- recipe_nocor %>%
+    bake(new_data = data_train)
+
+test_pca_baked <- recipe_nocor %>%
+    bake(new_data = data_test)
+
+nb_fit <- nb_spec %>%
+  fit(owns_ethereum ~ ., data = train_pca_baked)
+
+```
+
+---
+
+```{r}
+predictions_nb <- augment(nb_fit, new_data = test_pca_baked)
+predictions_nb %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_nb %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+---
+
+## Your Turn
+
+```{r}
+cor(data_train %>%
+      dplyr::select(where(is.numeric)))
+```
+Let's create a feature variable denoting the age per unit of education and create a new variable of age per unit of education 'age/education' 
+Add this variable to the recipe using step_mutate.
+
+Does including this feature improve the model's predictive power?
+
+---
+
+## Answer
+
+```{r}
+
+recipe_nocor <- recipe_simple %>% 
+  step_mutate(age_edu = age/education_num) %>%
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), threshold = .99) %>%
+  prep()
+
+train_pca_baked <- recipe_nocor %>%
+    bake(new_data = data_train)
+
+test_pca_baked <- recipe_nocor %>%
+    bake(new_data = data_test)
+
+nb_fit <- nb_spec %>%
+  fit(owns_ethereum ~ . , data = train_pca_baked)
+```
+
+---
+
+```{r}
+predictions_nb <- augment(nb_fit, new_data = test_pca_baked) 
+predictions_nb %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_nb %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+---
+
+### Which model would you choose?
+
+If our aim is to make the least number of mistakes or false alarms when targeting ethereum owners, we would use the model with higher precision. An example of acting on a false alarm is mistakenly sending a promotional ethereum reward email to a non-ethereum holder.
+
+If there is a high cost associated with missing true ethereum holders, then we'd care about increasing the sensitivity or recall, and not choose this model.
+
+---
+
+## Decision Tree
+
+- Uses a binary tree
+- Splits according to gini index
+
+```{r}
+tree_spec <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+```
+
+```{r}
+dt_fit <- tree_spec %>%
+  fit(owns_ethereum ~ ., data = data_train)
+```
+---
+```{r}
+dt_fit
+```
+
+---
+```{r}
+library(rpart.plot) # install.packages("rpart.plot")
+dt_fit %>%
+  extract_fit_engine() %>%
+  rpart.plot()
+```
+
+---
+
+Evaluate
+-- check why more accuracy on test data
+
+```{r}
+augment(dt_fit, new_data = data_train) %>%
+  conf_mat(owns_ethereum, estimate = .pred_class)
+
+augment(dt_fit, new_data = data_train) %>%
+  class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+---
+
+On test data
+
+```{r}
+predictions_dt <- augment(dt_fit, new_data = data_test) 
+
+predictions_dt %>%
+  conf_mat(owns_ethereum, estimate = .pred_class)
+
+predictions_dt %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+
+```
+
+
+---
+
+## XGBOOST
+
+```{r}
+library(xgboost) # install.packages("xgboost")
+boost_spec <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+
+boost_fit <- fit.model_spec(boost_spec, owns_ethereum ~ ., data = data_train)
+```
+
+---
+
+```{r}
+augment(boost_fit, new_data = data_test) %>%
+  conf_mat(truth = owns_ethereum, estimate = .pred_class)
+augment(boost_fit, new_data = data_test) %>%
+  class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+---
+
+## Random Forest 
+
+Random Forest creates multiple CART trees based on "bootstrapped" samples of data and then combines the predictions. 
+  
+```{r}
+## random forest specification
+rf_spec <- rand_forest() %>%
+    set_mode("classification") %>%
+    set_engine("ranger")
+## Fot on prepared data 
+rf_rs_wprep <- rf_spec %>%
+    fit(owns_ethereum ~ ., data = train_baked)
+
+```
+
+---
+
+```{r}
+rf_rs_wprep
+```
+
+---
+
+### Evaluation
+
+```{r}
+predictions_rf <- augment(rf_rs_wprep, new_data = test_baked)
+
+predictions_rf %>%
+    conf_mat(owns_ethereum, .pred_class)
+predictions_rf %>%
+    class_metrics(truth = owns_ethereum, estimate = .pred_class)
+```
+
+--- 
+
+---
+
+## Variable Importance
+
+```{r, eval=FALSE}
+library(vip)
+
+imp_data <- recipe_simple %>%
+  prep() %>%
+  bake(new_data = NULL) 
+
+rf_spec %>%
+  set_engine("ranger", importance = "permutation") %>%
+  fit(owns_ethereum ~ ., data = imp_data) %>%
+  vip(geom = "point")
+```
+
+---
+
+```{r, echo=FALSE}
+library(vip)
+
+imp_data <- recipe_simple %>%
+  prep() %>%
+  bake(new_data = NULL) 
+
+rf_spec %>%
+  set_engine("ranger", importance = "permutation") %>%
+  fit(owns_ethereum ~ ., data = imp_data) %>%
+  vip(geom = "point")
+```
+
+---
+
+
+## Other Improvements: Cross validation, Tuning hyperparameters 
+
+To improve the model's predictive power we use package rsample to create a 10 fold cross validation set on the training data.
+
+
+```{r, eval=FALSE}
+set.seed(234)
+data_folds <- vfold_cv(data_train, strata = owns_ethereum)
+data_folds
+
+rf_rs_cv <- model_wf %>%
+   add_recipe(recipe_simple) %>% # no need to prep as the recipe needs to be applied on folds
+   add_model(rf_spec) %>%
+   fit_resamples(
+     resamples = data_folds,
+     metrics = class_metrics,
+     control = control_resamples(save_pred = TRUE)
+   )
+#best model 
+show_best(rf_rs_cv, metric = "recall")
+
+collect_metrics(rf_rs_cv)
+
+collect_predictions(rf_rs_cv) %>%
+  conf_mat(owns_ethereum, .pred_class)
+
+```
+
+---
+
+**Evaluation**
+
+```{r eval=FALSE}
+
+predictions_final <- model_wf %>%
+  add_recipe(recipe_simple) %>%
+  add_model(rf_spec) %>%
+  last_fit(data_split)
+
+collect_predictions(predictions_final) %>%
+  conf_mat(owns_ethereum, .pred_class) %>%
+  summary() %>%
+  select(-.estimator) %>%
+  filter(.metric %in%
+    c("accuracy", "precision", "recall", "f_meas"))
+
+## Output
+# .metric  .estimate
+
+# accuracy	0.8637676			
+# precision	0.8867439			
+# recall	0.9419381			
+# f_meas	0.9135080	
+```
+
+---
+
+## Final conclusions
+
+Given a dataset you are now able to ask the right questions and use a variety of statistical modeling techniques to arrive at results and further action steps! 
+
+
