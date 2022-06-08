@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Grant Readability          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Grant Readability <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Gitcoin Grants
+
+Gitcoin is a platform where you get paid to work on and support open source software. Gitcoin Grants lets you donate to projects or put up your own project to be funded through the Quadratic Funding mechanism. 
+
+Our aim in this case study is to analyze grant descriptions on the Gitcoin platform, to assess the following:
+
+- How readable are gitcoin grants? Evaluating the quality and complexity of the grant text descriptions.
+- Is readability affecting the donations received? Evaluating the relationship between grant text quality and contributions received by the grant.
+
+---
+
+## Getting Started
+
+We will use the `tidyverse` suit of packages for data reading and manipulation, the `quanteda` and `nsyllable` package to extract text features. In order to neatly display tables we will also use the `knitr` package. The first step is to install and load the libraries.
+
+
+```r
+library(tidyverse)
+library(quanteda)
+library(nsyllable)
+library(knitr)
+```
+
+---
+
+## Data
+
+We have two datasets containing gitcoin grant details.
+
+- web-scraped data from gitcoin grants explorer (https://gitcoin.co/grants/explorer) containing the grant text data. 
+- round information, containing active grants during each donation round 
+
+
+```r
+grants &lt;- read_csv("data/grants_text.csv")
+
+rounds &lt;- read_csv("data/Grants_Results_History_Round_over_Round__Grant_over_Grant_-_GR1-GR12.csv")
+```
+
+---
+
+## Data Preview
+
+There are 2173 observations each representing a grant, and 3 columns in the grants dataframe.
+
+
+```r
+head(grants)
+```
+
+```
+## # A tibble: 6 × 3
+##      id title                                       description                 
+##   &lt;dbl&gt; &lt;chr&gt;                                       &lt;chr&gt;                       
+## 1     7 ETH2.0 Implementers Call Notes              "Transcript/Meeting notes o…
+## 2     9 fuzz geth and Parity for EVM consensus bugs "Work with the Ethereum Fou…
+## 3    12 Gitcoin Grants Official Matching Pool Fund  "The objective of this gran…
+## 4    13 ethers.js - Complete, Simple and Tiny       "The ethers.js library is a…
+## 5    15 Whiteblock Testing                          "Whiteblock is a blockchain…
+## 6    17 Implement support for asyncio using Web3.py "The Web3.py library provid…
+```
+
+The columns are grant ID, grant title and description text.
+
+---
+
+There are 5906 observations each representing a grant at a specific round, and 13 columns in the rounds dataframe.
+
+
+```r
+head(rounds)
+```
+
+```
+## # A tibble: 6 × 13
+##   round_number round_start_date round_end_date grant_title       grant_id region
+##          &lt;dbl&gt; &lt;date&gt;           &lt;date&gt;         &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt; 
+## 1           12 2021-12-01       2021-12-16     Coin Center is e…     1668 north…
+## 2           12 2021-12-01       2021-12-16     Electronic Front…     3974 north…
+## 3           12 2021-12-01       2021-12-16     The Tor Project       2805 undef…
+## 4           12 2021-12-01       2021-12-16     Longevity Prize …     4083 europe
+## 5           12 2021-12-01       2021-12-16     Rotki - The port…      149 europe
+## 6           12 2021-12-01       2021-12-16     The Blockchain A…     4118 north…
+## # … with 7 more variables: category &lt;chr&gt;, url &lt;chr&gt;, match_amount &lt;chr&gt;,
+## #   num_contributions &lt;dbl&gt;, num_unique_contributors &lt;dbl&gt;,
+## #   crowdfund_amount_contributions_usd &lt;chr&gt;, total &lt;chr&gt;
+```
+
+---
+
+The columns are:
+
+- round_number: Round which the grant was eligible for donations
+- round_start_date and round_end_date: The start and end dates for each round
+- grant_id: Grant identifier 
+- region: Region of the word the project is located in
+- category: Grant classification
+- url: Link to the grant posting
+- match_amount: Amount of matched contribution
+- num_contributions: Number of contributions received by the grant
+- num_unique_contributors: Number of unique contributors to the grant
+- crowdfund_amount_contributions_usd: Amount of crowdfunded contributions 
+- total: Total contribution amount received by the grant (match_amount+crowdfund_amount_contributions_usd)
+
+---
+
+## Data Cleaning
+
+The rounds data has dollar signs around the contribution amounts. We will use `parse_number()` function from tidyverse to extract the numeric value.
+
+
+```r
+rounds_clean &lt;- rounds %&gt;%
+  mutate(total = parse_number(total), 
+         crowdfund_amount_contributions_usd = parse_number(crowdfund_amount_contributions_usd),
+         match_amount = parse_number(match_amount)
+         )
+```
+
+---
+
+## Deriving Variables
+
+To control for the length of time a grant is active, we will use average per round contributions
+
+
+```r
+round_averages &lt;- rounds_clean %&gt;%
+  group_by(grant_id) %&gt;%
+  summarise(avg_amount_total = mean(total, na.rm = TRUE),
+            avg_match_amount = mean(match_amount, na.rm = TRUE), 
+            avg_crowdfund_amount = mean(crowdfund_amount_contributions_usd, na.rm = TRUE), 
+            avg_unique_contributors = mean(num_unique_contributors, na.rm = TRUE),
+            avg_contributions = mean(num_contributions, na.rm = TRUE))
+```
+
+---
+
+## Distribution of average contributions
+
+
+```r
+round_averages %&gt;%
+  ggplot(aes(x = avg_amount_total)) + scale_x_continuous(labels = scales::dollar) +
+  geom_histogram() + theme_minimal()
+```
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+Most contributions are small valued and some high one time contributions skews our plot, we can use a log scale to improve this plot.
+
+---
+
+We can plot the contribution amounts in a log scale to spread out the smaller valued contributions and remove the skew 
+
+
+```r
+round_averages %&gt;%
+  ggplot(aes(x = avg_amount_total)) + scale_x_log10(labels = scales::dollar) +
+  geom_histogram() + theme_minimal()
+```
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Readability Scoring
+
+The readability score - the Flesch-Kincaid reading grade level, of a grant corresponds to the complexity of the language in the grant description.
+
+We count the words, sentences, and syllables in each grant text. The score is a function of these parameters, calculated using a formula as shown:
+
+
+```r
+scored &lt;- grants %&gt;%
+  unite(col = text, title, description, sep = " ")  %&gt;%
+  mutate(syllables = nsyllable(text),
+         sentences = nsentence(text),
+         words = ntoken(text, remove_punct = TRUE),
+         fk_grade = 0.39 * (words/sentences) + 11.8 * (syllables/words) - 15.59) 
+```
+
+Join the calculated scores into a dataframe for analysis
+
+
+```r
+data &lt;- round_averages %&gt;%
+    inner_join(scored, by = c("grant_id" = "id"), keep = TRUE) 
+```
+
+`data` has 1858 grants with 12 columns denoting the word, syllable, sentence counts, and the contributions to each grant
+
+---
+
+## Relationship between grant readability and contribution amounts
+
+
+```r
+ggplot(data, aes(x = fk_grade, y = avg_amount_total)) +
+  geom_point() +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(title = "Relationship between grant readability scores and contribution amount",
+       x = "Readability Score",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal() 
+```
+
+---
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+Most grants receive scores between 10 and 20. There are a number of grants that receive high scores but do not get high contributions. There seems to be a sweet spot of grant readability scores beyond which the amount of contributions received decreases.
+
+---
+
+## Your Turn
+
+Improve on the previous plot, by using a different scale for amount of contribution
+
+---
+
+## Answer
+
+
+```r
+p &lt;- data %&gt;% 
+  ggplot(aes(x = fk_grade, y = avg_amount_total)) +
+  geom_point() + 
+  scale_y_log10(labels = scales::dollar, 
+                breaks = 10^seq(-2, 10, by = 1)) +
+  scale_x_continuous(n.breaks = 10) +
+  labs(title = "Relationship between grant readability scores and contribution amount received",
+       x = "Readability Score",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal() 
+```
+
+---
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+Similarly, using a scatterplot we can see a relationship between the number of words in a grant versus the contributions received
+
+
+```r
+p &lt;- ggplot(data , aes(x = words, y = avg_amount_total)) +
+  geom_point() + geom_smooth() +
+  scale_y_log10(labels = scales::dollar, breaks = 10^seq(-2, 10, by = 1)) +
+  scale_x_continuous(n.breaks = 10) +
+  labs(title = "Relationship between number of words in grant text and contribution amount received",
+       x = "Number of words",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal()
+```
+
+---
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Your Turn
+
+Create a plot of the number of syllables in a grant and the average 'crowdfunded' contributions received.
+
+---
+
+## Answer
+
+
+```r
+ggplot(data, aes(x = syllables, y = avg_crowdfund_amount)) +
+  geom_point() + geom_smooth() +
+  scale_y_log10(labels = scales::dollar, breaks = 10^seq(-2, 10, by = 0.5)) +
+  labs(title = "Relationship between number of syllables and contributions",
+       y = "Average Crowdfunded Contribution Amount per Round") +
+  theme_minimal()
+```
+
+---
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-18-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Relationship between grant readability and contribution amounts -  improved visual!
+
+Let's look at a way to clearly showcase the nonlinear relationship between readability and the contribution amounts.
+
+First we discretize the readability score - we bin by every 5 units to create a categorical score variable. This is our x axis, and we use `avg_crowdfund_amount` as our y axis.
+Then we keep the log scale for amounts, and use a series of boxplots to show the variability in each category.
+
+
+```r
+p &lt;- data %&gt;%
+  mutate(score_cat = cut_width(fk_grade, width = 5, boundary = 0)) %&gt;%
+  ggplot(aes(x = score_cat , y = avg_crowdfund_amount)) +
+  scale_y_log10(labels = scales::dollar) +
+  geom_boxplot()  +
+  labs(x = "Score Interval", y = "Average Crowdfunded Amount per Round",
+       title = "Distribution of Average Contribution Amount by Readability score") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+---
+
+We can further enhance the visual by plotting the mean contribution amount at each bin
+
+
+```r
+p + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") + labs(subtitle = "With mean contribution highlighted")
+```
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-20-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+To clearly see the center of mass decreasing at the higher categories, we can also plot the mean values or even jitter points  within the boxplot.
+
+
+```r
+p + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") + labs(subtitle = "With mean contribution highlighted")
+```
+
+---
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-22-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+p + geom_jitter(shape=16, position = position_jitter(0.2), alpha = 0.5) + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") 
+```
+
+&lt;img src="grants_files/figure-html/unnamed-chunk-23-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Conclusion
+
+We learnt that there is a nonlinear relationship between simple text statistics like the number of words and syllables in the grant text and the amount of contributions it receives. Overly wordy grants and grants with complex words having high number of syllables are less favorable to the contributors funding them. 
+
+We also learnt neat visualization skills in ggplot:
+  - using log scales, and
+  - bining variables to use boxplots for showcasing the distributions within categories.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(images/logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

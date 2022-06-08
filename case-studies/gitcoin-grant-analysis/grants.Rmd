@@ -1,0 +1,344 @@
+---
+title: "Grant Readability <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=12, dpi=300)
+```
+
+## Gitcoin Grants
+
+Gitcoin is a platform where you get paid to work on and support open source software. Gitcoin Grants lets you donate to projects or put up your own project to be funded through the Quadratic Funding mechanism. 
+
+Our aim in this case study is to analyze grant descriptions on the Gitcoin platform, to assess the following:
+
+- How readable are gitcoin grants? Evaluating the quality and complexity of the grant text descriptions.
+- Is readability affecting the donations received? Evaluating the relationship between grant text quality and contributions received by the grant.
+
+---
+
+## Getting Started
+
+We will use the `tidyverse` suit of packages for data reading and manipulation, the `quanteda` and `nsyllable` package to extract text features. In order to neatly display tables we will also use the `knitr` package. The first step is to install and load the libraries.
+
+```{r}
+library(tidyverse)
+library(quanteda)
+library(nsyllable)
+library(knitr)
+```
+
+---
+
+## Data
+
+We have two datasets containing gitcoin grant details.
+
+- web-scraped data from gitcoin grants explorer (https://gitcoin.co/grants/explorer) containing the grant text data. 
+- round information, containing active grants during each donation round 
+
+```{r}
+grants <- read_csv("data/grants_text.csv")
+
+rounds <- read_csv("data/Grants_Results_History_Round_over_Round__Grant_over_Grant_-_GR1-GR12.csv")
+
+```
+
+---
+
+## Data Preview
+
+There are 2173 observations each representing a grant, and 3 columns in the grants dataframe.
+
+```{r}
+head(grants)
+```
+
+The columns are grant ID, grant title and description text.
+
+---
+
+There are 5906 observations each representing a grant at a specific round, and 13 columns in the rounds dataframe.
+
+```{r}
+head(rounds)
+```
+
+---
+
+The columns are:
+
+- round_number: Round which the grant was eligible for donations
+- round_start_date and round_end_date: The start and end dates for each round
+- grant_id: Grant identifier 
+- region: Region of the word the project is located in
+- category: Grant classification
+- url: Link to the grant posting
+- match_amount: Amount of matched contribution
+- num_contributions: Number of contributions received by the grant
+- num_unique_contributors: Number of unique contributors to the grant
+- crowdfund_amount_contributions_usd: Amount of crowdfunded contributions 
+- total: Total contribution amount received by the grant (match_amount+crowdfund_amount_contributions_usd)
+
+---
+
+## Data Cleaning
+
+The rounds data has dollar signs around the contribution amounts. We will use `parse_number()` function from tidyverse to extract the numeric value.
+
+```{r}
+rounds_clean <- rounds %>%
+  mutate(total = parse_number(total), 
+         crowdfund_amount_contributions_usd = parse_number(crowdfund_amount_contributions_usd),
+         match_amount = parse_number(match_amount)
+         )
+```
+
+---
+
+## Deriving Variables
+
+To control for the length of time a grant is active, we will use average per round contributions
+
+```{r}
+round_averages <- rounds_clean %>%
+  group_by(grant_id) %>%
+  summarise(avg_amount_total = mean(total, na.rm = TRUE),
+            avg_match_amount = mean(match_amount, na.rm = TRUE), 
+            avg_crowdfund_amount = mean(crowdfund_amount_contributions_usd, na.rm = TRUE), 
+            avg_unique_contributors = mean(num_unique_contributors, na.rm = TRUE),
+            avg_contributions = mean(num_contributions, na.rm = TRUE))
+```
+
+---
+
+## Distribution of average contributions
+
+```{r, fig.height=5}
+round_averages %>%
+  ggplot(aes(x = avg_amount_total)) + scale_x_continuous(labels = scales::dollar) +
+  geom_histogram() + theme_minimal()
+```
+
+Most contributions are small valued and some high one time contributions skews our plot, we can use a log scale to improve this plot.
+
+---
+
+We can plot the contribution amounts in a log scale to spread out the smaller valued contributions and remove the skew 
+
+```{r, fig.height=5}
+round_averages %>%
+  ggplot(aes(x = avg_amount_total)) + scale_x_log10(labels = scales::dollar) +
+  geom_histogram() + theme_minimal()
+```
+
+
+---
+
+## Readability Scoring
+
+The readability score - the Flesch-Kincaid reading grade level, of a grant corresponds to the complexity of the language in the grant description.
+
+We count the words, sentences, and syllables in each grant text. The score is a function of these parameters, calculated using a formula as shown:
+
+```{r}
+scored <- grants %>%
+  unite(col = text, title, description, sep = " ")  %>%
+  mutate(syllables = nsyllable(text),
+         sentences = nsentence(text),
+         words = ntoken(text, remove_punct = TRUE),
+         fk_grade = 0.39 * (words/sentences) + 11.8 * (syllables/words) - 15.59) 
+```
+
+Join the calculated scores into a dataframe for analysis
+
+```{r}
+data <- round_averages %>%
+    inner_join(scored, by = c("grant_id" = "id"), keep = TRUE) 
+```
+
+`data` has 1858 grants with 12 columns denoting the word, syllable, sentence counts, and the contributions to each grant
+
+---
+
+## Relationship between grant readability and contribution amounts
+
+```{r, eval=FALSE}
+ggplot(data, aes(x = fk_grade, y = avg_amount_total)) +
+  geom_point() +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(title = "Relationship between grant readability scores and contribution amount",
+       x = "Readability Score",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal() 
+```
+
+---
+
+```{r, echo=FALSE, fig.height=5}
+ggplot(data, aes(x = fk_grade, y = avg_amount_total)) +
+  geom_point() +
+  scale_y_continuous(labels = scales::dollar) +
+  labs(title = "Relationship between grant readability scores and contribution amount",
+       x = "Readability Score",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal() 
+```
+
+Most grants receive scores between 10 and 20. There are a number of grants that receive high scores but do not get high contributions. There seems to be a sweet spot of grant readability scores beyond which the amount of contributions received decreases.
+
+---
+
+## Your Turn
+
+Improve on the previous plot, by using a different scale for amount of contribution
+
+---
+
+## Answer
+
+```{r}
+p <- data %>% 
+  ggplot(aes(x = fk_grade, y = avg_amount_total)) +
+  geom_point() + 
+  scale_y_log10(labels = scales::dollar, 
+                breaks = 10^seq(-2, 10, by = 1)) +
+  scale_x_continuous(n.breaks = 10) +
+  labs(title = "Relationship between grant readability scores and contribution amount received",
+       x = "Readability Score",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal() 
+
+```
+
+---
+
+```{r, echo=FALSE}
+p
+```
+
+---
+
+Similarly, using a scatterplot we can see a relationship between the number of words in a grant versus the contributions received
+
+```{r}
+p <- ggplot(data , aes(x = words, y = avg_amount_total)) +
+  geom_point() + geom_smooth() +
+  scale_y_log10(labels = scales::dollar, breaks = 10^seq(-2, 10, by = 1)) +
+  scale_x_continuous(n.breaks = 10) +
+  labs(title = "Relationship between number of words in grant text and contribution amount received",
+       x = "Number of words",
+       y = "Average Contribution Amount per Round") +
+  theme_minimal()
+```
+
+---
+
+```{r, echo=FALSE}
+p
+```
+
+---
+
+## Your Turn
+
+Create a plot of the number of syllables in a grant and the average 'crowdfunded' contributions received.
+
+---
+
+## Answer
+
+```{r, eval=FALSE}
+ggplot(data, aes(x = syllables, y = avg_crowdfund_amount)) +
+  geom_point() + geom_smooth() +
+  scale_y_log10(labels = scales::dollar, breaks = 10^seq(-2, 10, by = 0.5)) +
+  labs(title = "Relationship between number of syllables and contributions",
+       y = "Average Crowdfunded Contribution Amount per Round") +
+  theme_minimal()
+
+```
+
+---
+
+```{r, echo=FALSE}
+ggplot(data, aes(x = syllables, y = avg_crowdfund_amount)) +
+  geom_point() + geom_smooth() +
+  scale_y_log10(labels = scales::dollar, breaks = 10^seq(-2, 10, by = 0.5)) +
+  labs(title = "Relationship between number of syllables and contributions",
+       y = "Average Crowdfunded Contribution Amount per Round") +
+  theme_minimal()
+
+```
+
+---
+
+## Relationship between grant readability and contribution amounts -  improved visual!
+
+Let's look at a way to clearly showcase the nonlinear relationship between readability and the contribution amounts.
+
+First we discretize the readability score - we bin by every 5 units to create a categorical score variable. This is our x axis, and we use `avg_crowdfund_amount` as our y axis.
+Then we keep the log scale for amounts, and use a series of boxplots to show the variability in each category.
+
+```{r}
+p <- data %>%
+  mutate(score_cat = cut_width(fk_grade, width = 5, boundary = 0)) %>%
+  ggplot(aes(x = score_cat , y = avg_crowdfund_amount)) +
+  scale_y_log10(labels = scales::dollar) +
+  geom_boxplot()  +
+  labs(x = "Score Interval", y = "Average Crowdfunded Amount per Round",
+       title = "Distribution of Average Contribution Amount by Readability score") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+---
+
+We can further enhance the visual by plotting the mean contribution amount at each bin
+
+```{r}
+p + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") + labs(subtitle = "With mean contribution highlighted")
+```
+
+---
+
+To clearly see the center of mass decreasing at the higher categories, we can also plot the mean values or even jitter points  within the boxplot.
+
+```{r, eval=FALSE}
+p + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") + labs(subtitle = "With mean contribution highlighted")
+```
+
+---
+
+```{r, echo=FALSE}
+p + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") + labs(subtitle = "With mean contribution highlighted")
+```
+
+---
+
+```{r}
+p + geom_jitter(shape=16, position = position_jitter(0.2), alpha = 0.5) + stat_summary(fun = mean, geom = "point", shape=18, alpha = 0.43, size=4, color="blue") 
+```
+
+
+---
+
+## Conclusion
+
+We learnt that there is a nonlinear relationship between simple text statistics like the number of words and syllables in the grant text and the amount of contributions it receives. Overly wordy grants and grants with complex words having high number of syllables are less favorable to the contributors funding them. 
+
+We also learnt neat visualization skills in ggplot:
+  - using log scales, and
+  - bining variables to use boxplots for showcasing the distributions within categories.
+
