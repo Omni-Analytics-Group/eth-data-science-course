@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Predicting Growth in L2 Chains          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Predicting Growth in L2 Chains <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Introduction
+
+A Layer 2 chain, or L2 chain, helps to keep in check the growth of L1 chains such as Ethereum.
+
+![](l2.png)
+
+---
+
+## Goals
+
+As L2 chains continue to grow, it is worth devoting some statistical expertise to attempting to forecast their growth.
+
+In this case study, we will focus on two: `Polygon` and `Optimism`, and use a Brownian Motion based forecasting technique in order to forecast the growth.
+
+Let's get started!
+
+---
+
+## The Data
+
+First, let's begin by loading in our two sources of data. We'll start with `Polygon`:
+
+
+```r
+pol &lt;- read_csv("data/polygon.csv")
+
+pol %&gt;%
+    head %&gt;%
+    kable
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date(UTC) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; UnixTimeStamp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; No. of Verified Contracts &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-05-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1620777600 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-05-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1621209600 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-05-18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1621296000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-05-28 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1622160000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-06-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1623196800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 468 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-06-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1623283200 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 228 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Optimism Data
+
+Next, the `Optimism` data:
+
+
+```r
+optim &lt;- read_csv("data/optimistic.csv")
+
+optim %&gt;%
+    head %&gt;%
+    kable
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date(UTC) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; UnixTimeStamp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; No. of Verified Contracts &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-01-14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1610582400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-01-15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1610668800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-01-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1610755200 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-01-17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1610841600 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-01-18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1610928000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2021-01-19 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1611014400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## A First Glance at the Polygon Data
+
+We do some minor data cleaning below:
+
+
+```r
+## Day of week
+pol$Day &lt;- weekdays(pol$`Date(UTC)`)
+pol$Day &lt;- factor(pol$Day, levels=weekdays(pol$`Date(UTC)`[2]+0:6))
+pol$Contracts &lt;- pol$`No. of Verified Contracts`
+optim$Day &lt;- weekdays(optim$`Date(UTC)`)
+optim$Day &lt;- factor(optim$Day, levels=weekdays(pol$`Date(UTC)`[2]+0:6))
+optim$Contracts &lt;- optim$`No. of Verified Contracts`
+
+
+## Weekday wise Contracts Deployed
+pol_pld &lt;- pol[pol$Contracts&gt;0,]
+pol_plot &lt;- pol_pld %&gt;%
+			ggplot(aes(x=Day, y=Contracts, fill=Day)) +
+			geom_boxplot() +
+			scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+			geom_jitter(color="black", size=0.4, alpha=0.9) +
+			theme(legend.position="none",plot.title = element_text(size=11)) +
+			ggtitle("Contracts Verified Weekday Wise (Polygon Chain)") +
+			xlab("Weekday")+
+			scale_y_continuous(limits = quantile(pol_pld$Contracts, c(0.01, 0.99)))
+```
+
+---
+
+We immediately see a strong weekend effect in the number of contracts verified for Polygon
+
+&lt;img src="growth_files/figure-html/unnamed-chunk-4-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## A First Glance at the Optimism Data
+
+We perform a similar routine for the optimism data
+
+
+```r
+optim_pld &lt;- optim[optim$Contracts&gt;0,]
+optim_plot &lt;- optim_pld %&gt;%
+			ggplot(aes(x=Day, y=Contracts, fill=Day)) +
+			geom_boxplot() +
+			scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+			geom_jitter(color="black", size=0.4, alpha=0.9) +
+			theme(legend.position="none",plot.title = element_text(size=11)) +
+			ggtitle("Contracts Verified Weekday Wise (Optimistic Chain)") +
+			xlab("Weekday")+
+			scale_y_continuous(limits = quantile(optim_pld$Contracts, c(0.01, 0.99)))
+```
+
+---
+
+The weekend effect is much less pronounced for the Optimism chain, though there still remains a noticeable dropoff in verified contracts on Sundays.
+
+&lt;img src="growth_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Polygon Calendar (2022)
+
+We can visualize a calendar of the 2022 Polygon data using the following code:
+
+
+```r
+pol22d &lt;- data.frame(Date = seq(ymd('2022-01-01'),ymd('2022-12-31'), by = 'days'), Contracts = 0)
+pol22d$Contracts &lt;- pol$Contracts[match(pol22d$Date,pol$`Date(UTC)`)]
+pol22d$ContractsCuts &lt;- as.character(cut(pol22d$Contracts, c(0:6*100),right=FALSE))
+pol22d$ContractsCuts &lt;- fct_reorder(pol22d$ContractsCuts, pol22d$Contracts)
+pol22 &lt;- calendR(
+					title = "Polygon 2022",title.size = 20,mbg.col = 2,weeknames = c("M","T","W","T","F","S","S"),subtitle = "Contracts Verified",subtitle.size = 10,months.col = "white",
+					year = 2022,special.days = as.character(pol22d$ContractsCuts),special.col = brewer.pal(length(levels(pol22d$ContractsCuts)), "Oranges")[order(levels(pol22d$ContractsCuts))],legend.pos = "bottom"
+				)
+```
+
+---
+
+&lt;img src="growth_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Polygon Calendar (2021 + 2022)
+
+And for 2021 + 2022 combined:
+
+
+```r
+pol21d &lt;- data.frame(Date = seq(ymd('2021-01-01'),ymd('2021-12-31'), by = 'days'), Contracts = 0)
+pol21d$Contracts &lt;- pol$Contracts[match(pol21d$Date,pol$`Date(UTC)`)]
+pol21d$ContractsCuts &lt;- as.character(cut(pol21d$Contracts, c(0:5*100,3900,4000),right=FALSE,dig.lab=10))
+pol21d$ContractsCuts &lt;- fct_reorder(pol21d$ContractsCuts, pol21d$Contracts)
+pol21 &lt;- calendR(
+					title = "Polygon 2021",,title.size = 20,mbg.col = 2,weeknames = c("M","T","W","T","F","S","S"),subtitle = "Contracts Verified",subtitle.size = 10,months.col = "white",
+					year = 2021,special.days = as.character(pol21d$ContractsCuts),special.col = brewer.pal(length(levels(pol21d$ContractsCuts)), "Oranges")[order(levels(pol21d$ContractsCuts))],legend.pos = "bottom"
+				)
+pol_calplot &lt;- pol21+pol22
+```
+
+---
+
+&lt;img src="growth_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Optimism Calendar (2022)
+
+A similar routine allows us to compute the calendar for Optimism:
+
+
+```r
+opt22d &lt;- data.frame(Date = seq(ymd('2022-01-01'),ymd('2022-12-31'), by = 'days'), Contracts = 0)
+opt22d$Contracts &lt;- optim$Contracts[match(opt22d$Date,optim$`Date(UTC)`)]
+opt22d$ContractsCuts &lt;- as.character(cut(opt22d$Contracts, c(0,1,1:4*20),right=FALSE))
+opt22d$ContractsCuts &lt;- fct_reorder(opt22d$ContractsCuts, opt22d$Contracts)
+opt22 &lt;- calendR(
+					title = "Optimistic 2022",,title.size = 20,mbg.col = 2,weeknames = c("M","T","W","T","F","S","S"),subtitle = "Contracts Verified",subtitle.size = 10,months.col = "white",
+					year = 2022,special.days = as.character(opt22d$ContractsCuts),special.col = brewer.pal(length(levels(opt22d$ContractsCuts)), "Oranges")[order(levels(opt22d$ContractsCuts))],legend.pos = "bottom"
+				)
+```
+
+---
+
+&lt;img src="growth_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Optimism Calendar (2021 + 2022)
+
+And for 2021 + 2022 combined:
+
+
+```r
+opt21d &lt;- data.frame(Date = seq(ymd('2021-01-01'),ymd('2021-12-31'), by = 'days'), Contracts = 0)
+opt21d$Contracts &lt;- optim$Contracts[match(opt21d$Date,optim$`Date(UTC)`)]
+opt21d$ContractsCuts &lt;- as.character(cut(opt21d$Contracts, c(0,1,1:4*10),right=FALSE))
+opt21d$ContractsCuts &lt;- fct_reorder(opt21d$ContractsCuts, opt21d$Contracts)
+opt21 &lt;- calendR(	
+					title = "Optimistic 2021",,title.size = 20,mbg.col = 2,weeknames = c("M","T","W","T","F","S","S"),subtitle = "Contracts Verified",subtitle.size = 10,months.col = "white",
+					year = 2021,special.days = as.character(opt21d$ContractsCuts),special.col = brewer.pal(length(levels(opt21d$ContractsCuts)), "Oranges")[order(levels(opt21d$ContractsCuts))],legend.pos = "bottom"
+				)
+optim_calplot &lt;- opt21+opt22
+```
+
+---
+
+&lt;img src="growth_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Brownian Motion
+
+Lastly, we use brownian motion in order to forecast each
+
+
+```r
+## Brownian Motion
+polbd &lt;- pol[5:nrow(pol),]
+polbd$Date &lt;- polbd$`Date(UTC)`
+polbd &lt;- polbd[,c("Date","Contracts")]
+optimbd &lt;- optim
+optimbd$Date &lt;- optimbd$`Date(UTC)`
+optimbd &lt;- optimbd[,c("Date","Contracts")]
+polbd_n &lt;- data.frame(Date = max(polbd$Date)+1:30)
+pol_forecast &lt;- brownian_forecast(polbd,polbd_n)
+optimbd_n &lt;- data.frame(Date = max(optimbd$Date)+1:30)
+optim_forecast &lt;- brownian_forecast(optimbd,optimbd_n)
+```
+
+---
+
+## Polygon Forecast
+
+
+```r
+pol_forecast %&gt;%
+    head %&gt;%
+    kable
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Prediction &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Upper &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Lower &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Method &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 349.8392 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 684.8991 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 165.71667 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 381.0921 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 917.8516 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 124.71213 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 400.5970 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1072.4208 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 98.68100 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 419.8736 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1317.9264 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.78054 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 457.1003 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1525.9991 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.78903 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 499.6420 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1876.4723 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58.53837 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Optimism Forecast
+
+
+```r
+optim_forecast %&gt;%
+    head %&gt;%
+    kable
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Date &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Prediction &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Upper &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Lower &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Method &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 67.77669 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 300.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.0000000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-09 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 160.29774 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1500.000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3000000 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 330.73914 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2626.042 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1996875 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 919.59318 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5289.005 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0810541 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5213.61214 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12021.429 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0427930 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; 2022-06-13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11379.09922 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27433.425 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.0259187 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Brownian Motion &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
