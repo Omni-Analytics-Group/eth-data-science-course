@@ -1,0 +1,215 @@
+---
+title: "A Statistical Dive into the Unlock Protocol <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=14, dpi=300)
+
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(lubridate)
+```
+
+## Introduction
+
+The Unlock Protocol is an attempt to bring Content Monetinization to the Web3 ecosystem, allowing just a few lines of code to be added in order to paywall or provide premium content.
+
+Unlike traditional paywall models, this is entirely decentralized and open source!
+
+![](unlock.png)
+
+---
+
+## Goals
+
+We have scraped data directly from the chain in order to analyze some properties in the usage and growth of the unlock protocol.
+
+Let's get started!
+
+---
+
+## The Data
+
+First, let's begin by loading in our data and taking a first peak:
+
+```{r}
+unlock <- read_csv("data/unlock_data.csv")
+
+unlock %>%
+    select(Block, Time, Type, ContractTag, ContractName, TokenTracker) %>%
+    head(n = 5) %>%
+    kable
+```
+
+---
+
+## Time Period
+
+To get some context for the time period for which we are analyzing, we take a look at the `min` and the `max` of the time variable:
+
+```{r}
+min(unlock$Time)
+```
+
+```{r}
+max(unlock$Time)
+```
+
+We see that the data covers the time period between December 2015 and May 2022.
+
+---
+
+## Transactions Over Time
+
+How has the number of transactions per month changed as a function of time?
+
+```{r}
+p1 <- unlock %>%
+    mutate(Date = as_date(Time)) %>%
+    mutate(Date = ymd(paste(year(Date), month(Date), "01", sep = "-"))) %>%
+    group_by(Date) %>%
+    summarise(Count = n()) %>%
+    mutate(CumeCount = cumsum(Count)) %>%
+    ggplot(aes(Date, CumeCount)) +
+        geom_line() +
+        geom_bar(stat = "identity", aes(y = Count)) +
+        scale_x_date(date_breaks = "3 months", date_labels = "%b %y") +
+        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Cumulative Number of Transactions over Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Transactions",
+            x = "Date"
+        )
+```
+
+---
+
+We see a steady growth that accelerated in 2020, including a particularly large spike in December 2021.
+
+```{r, echo=FALSE}
+p1
+```
+
+---
+
+## Some Quick Statistics
+
+Aggregating over all time, the total number of transactions is:
+
+```{r}
+nrow(unlock)
+```
+
+The number of unique wallets is:
+
+```{r}
+length(unique(unlock$From))
+```
+
+And the number of unique contracts is:
+
+```{r}
+length(unique(unlock$Contract))
+```
+
+---
+
+## Top Contract Tags
+
+```{r}
+p2 <- unlock %>%
+    filter(!is.na(ContractTag)) %>%
+    group_by(ContractTag) %>%
+    summarise(Count = n()) %>%
+    arrange(desc(Count)) %>%
+    slice(1:30) %>%
+    mutate(ContractTag = factor(ContractTag, levels = rev(ContractTag))) %>%
+    ggplot(aes(x = Count, y = ContractTag)) +
+        geom_bar(stat = "identity") +
+        scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Top 30 Contract Tags of All Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Contract Tag",
+            x = "Number of Transactions"
+        )
+```
+
+---
+
+```{r, echo=FALSE}
+p2
+```
+
+---
+
+## Top Contract Names
+
+```{r}
+p3 <- unlock %>%
+    filter(!is.na(ContractName)) %>%
+    group_by(ContractName) %>%
+    summarise(Count = n()) %>%
+    arrange(desc(Count)) %>%
+    slice(1:30) %>%
+    mutate(ContractName = factor(ContractName, levels = rev(ContractName))) %>%
+    ggplot(aes(x = Count, y = ContractName)) +
+        geom_bar(stat = "identity") +
+        scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Top 30 Contract Names of All Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Contract Name",
+            x = "Number of Transactions"
+        )
+```
+
+---
+
+```{r, echo=FALSE}
+p3
+```
+
+---
+
+## Top Token Trackers
+
+```{r}
+p4 <- unlock %>%
+    filter(!is.na(TokenTracker)) %>%
+    group_by(TokenTracker) %>%
+    summarise(Count = n()) %>%
+    arrange(desc(Count)) %>%
+    slice(1:30) %>%
+    mutate(TokenTracker = factor(TokenTracker, levels = rev(TokenTracker))) %>%
+    ggplot(aes(x = Count, y = TokenTracker)) +
+        geom_bar(stat = "identity") +
+        scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Top 30 Token Trackers of All Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Token Tracker",
+            x = "Number of Transactions"
+        )
+```
+
+---
+
+```{r, echo=FALSE}
+p4
+```

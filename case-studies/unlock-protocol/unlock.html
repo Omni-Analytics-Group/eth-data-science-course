@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A Statistical Dive into the Unlock Protocol          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# A Statistical Dive into the Unlock Protocol <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Introduction
+
+The Unlock Protocol is an attempt to bring Content Monetinization to the Web3 ecosystem, allowing just a few lines of code to be added in order to paywall or provide premium content.
+
+Unlike traditional paywall models, this is entirely decentralized and open source!
+
+![](unlock.png)
+
+---
+
+## Goals
+
+We have scraped data directly from the chain in order to analyze some properties in the usage and growth of the unlock protocol.
+
+Let's get started!
+
+---
+
+## The Data
+
+First, let's begin by loading in our data and taking a first peak:
+
+
+```r
+unlock &lt;- read_csv("data/unlock_data.csv")
+
+unlock %&gt;%
+    select(Block, Time, Type, ContractTag, ContractName, TokenTracker) %&gt;%
+    head(n = 5) %&gt;%
+    kable
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; Block &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Time &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Type &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ContractTag &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; ContractName &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; TokenTracker &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12536042 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-05-30 13:36:06 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contract &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder: BID Token &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; BID &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder (BID) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12786124 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-07-08 10:16:50 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contract &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder: BID Token &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; BID &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder (BID) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12661386 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-06-18 23:38:39 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contract &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder: BID Token &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; BID &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder (BID) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12274699 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-04-20 03:52:57 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contract &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder: BID Token &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; BID &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder (BID) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 12556552 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-06-02 17:57:29 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Contract &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder: BID Token &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; BID &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; TopBidder (BID) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Time Period
+
+To get some context for the time period for which we are analyzing, we take a look at the `min` and the `max` of the time variable:
+
+
+```r
+min(unlock$Time)
+```
+
+```
+## [1] "2015-12-29 19:13:43 UTC"
+```
+
+
+```r
+max(unlock$Time)
+```
+
+```
+## [1] "2022-05-27 00:55:38 UTC"
+```
+
+We see that the data covers the time period between December 2015 and May 2022.
+
+---
+
+## Transactions Over Time
+
+How has the number of transactions per month changed as a function of time?
+
+
+```r
+p1 &lt;- unlock %&gt;%
+    mutate(Date = as_date(Time)) %&gt;%
+    mutate(Date = ymd(paste(year(Date), month(Date), "01", sep = "-"))) %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Count = n()) %&gt;%
+    mutate(CumeCount = cumsum(Count)) %&gt;%
+    ggplot(aes(Date, CumeCount)) +
+        geom_line() +
+        geom_bar(stat = "identity", aes(y = Count)) +
+        scale_x_date(date_breaks = "3 months", date_labels = "%b %y") +
+        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Cumulative Number of Transactions over Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Transactions",
+            x = "Date"
+        )
+```
+
+---
+
+We see a steady growth that accelerated in 2020, including a particularly large spike in December 2021.
+
+&lt;img src="unlock_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Some Quick Statistics
+
+Aggregating over all time, the total number of transactions is:
+
+
+```r
+nrow(unlock)
+```
+
+```
+## [1] 140406
+```
+
+The number of unique wallets is:
+
+
+```r
+length(unique(unlock$From))
+```
+
+```
+## [1] 287
+```
+
+And the number of unique contracts is:
+
+
+```r
+length(unique(unlock$Contract))
+```
+
+```
+## [1] 10209
+```
+
+---
+
+## Top Contract Tags
+
+
+```r
+p2 &lt;- unlock %&gt;%
+    filter(!is.na(ContractTag)) %&gt;%
+    group_by(ContractTag) %&gt;%
+    summarise(Count = n()) %&gt;%
+    arrange(desc(Count)) %&gt;%
+    slice(1:30) %&gt;%
+    mutate(ContractTag = factor(ContractTag, levels = rev(ContractTag))) %&gt;%
+    ggplot(aes(x = Count, y = ContractTag)) +
+        geom_bar(stat = "identity") +
+        scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Top 30 Contract Tags of All Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Contract Tag",
+            x = "Number of Transactions"
+        )
+```
+
+---
+
+&lt;img src="unlock_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Top Contract Names
+
+
+```r
+p3 &lt;- unlock %&gt;%
+    filter(!is.na(ContractName)) %&gt;%
+    group_by(ContractName) %&gt;%
+    summarise(Count = n()) %&gt;%
+    arrange(desc(Count)) %&gt;%
+    slice(1:30) %&gt;%
+    mutate(ContractName = factor(ContractName, levels = rev(ContractName))) %&gt;%
+    ggplot(aes(x = Count, y = ContractName)) +
+        geom_bar(stat = "identity") +
+        scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Top 30 Contract Names of All Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Contract Name",
+            x = "Number of Transactions"
+        )
+```
+
+---
+
+&lt;img src="unlock_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Top Token Trackers
+
+
+```r
+p4 &lt;- unlock %&gt;%
+    filter(!is.na(TokenTracker)) %&gt;%
+    group_by(TokenTracker) %&gt;%
+    summarise(Count = n()) %&gt;%
+    arrange(desc(Count)) %&gt;%
+    slice(1:30) %&gt;%
+    mutate(TokenTracker = factor(TokenTracker, levels = rev(TokenTracker))) %&gt;%
+    ggplot(aes(x = Count, y = TokenTracker)) +
+        geom_bar(stat = "identity") +
+        scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        labs(
+            title = "Top 30 Token Trackers of All Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Token Tracker",
+            x = "Number of Transactions"
+        )
+```
+
+---
+
+&lt;img src="unlock_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
