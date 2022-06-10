@@ -1,0 +1,116 @@
+---
+title: "Filecoin Miner Index API Exploration <br> <br> <br> <br> <br>"
+author: "Omni Analytics Group"
+output:
+  xaringan::moon_reader:
+    includes:
+      after_body: insert-logo.html
+    css: [default, default-fonts, classroom.css]
+    lib_dir: libs
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center", fig.width=18, dpi=300)
+
+## Loading Libraries
+library(knitr)
+library(kableExtra)
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(ISOcodes)
+
+m_d <- readRDS("data/filecoin_miner_data.RDS")
+
+input <- list(sel_min = m_d$miner_address[1:5])
+
+country_df <- data.frame(ID=unique(m_d$miner_location),Country_Code=ISO_3166_1$Alpha_3[match(unique(m_d$miner_location),ISO_3166_1$Alpha_2)],Country_Name=ISO_3166_1$Name[match(unique(m_d$miner_location),ISO_3166_1$Alpha_2)])
+country_df <- country_df[complete.cases(country_df),]
+
+m_d$miner_location_A3 <- country_df$Country_Code[match(m_d$miner_location,country_df$ID)]
+m_d$miner_location_Country <- country_df$Country_Name[match(m_d$miner_location,country_df$ID)]
+m_d$fc_askPrice <- as.numeric(m_d$fc_askPrice)/10^18
+m_d$fc_askVerifiedPrice <- as.numeric(m_d$fc_askVerifiedPrice)/10^18
+m_d$fc_minPieceSize <- as.numeric(m_d$fc_minPieceSize)/1024^3
+m_d$fc_maxPieceSize <- as.numeric(m_d$fc_maxPieceSize)/1024^3
+
+## Cleaning functions
+tfr_rate <- function(x)
+{
+	res <- sapply(unlist(strsplit(x,"<->")),function(x) as.numeric(strsplit(x,";")[[1]][2]))[which.max(sapply(unlist(strsplit(x,"<->")),function(x) as_datetime(strsplit(x,";")[[1]][1])))]
+	if(length(res)==0) return(NA)
+	paste(round(res,4),"MiB/s")
+}
+
+										# if(length(input$sel_min)<2) return(NULL)
+										min_d <- t(m_d[m_d$miner_address %in% input$sel_min,])
+										colnames(min_d) <- min_d[1,]
+										min_d <- min_d[-1,,drop=FALSE]
+										min_d <- min_d[c(31,2:9,11:18,28:29),,drop=FALSE]
+										rownames(min_d) <- c(
+																"Country",
+																"Last Updated",
+																"Miner Power %",
+																"Ask Price (FIL)",
+																"Ask Price Verified (FIL)",
+																"Min Piece Size",
+																"Max Piece Size",
+																"Num Active Sectors",
+																"Num Faulty Sectors",
+																"Total Deals",
+																"Last Deal",
+																"Total Deals Failure",
+																"Last Deal Failure",
+																"Total Retrievals",
+																"Last Retrieval",
+																"Total Retrievals Failure",
+																"Last Retrieval Failure",
+																"Last Deal Transfer Rate",
+																"Last Retrieval Transfer Rate"
+															)
+										min_d["Miner Power %",] <- paste(round(as.numeric(min_d["Miner Power %",])*100,4),"%")
+										min_d["Last Updated",] <- as.character(as_datetime(min_d["Last Updated",]))
+										min_d["Ask Price (FIL)",] <- ifelse(is.na(min_d["Ask Price (FIL)",]),NA,paste(min_d["Ask Price (FIL)",],"FIL"))
+										min_d["Ask Price Verified (FIL)",] <- ifelse(is.na(min_d["Ask Price Verified (FIL)",]),NA,paste(min_d["Ask Price Verified (FIL)",],"FIL"))
+										min_d["Min Piece Size",] <- paste(min_d["Min Piece Size",],"GB")
+										min_d["Max Piece Size",] <- paste(min_d["Max Piece Size",],"GB")
+										min_d["Last Deal",] <- as.character(as_datetime(min_d["Last Deal",]))
+										min_d["Last Deal Failure",] <- as.character(as_datetime(min_d["Last Deal Failure",]))
+										min_d["Last Retrieval",] <- as.character(as_datetime(min_d["Last Retrieval",]))
+										min_d["Last Retrieval Failure",] <- as.character(as_datetime(min_d["Last Retrieval Failure",]))
+										min_d["Last Deal Transfer Rate",] <- sapply(min_d["Last Deal Transfer Rate",],tfr_rate)
+										min_d["Last Retrieval Transfer Rate",] <- sapply(min_d["Last Retrieval Transfer Rate",],tfr_rate)
+```
+
+## Filecoin
+
+As part of the Gitcoin Round 9 textile Hackathon our team took on the task of creating a Miner Index Visual Explorer. Using data from the new Filecoin Miner Index API, we've developed a collection of visualizations to help network enthusiasts get a high level overview of the health and performance of storage miners. The default page contains a global breakdown of miner activity and decentralization as measured by the percentage of miner power and the number of miners. Here performance is measured through the number of faulty sectors and retrieval failures. 
+
+In this case study, we deconstruct the application into the component visuals and walk through the process of extracting all the relevant pieces from our application. We hope you enjoy!
+
+---
+
+## Examining the Data
+
+```{r}
+DT::datatable(min_d[1:6,],options = list(scrollX = TRUE,pageLength = 50, dom = 't',ordering=F))
+```
+
+---
+
+## Distribution of Costs
+
+---
+
+## Distribution of Expiration Times
+
+---
