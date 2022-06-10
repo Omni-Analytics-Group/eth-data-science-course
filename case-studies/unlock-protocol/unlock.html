@@ -31,7 +31,8 @@ The Unlock Protocol is an attempt to bring Content Monetinization to the Web3 ec
 
 Unlike traditional paywall models, this is entirely decentralized and open source!
 
-![](unlock.png)
+&lt;br&gt;&lt;br&gt;
+&lt;div style='text-align: center'&gt;&lt;img src='unlock.png'&gt;&lt;/div&gt;
 
 ---
 
@@ -57,7 +58,12 @@ Ultimately, the data is people who have interacted with the Unlock contract and 
 
 ## Goals
 
-We have scraped data directly from the chain in order to analyze some properties in the usage and growth of the unlock protocol.
+Using the scraped data, we wish to do some of the following:
+
+- Clean and process the data to make it suitable for analysis, as needed
+- Analyze both the aggregate and the over-time growth metrics of the Unlock Protocol
+- Get a feel for the number of unique contracts and wallets interacting with the protocol
+- Say something about the top tags names, and token trackers.
 
 Let's get started!
 
@@ -65,7 +71,7 @@ Let's get started!
 
 ## The Data
 
-First, let's begin by loading in our data and taking a first peak:
+First, let's begin by loading in our data and taking a first peak. Note that for verbosity, we are removing a few contract columns when displaying here.
 
 
 ```r
@@ -160,38 +166,6 @@ We see that the data covers the time period between December 2015 and May 2022.
 
 ---
 
-## Transactions Over Time
-
-How has the number of transactions per month changed as a function of time?
-
-
-```r
-p1 &lt;- unlock %&gt;%
-    mutate(Date = as_date(Time)) %&gt;%
-    mutate(Date = ymd(paste(year(Date), month(Date), "01", sep = "-"))) %&gt;%
-    group_by(Date) %&gt;%
-    summarise(Count = n()) %&gt;%
-    mutate(CumeCount = cumsum(Count)) %&gt;%
-    ggplot(aes(Date, CumeCount)) +
-        geom_line() +
-        geom_bar(stat = "identity", aes(y = Count)) +
-        scale_x_date(date_breaks = "3 months", date_labels = "%b %y") +
-        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
-        labs(
-            title = "Cumulative Number of Transactions over Time",
-            subtitle = "For the Unlock Protocol",
-            y = "Transactions",
-            x = "Date"
-        )
-```
-
----
-
-We see a steady growth that accelerated in 2020, including a particularly large spike in December 2021.
-
-&lt;img src="unlock_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
-
----
 
 ## Some Quick Statistics
 
@@ -230,7 +204,43 @@ length(unique(unlock$Contract))
 
 ---
 
+## Transactions Over Time
+
+How has the number of transactions per month changed as a function of time?
+
+
+```r
+p1 &lt;- unlock %&gt;%
+    mutate(Date = as_date(Time)) %&gt;%
+    mutate(Date = ymd(paste(year(Date), month(Date), "01", sep = "-"))) %&gt;%
+    group_by(Date) %&gt;%
+    summarise(Count = n()) %&gt;%
+    mutate(CumeCount = cumsum(Count)) %&gt;%
+    ggplot(aes(Date, CumeCount)) +
+        geom_line(colour = "#D64555", size = 1.25) +
+        geom_bar(stat = "identity", aes(y = Count), fill = "#D64555", colour = "grey60") +
+        scale_x_date(date_breaks = "3 months", date_labels = "%b %y") +
+        scale_y_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        watermark_img("unlock.png", width = 70, location = "tl", alpha = 0.3) +
+        labs(
+            title = "Cumulative Number of Transactions over Time",
+            subtitle = "For the Unlock Protocol",
+            y = "Transactions",
+            x = "Date"
+        )
+```
+
+---
+
+We see a steady growth that accelerated in 2020, including a particularly large spike in December 2021.
+
+&lt;img src="unlock_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
 ## Top Contract Tags
+
+Now let's compute the top contract tags:
 
 
 ```r
@@ -242,8 +252,9 @@ p2 &lt;- unlock %&gt;%
     slice(1:30) %&gt;%
     mutate(ContractTag = factor(ContractTag, levels = rev(ContractTag))) %&gt;%
     ggplot(aes(x = Count, y = ContractTag)) +
-        geom_bar(stat = "identity") +
+        geom_bar(stat = "identity", fill = "#D64555", colour = "grey60") +
         scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        watermark_img("unlock.png", width = 70, location = "br", alpha = 0.3) +
         labs(
             title = "Top 30 Contract Tags of All Time",
             subtitle = "For the Unlock Protocol",
@@ -254,11 +265,15 @@ p2 &lt;- unlock %&gt;%
 
 ---
 
+Towards the top of the list, we see Uniswap V2, USD Coin, and DAI, with Uniswap V2 leading the way with well over 12,000 transactions associated.
+
 &lt;img src="unlock_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
 ## Top Contract Names
+
+We can use nearly the same routine to look at the top contract names:
 
 
 ```r
@@ -270,8 +285,9 @@ p3 &lt;- unlock %&gt;%
     slice(1:30) %&gt;%
     mutate(ContractName = factor(ContractName, levels = rev(ContractName))) %&gt;%
     ggplot(aes(x = Count, y = ContractName)) +
-        geom_bar(stat = "identity") +
+        geom_bar(stat = "identity", fill = "#D64555", colour = "grey60") +
         scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        watermark_img("unlock.png", width = 70, location = "br", alpha = 0.3) +
         labs(
             title = "Top 30 Contract Names of All Time",
             subtitle = "For the Unlock Protocol",
@@ -282,11 +298,15 @@ p3 &lt;- unlock %&gt;%
 
 ---
 
+The story is much the same, with Uniswap at the top, followed by InBetweeners and FiatTokenProxy.
+
 &lt;img src="unlock_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
 ## Top Token Trackers
+
+Finally, we do the same analysis looking at the top token trackers:
 
 
 ```r
@@ -298,8 +318,9 @@ p4 &lt;- unlock %&gt;%
     slice(1:30) %&gt;%
     mutate(TokenTracker = factor(TokenTracker, levels = rev(TokenTracker))) %&gt;%
     ggplot(aes(x = Count, y = TokenTracker)) +
-        geom_bar(stat = "identity") +
+        geom_bar(stat = "identity", fill = "#D64555", colour = "grey60") +
         scale_x_continuous(labels = scales::comma, breaks = scales::pretty_breaks(n = 10)) +
+        watermark_img("unlock.png", width = 70, location = "br", alpha = 0.3) +
         labs(
             title = "Top 30 Token Trackers of All Time",
             subtitle = "For the Unlock Protocol",
@@ -310,7 +331,18 @@ p4 &lt;- unlock %&gt;%
 
 ---
 
+Now, InBetweeners rises to the top, and USDC + DAI round out the rest of the top three.
+
 &lt;img src="unlock_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Conclusion
+
+We hope you enjoyed this brief look into the Unlock Protocol and analyzing data on transactions associated with it from the blockchain. Be on the lookout for many more case studies coming down the pipeline!
+
+&lt;br&gt;&lt;br&gt;
+&lt;div style='text-align: center'&gt;&lt;img src='unlock.png'&gt;&lt;/div&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
