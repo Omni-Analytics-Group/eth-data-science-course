@@ -63,6 +63,7 @@ Module 4 - Case Studies
 * An Analysis of the Uniswap Platform ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/uniswap/report.html))
 * Forefront Social Token Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/forefront/forefront.html))
 * Gitcoin Grants Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/gitcoin-grant-analysis/grants.html))
+* Predicting Growth in L2 Chains ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/l2-growth/growth.html))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
 
