@@ -35,6 +35,26 @@ Unlike traditional paywall models, this is entirely decentralized and open sourc
 
 ---
 
+## Unlock Contract
+
+The contract we scraped data from was the following:
+
+https://etherscan.io/address/0x3d5409cce1d45233de1d4ebdee74b8e004abdd13
+
+We scraped all the accounts who had interacted with this contract
+
+![](transactions.png)
+
+---
+
+## Unlock Contract Scraping
+
+Next, for those individual accounts, we browsed to their page and scraped all the addresses they have interacted with. Then we used those final contracts and scraped this info for each of those if it's a contract and skipped if an address.
+
+Ultimately, the data is people who have interacted with the Unlock contract and have interacted with which other contracts.
+
+![](final.png)
+
 ## Goals
 
 We have scraped data directly from the chain in order to analyze some properties in the usage and growth of the unlock protocol.
