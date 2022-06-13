@@ -52,15 +52,182 @@ Because the analysis was originally constructed as a Shiny application, we will 
 
 ---
 
+## Loading R Libraries
+
+A set of R libraries are required to follow along. You can load them all with the following lines (install if necessary):
+
+
+```r
+## Loading Libraries
+library(knitr)
+library(kableExtra)
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(ISOcodes)
+library(highcharter)
+library(widgetframe)
+```
+
+---
+
+## Loading the Data
+
+The data has been exported as an RDS file, so we can begin by simply reading it in, and taking a look at the raw data:
+
+
+```r
+m_d &lt;- readRDS("data/filecoin_miner_data.RDS")
+
+m_d[,1:5] %&gt;%
+    head(n = 5) %&gt;%
+    kable
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; miner_address &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; miner_location &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; miner_updatedAt &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; fc_relativePower &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; fc_askPrice &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; f022352 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NO &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-03-29T16:03:32.701Z &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5.47e-05 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 20000000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; f015927 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; US &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-03-29T16:03:30.899Z &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.37e-05 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 50000000000 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; t016306 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-03-29T16:03:32.076Z &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00e+00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; t016304 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-03-29T16:03:29.623Z &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00e+00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; t016303 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2021-03-29T16:03:31.070Z &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.00e+00 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Cleaning the Data
+
+Next we perform some preliminary cleaning steps:
+
+
+```r
+var_map &lt;- list("Miner Power %" = "fc_relativePower",
+                "Num Active Sectors" = "fc_activeSectors",
+                "Num Faulty Sectors" = "fc_faultySectors",
+                "Total Deals" = "tt_deal_total",
+                "Total Deals Failure" = "tt_deal_failure")
+
+input &lt;- list(sel_min = m_d$miner_address[1:5],
+              select_column = "Miner Power %")
+
+country_df &lt;- data.frame(ID=unique(m_d$miner_location),Country_Code=ISO_3166_1$Alpha_3[match(unique(m_d$miner_location),ISO_3166_1$Alpha_2)],Country_Name=ISO_3166_1$Name[match(unique(m_d$miner_location),ISO_3166_1$Alpha_2)])
+country_df &lt;- country_df[complete.cases(country_df),]
+
+m_d$miner_location_A3 &lt;- country_df$Country_Code[match(m_d$miner_location,country_df$ID)]
+m_d$miner_location_Country &lt;- country_df$Country_Name[match(m_d$miner_location,country_df$ID)]
+m_d$fc_askPrice &lt;- as.numeric(m_d$fc_askPrice)/10^18
+m_d$fc_askVerifiedPrice &lt;- as.numeric(m_d$fc_askVerifiedPrice)/10^18
+m_d$fc_minPieceSize &lt;- as.numeric(m_d$fc_minPieceSize)/1024^3
+m_d$fc_maxPieceSize &lt;- as.numeric(m_d$fc_maxPieceSize)/1024^3
+```
+
+---
+
+## Cleaning the Data (Part Two)
+
+
+```r
+## Cleaning functions
+tfr_rate &lt;- function(x)
+{
+	res &lt;- sapply(unlist(strsplit(x,"&lt;-&gt;")),function(x) as.numeric(strsplit(x,";")[[1]][2]))[which.max(sapply(unlist(strsplit(x,"&lt;-&gt;")),function(x) as_datetime(strsplit(x,";")[[1]][1])))]
+	if(length(res)==0) return(NA)
+	paste(round(res,4),"MiB/s")
+}
+
+# if(length(input$sel_min)&lt;2) return(NULL)
+min_d &lt;- t(m_d[m_d$miner_address %in% input$sel_min,])
+colnames(min_d) &lt;- min_d[1,]
+min_d &lt;- min_d[-1,,drop=FALSE]
+min_d &lt;- min_d[c(31,2:9,11:18,28:29),,drop=FALSE]
+```
+
+---
+
+## Cleaning the Data (Part Three)
+
+
+```r
+rownames(min_d) &lt;- c("Country", "Last Updated", "Miner Power %",
+					 "Ask Price (FIL)", "Ask Price Verified (FIL)",
+					 "Min Piece Size", "Max Piece Size",
+					 "Num Active Sectors", "Num Faulty Sectors",
+					 "Total Deals", "Last Deal",
+					 "Total Deals Failure", "Last Deal Failure",
+					 "Total Retrievals", "Last Retrieval",
+					 "Total Retrievals Failure", "Last Retrieval Failure",
+					 "Last Deal Transfer Rate", "Last Retrieval Transfer Rate"
+					)
+min_d["Miner Power %",] &lt;- paste(round(as.numeric(min_d["Miner Power %",])*100,4),"%")
+min_d["Last Updated",] &lt;- as.character(as_datetime(min_d["Last Updated",]))
+min_d["Ask Price (FIL)",] &lt;- ifelse(is.na(min_d["Ask Price (FIL)",]),NA,paste(min_d["Ask Price (FIL)",],"FIL"))
+min_d["Ask Price Verified (FIL)",] &lt;- ifelse(is.na(min_d["Ask Price Verified (FIL)",]),NA,paste(min_d["Ask Price Verified (FIL)",],"FIL"))
+min_d["Min Piece Size",] &lt;- paste(min_d["Min Piece Size",],"GB")
+min_d["Max Piece Size",] &lt;- paste(min_d["Max Piece Size",],"GB")
+min_d["Last Deal",] &lt;- as.character(as_datetime(min_d["Last Deal",]))
+min_d["Last Deal Failure",] &lt;- as.character(as_datetime(min_d["Last Deal Failure",]))
+min_d["Last Retrieval",] &lt;- as.character(as_datetime(min_d["Last Retrieval",]))
+min_d["Last Retrieval Failure",] &lt;- as.character(as_datetime(min_d["Last Retrieval Failure",]))
+min_d["Last Deal Transfer Rate",] &lt;- sapply(min_d["Last Deal Transfer Rate",],tfr_rate)
+min_d["Last Retrieval Transfer Rate",] &lt;- sapply(min_d["Last Retrieval Transfer Rate",],tfr_rate)
+```
+
+---
+
 ## Examining the Data
+
+With the data cleaned, let's take a peak at the result:
 
 
 ```r
 DT::datatable(min_d[1:6,],options = list(scrollX = TRUE,pageLength = 50, dom = 't',ordering=F))
 ```
 
-<div id="htmlwidget-7431acf45a08d5804d61" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7431acf45a08d5804d61">{"x":{"filter":"none","vertical":false,"data":[["Country","Last Updated","Miner Power %","Ask Price (FIL)","Ask Price Verified (FIL)","Min Piece Size"],["Norway","2021-03-29 16:03:32","0.0055 %","2e-08 FIL","0e+00 FIL","0.125 GB"],["United States","2021-03-29 16:03:30","0.0014 %","5e-08 FIL","5e-09 FIL","1.000 GB"],[null,"2021-03-29 16:03:32","0 %",null,null,"0.000 GB"],[null,"2021-03-29 16:03:29","0 %",null,null,"0.000 GB"],[null,"2021-03-29 16:03:31","0 %",null,null,"0.000 GB"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>f022352<\/th>\n      <th>f015927<\/th>\n      <th>t016306<\/th>\n      <th>t016304<\/th>\n      <th>t016303<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":50,"dom":"t","ordering":false,"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-98be20c587a7a523dbfe" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-98be20c587a7a523dbfe">{"x":{"filter":"none","vertical":false,"data":[["Country","Last Updated","Miner Power %","Ask Price (FIL)","Ask Price Verified (FIL)","Min Piece Size"],["Norway","2021-03-29 16:03:32","0.0055 %","2e-08 FIL","0e+00 FIL","0.125 GB"],["United States","2021-03-29 16:03:30","0.0014 %","5e-08 FIL","5e-09 FIL","1.000 GB"],[null,"2021-03-29 16:03:32","0 %",null,null,"0.000 GB"],[null,"2021-03-29 16:03:29","0 %",null,null,"0.000 GB"],[null,"2021-03-29 16:03:31","0 %",null,null,"0.000 GB"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>f022352<\/th>\n      <th>f015927<\/th>\n      <th>t016306<\/th>\n      <th>t016304<\/th>\n      <th>t016303<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":50,"dom":"t","ordering":false,"columnDefs":[{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -122,43 +289,43 @@ Now we can produce a number of visualizations of different variables!
 
 ## Miner Power % by Country
 
-<div id="htmlwidget-2f0c0bce2874000af553" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-2f0c0bce2874000af553">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-4.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c642b72f2534dfede272" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c642b72f2534dfede272">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-9.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Number of Miners by Country
 
-<div id="htmlwidget-72b83ae19a4c0f8a535e" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-72b83ae19a4c0f8a535e">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-5.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a6f7cc2e6201a68492a6" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a6f7cc2e6201a68492a6">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-10.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Number of Active Sectors by Country
 
-<div id="htmlwidget-c7b76f87f15235308c1e" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c7b76f87f15235308c1e">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-6.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b4433cf72ad5e85b83a5" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b4433cf72ad5e85b83a5">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-11.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Number of Faulty Sectors by Country
 
-<div id="htmlwidget-c26dfe5e0177d2f862ae" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-c26dfe5e0177d2f862ae">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-7.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-44af341b4a49cfd8b442" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-44af341b4a49cfd8b442">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-12.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Number of Deals by Country
 
-<div id="htmlwidget-6a904872b11e70ab65f0" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-6a904872b11e70ab65f0">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-8.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9312689b2b09553e1c94" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9312689b2b09553e1c94">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-13.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Number of Deal Failures by Country
 
-<div id="htmlwidget-03606befb3081bb11002" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-03606befb3081bb11002">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-9.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-11740c36e08ddb1ba0cd" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-11740c36e08ddb1ba0cd">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-14.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -200,36 +367,36 @@ hc_hist &lt;- function(col) {
 
 ## Distribution of Miner Power %
 
-<div id="htmlwidget-e935c3b46e3ef4e31a37" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-e935c3b46e3ef4e31a37">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-11.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-474822896c1b7e416e5b" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-474822896c1b7e416e5b">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-16.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Distribution of Number of Active Sectors
 
-<div id="htmlwidget-4e5d72fd51ff83f4eb17" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4e5d72fd51ff83f4eb17">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-12.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9d78a00895e9ea86d82d" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9d78a00895e9ea86d82d">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-17.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Distribution of Number of Faulty Sectors 
 
-<div id="htmlwidget-600ce02a0fe1a276a2e0" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-600ce02a0fe1a276a2e0">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-13.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b15da57920b8a88aa3b2" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b15da57920b8a88aa3b2">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-18.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Distribution of Number of Deals
 
-<div id="htmlwidget-0808d70b63842cb3385d" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0808d70b63842cb3385d">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-14.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-fecb604f521717a2518e" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-fecb604f521717a2518e">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-19.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 ## Distribution of Number of Deal Failures
 
-<div id="htmlwidget-db827876f5fe125980ad" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
-<script type="application/json" data-for="htmlwidget-db827876f5fe125980ad">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-15.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c8d903180b621ba53755" style="width:100%;height:2100px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c8d903180b621ba53755">{"x":{"url":"filecoin_files/figure-html//widgets/widget_unnamed-chunk-20.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ## Distributional Analysis
 
