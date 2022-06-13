@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>body{background-color:white;}</style>
+<script src="highchart_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="highchart_libs/jquery-3.5.1/jquery.min.js"></script>
+<script src="highchart_libs/proj4js-2.3.15/proj4.js"></script>
+<link href="highchart_libs/highcharts-9.3.1/css/motion.css" rel="stylesheet" />
+<script src="highchart_libs/highcharts-9.3.1/highcharts.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/highcharts-3d.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/highcharts-more.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/stock.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/map.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/data.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/exporting.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/offline-exporting.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/drilldown.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/item-series.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/overlapping-datalabels.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/annotations.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/export-data.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/funnel.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/heatmap.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/treemap.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/sankey.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/dependency-wheel.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/organization.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/solid-gauge.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/streamgraph.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/sunburst.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/vector.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/wordcloud.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/xrange.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/tilemap.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/venn.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/gantt.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/timeline.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/parallel-coordinates.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/bullet.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/coloraxis.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/dumbbell.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/lollipop.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/series-label.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/plugins/motion.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/custom/reset.js"></script>
+<script src="highchart_libs/highcharts-9.3.1/modules/boost.js"></script>
+<script src="highchart_libs/highchart-binding-0.9.4/highchart.js"></script>
+<script src="highchart_libs/pymjs-1.3.2/pym.v1.min.js"></script>
+  <title>highchart</title>
+</head>
+<body>
+<div id="htmlwidget_container">
+  <div id="htmlwidget-a9413d368e5dbee84f65" style="width:100%;height:500px;" class="highchart html-widget"></div>
+  <script>HTMLWidgets.pymChild = new pym.Child();HTMLWidgets.addPostRenderHandler(function(){
+                                setTimeout(function(){HTMLWidgets.pymChild.sendHeight();},100);
+                            });</script>
+</div>
+<script type="application/json" data-for="htmlwidget-a9413d368e5dbee84f65">{"x":{"hc_opts":{"chart":{"reflow":true,"zoomType":"x"},"title":{"text":"Total Deals Histogram (Logarithmic Y Axis)"},"yAxis":{"title":{"text":"Count"},"type":"logarithmic"},"credits":{"enabled":false},"exporting":{"enabled":false},"boost":{"enabled":false},"plotOptions":{"series":{"label":{"enabled":false},"turboThreshold":0},"treemap":{"layoutAlgorithm":"squarified"}},"tooltip":{"formatter":"function() { return  this.point.name + '<br/>' + this.y; }"},"series":[{"data":[{"x":5,"y":1499,"name":"(0, 10]"},{"x":15,"y":26,"name":"(10, 20]"},{"x":25,"y":13,"name":"(20, 30]"},{"x":35,"y":10,"name":"(30, 40]"},{"x":45,"y":2,"name":"(40, 50]"},{"x":55,"y":2,"name":"(50, 60]"},{"x":65,"y":4,"name":"(60, 70]"},{"x":75,"y":2,"name":"(70, 80]"},{"x":85,"y":1,"name":"(80, 90]"},{"x":95,"y":0,"name":"(90, 100]"},{"x":105,"y":2,"name":"(100, 110]"},{"x":115,"y":1,"name":"(110, 120]"},{"x":125,"y":4,"name":"(120, 130]"},{"x":135,"y":1,"name":"(130, 140]"},{"x":145,"y":0,"name":"(140, 150]"},{"x":155,"y":0,"name":"(150, 160]"},{"x":165,"y":0,"name":"(160, 170]"},{"x":175,"y":0,"name":"(170, 180]"},{"x":185,"y":1,"name":"(180, 190]"},{"x":195,"y":0,"name":"(190, 200]"},{"x":205,"y":0,"name":"(200, 210]"},{"x":215,"y":0,"name":"(210, 220]"},{"x":225,"y":0,"name":"(220, 230]"},{"x":235,"y":0,"name":"(230, 240]"},{"x":245,"y":0,"name":"(240, 250]"},{"x":255,"y":0,"name":"(250, 260]"},{"x":265,"y":0,"name":"(260, 270]"},{"x":275,"y":1,"name":"(270, 280]"}],"type":"column","pointRange":10,"groupPadding":0,"pointPadding":0,"borderWidth":0,"name":"Total Deals"}],"xAxis":{"title":{"text":"Total Deals"}},"legend":{"enabled":false}},"theme":{"chart":{"backgroundColor":"transparent"},"colors":["#7cb5ec","#434348","#90ed7d","#f7a35c","#8085e9","#f15c80","#e4d354","#2b908f","#f45b5b","#91e8e1"]},"conf_opts":{"global":{"Date":null,"VMLRadialGradientURL":"http =//code.highcharts.com/list(version)/gfx/vml-radial-gradient.png","canvasToolsURL":"http =//code.highcharts.com/list(version)/modules/canvas-tools.js","getTimezoneOffset":null,"timezoneOffset":0,"useUTC":true},"lang":{"contextButtonTitle":"Chart context menu","decimalPoint":".","downloadCSV":"Download CSV","downloadJPEG":"Download JPEG image","downloadPDF":"Download PDF document","downloadPNG":"Download PNG image","downloadSVG":"Download SVG vector image","downloadXLS":"Download XLS","drillUpText":"◁ Back to {series.name}","exitFullscreen":"Exit from full screen","exportData":{"annotationHeader":"Annotations","categoryDatetimeHeader":"DateTime","categoryHeader":"Category"},"hideData":"Hide data table","invalidDate":null,"loading":"Loading...","months":["January","February","March","April","May","June","July","August","September","October","November","December"],"noData":"No data to display","numericSymbolMagnitude":1000,"numericSymbols":["k","M","G","T","P","E"],"printChart":"Print chart","resetZoom":"Reset zoom","resetZoomTitle":"Reset zoom level 1:1","shortMonths":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"shortWeekdays":["Sat","Sun","Mon","Tue","Wed","Thu","Fri"],"thousandsSep":" ","viewData":"View data table","viewFullscreen":"View in full screen","weekdays":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]}},"type":"chart","fonts":[],"debug":false},"evals":["hc_opts.tooltip.formatter"],"jsHooks":[]}</script>
+<script type="application/htmlwidget-sizing" data-for="htmlwidget-a9413d368e5dbee84f65">{"viewer":{"width":"100%","height":350,"padding":0,"fill":false},"browser":{"width":"100%","height":500,"padding":0,"fill":false}}</script>
+</body>
+</html>
