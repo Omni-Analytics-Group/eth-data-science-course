@@ -64,7 +64,7 @@ Module 4 - Case Studies
 * Forefront Social Token Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/forefront/forefront.html))
 * Gitcoin Grants Analysis ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/gitcoin-grant-analysis/grants.html))
 * Predicting Growth in L2 Chains ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/l2-growth/growth.html))
-* A Statistical Dive into the Unlock Protocol ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/unlock-protocol/unlock.html))
+* A Statistical Dive into the Unlock Protocol ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/unlock-protocol/unlock.html), [Video](https://youtu.be/RpEA7EWNE6k))
 * Filecoin Miner Index API Exploration ([Slides](https://crypto.omnianalytics.io/eth-data-science-course/case-studies/filecoin/filecoin.html))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
