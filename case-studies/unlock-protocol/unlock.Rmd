@@ -61,6 +61,8 @@ Ultimately, the final data set consisted of wallet addresses that interacted wit
 
 ![](final.png)
 
+---
+
 ## Goals
 
 Using the scraped [data](https://github.com/Omni-Analytics-Group/eth-data-science-course/tree/master/case-studies/unlock-protocol/data), we wish to do the following:
