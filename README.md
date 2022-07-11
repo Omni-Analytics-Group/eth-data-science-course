@@ -134,6 +134,19 @@ Change log
 * Various link fixes and copy edits
 * Minor updates to Module 3
 
+## Vision
+
+For a little over a year, this course has been inspiring new data scientists and teaching the fundamentals of statistical analysis all while introducing students to the world of cryptocurrency through the practical application of these skills to Ethereum based projects. As we continue to push forward on our dream of educating the next generation of blockchain native data scientists, we are going to begin to experiment with more Web3 enabled features for the course. Were investigating the use of interactive quizzes with POAP rewards, hosting live seminars within Decentraland, and creating a Discord community of course afficiandos. We'd love your continued support as we grow this course into the best open source data science educational public good on the internet!
+
+## Testimonials
+
+"This course is like a rain following a drought. It kindly walks you through the process starting from the use of R to introduction of graphs and machine learning concepts with interesting case studies. I strongly recommend it not only to researchers interested in Ethereum blockchain but also to any students or professionals that have interest in learning data analysis and science." - [Will Shin](https://www.linkedin.com/in/wooil-s-51308353/) (Principal Economist at [Klaytn](https://www.klaytn.com))
+
+## Impact and Accolades
+
+* March 11th, 2022 - 59 Stars - 16 Forks
+* June   8th, 2022 - 76 Stars - 17 Forks
+
 ## FAQ
 
 *Do you all have experience in this stuff?*  
@@ -147,16 +160,6 @@ We'll initially focus on the statistical language R, but then expand to Python. 
 
 *Can I request a topic?*  
 Sure! Once we flesh out the initial course material. If funding persists, we'd be more than happy to take suggestions on case studies or topics.
-
-## Testimonials
-
-"This course is like a rain following a drought. It kindly walks you through the process starting from the use of R to introduction of graphs and machine learning concepts with interesting case studies. I strongly recommend it not only to researchers interested in Ethereum blockchain but also to any students or professionals that have interest in learning data analysis and science." - [Will Shin](https://www.linkedin.com/in/wooil-s-51308353/) (Principal Economist at [Klaytn](https://www.klaytn.com))
-
-## Impact and Accolades
-
-* March 11th, 2022 - 59 Stars - 16 Forks
-* June   8th, 2022 - 76 Stars - 17 Forks
-
 
 ## Featured Projects
 
