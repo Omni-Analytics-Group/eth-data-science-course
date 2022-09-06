@@ -73,9 +73,9 @@ Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Cry
 
 Lagniappe
 
-* ([The Omniacs’ Data Science Code Snippet
-Tweet Book Vol 1](https://crypto.omnianalytics.org/eth-data-science-course/lagniappe/tweetbook/vol1/rstats_tweetbook.pdf))
-* ([Kids Data Collection Worksheet](https://crypto.omnianalytics.org/eth-data-science-course/lagniappe/data%20collection%20worksheet/Kids%20Crypto%20Data%20Collection%20Worksheet.pdf))
+* [The Omniacs’ Data Science Code Snippet
+Tweet Book Vol 1](https://crypto.omnianalytics.org/eth-data-science-course/lagniappe/tweetbook/vol1/rstats_tweetbook.pdf)
+* [Kids Data Collection Worksheet](https://crypto.omnianalytics.org/eth-data-science-course/lagniappe/data%20collection%20worksheet/Kids%20Crypto%20Data%20Collection%20Worksheet.pdf)
 
 ## Updates
 
