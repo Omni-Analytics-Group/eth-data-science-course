@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Uniswap Analytics Bounty #13          </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Uniswap Analytics Bounty #13 <br> <br> <br> <br> <br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Introduction
+
+This brief README/tutorial will walk you through our submission for the Uniswap Community Analytics Bounty #13. Let's get started@
+
+
+```r
+## Load Libraries
+library(tidyverse)
+library(uniswappeR)
+```
+
+---
+
+## Objective
+
+For this bounty we chose to analyze the liquidity provision patterns of Uniswap market makers during the first two weeks after an airdrop. 
+
+The 9 airdropped tokens of interest are Uniswap ($UNI), Badger DAO ($BADGER), Tornado Cash ($TORN), ParaSwap ($PSP), MurALL ($PAINT), Mirror Protocol ($MIR), Ethereum Push Notification Service ($PUSH), and Hop Protocol ($HOP). 
+
+This analysis will use statistical graphics to compare and contrast trends in liquidity provider behavior across the first two weeks of some of the eco-systems' most popular airdrops.
+
+---
+
+## Data
+
+Using the `uniswappeR` package, we called the get_liq_data function to extract data for each of the 9 tokens across both the v2 and v3 Uniswap pools. Looping through and saving the results, we compiled the liq_burns.RDS dataset. This data is a list of time series dataframes, which each contain 7 columns, and in total comprise 117,524 rows. A preview of the data is shown below:
+
+![](data_screencap.png)
+
+---
+
+## Analysis
+
+From here, we tied together the data around each token to create area plots that track the amount of liquidity added and removed over time. 
+
+To follow up, we produced cumulative area plots that show the total amount of liquidity of each. The areas are colored by whether, at the particular time points, the liquidity for each of the nine tokens was positive. 
+
+Added liquidity is shown in green, while removed liquidity is shown in red. The overall blue area comprises the total liquidity balance as a function of time.
+
+---
+
+## Liquidity Plot
+
+![](AirdropLiq.jpeg)
+
+---
+
+## Results (Part One)
+
+We see that the trend in liquidity added/removed over time is highly dependent on the token, with the maximum liquidity provided over the first two weeks topping out at over $50 million for $UNI while it stayed at a lowly, stagnant $30,000 for $PAINT. 
+
+From a macro perspective, there is a substantial amount of diversity in the shape of the cumulative amount of liquidity provided. Uniswap experience a logarithmic rise to its plateau as it reached its $50M saturation mark in only 5 days. 
+
+Gitcoin, the Hop Protocol, and Murall, to a lesser extent, all had the same trend within their cumulative liquidity amounts. The EPNS protocol had a growth pattern more similar to an "S curve" where, after a slow start marred with a lack of liquidity, providers swooped in later to inject $3M over the course of a week, then the deposits tapered off. Paraswap unfortunately saw a nearly 40% decline in liquidity after it spiked in the first few days. 
+
+---
+
+## Results (Part Two)
+
+Of all the protocols, Tornado Cash has exhibited the most variability in its liquidity. It had a slower than usual start, a massive jump, a dip, then a resurgence only to suffer further declines until it reach it caught its footing by finishing on an upward trend. When observing the initial liquidity provisions for each platform it is fairly standard that most liquidity is provided at the initial on-set of the pool's creation. 
+
+In this two week span and for the airdrops analyzed here, there was some additional liquidity added during the middle and later parts of the period, but the vast majority for each was added at the beginning. The removal of liquidity is a bit more variable overtime. From each graph, we see don't see too many patterns categorizing when money leaves a pool. 
+
+It should be noted that both $GTC and $PSP saw stark increases in the amount of liquidity leaving in the first week. In Gitcoin's case, the outflows didn't stifle overall liquidity since inflows actually outpaced them as they increased the overall balance. For Paraswap, unfortunately, this was not so.
+
+---
+
+## Conclusion
+
+Ultimately, our foray into this data yielded some interesting findings about how the liquidity distributions have varied across the nine tokens. These customized set of visualizations are useful tools that highlight the variation in liquidity provider behavior. 
+
+Through the use of these graphs it becomes immediately clear that there is much more we could do. For one, this analysis could be expanded beyond the tokens from this, and potentially an API could be deployed to allow a similar dataset and chart to be generated for the token of one's choosing. In addition, the time frame need not be restricted to this two week period, and could be expanded far beyond. Lastly, the liquidity could also be compared to each token's overall market capitalization, to give even more insight into the token's performance and how it has behaved on the Uniswap platform.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
