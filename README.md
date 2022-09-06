@@ -66,8 +66,16 @@ Module 4 - Case Studies
 * Predicting Growth in L2 Chains ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/l2-growth/growth.html))
 * A Statistical Dive into the Unlock Protocol ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/unlock-protocol/unlock.html), [Video](https://youtu.be/RpEA7EWNE6k))
 * Filecoin Miner Index API Exploration ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/filecoin/filecoin.html))
+* Uniswap Airdrop Liquidity Provider Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap-bounty13/bounty.html#1))
+* Uniswap Governance Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap-bounty14/bounty.html#1))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
+
+Lagniappe
+
+* ([The Omniacs’ Data Science Code Snippet
+Tweet Book Vol 1](https://crypto.omnianalytics.org/eth-data-science-course/lagniappe/tweetbook/vol1/rstats_tweetbook.pdf))
+* ([Kids Data Collection Worksheet](https://crypto.omnianalytics.org/eth-data-science-course/lagniappe/data%20collection%20worksheet/Kids%20Crypto%20Data%20Collection%20Worksheet.pdf))
 
 ## Updates
 
@@ -134,6 +142,16 @@ Change log
 * Various link fixes and copy edits
 * Minor updates to Module 3
 
+*Gitcoin Grant Round 15*
+
+This round we've decided to experiment with a little bit of alternative styled content!  In the `lagniappe` folder you'll find a compilation "Tweet Book" of R programming related tweets from our Twitter.  As our first foray into children's content, we created a data collection worksheet that has young, budding data scientists describing crypto currency logos in spreadsheet form. It should be a short, fun exercise for anyone getting used to how data is structured. We've also included two new Uniswap-centric case studies, one of which won an award for most insightful analysis of the protocol's governance. With that, we hope you enjoy this update!
+
+Change log
+* 2 new Case Studies
+* Added our first kids data collection worksheet
+* Added Vol. 1 of our quick stats "Tweet book"
+* Various link fixes
+
 ## Vision
 
 For a little over a year, this course has been inspiring new data scientists and teaching the fundamentals of statistical analysis all while introducing students to the world of cryptocurrency through the practical application of these skills to Ethereum based projects. As we continue to push forward on our dream of educating the next generation of blockchain native data scientists, we are going to begin to experiment with more Web3 enabled features for the course. Were investigating the use of interactive quizzes with POAP rewards, hosting live seminars within Decentraland, and creating a Discord community of course afficiandos. We'd love your continued support as we grow this course into the best open source data science educational public good on the internet!
@@ -146,6 +164,7 @@ For a little over a year, this course has been inspiring new data scientists and
 
 * March 11th, 2022 - 59 Stars - 16 Forks
 * June   8th, 2022 - 76 Stars - 17 Forks
+* Sept   6th, 2022 - 90 Stars - 21 Forks
 
 ## FAQ
 
