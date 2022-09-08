@@ -19,6 +19,17 @@ output:
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.align = "center")
 ```
 
+```{css, echo=FALSE}
+pre {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+
+pre[class] {
+  max-height: 100px;
+}
+```
+
 ## Objective
 
 For this bounty we are opting to "dip our toes" into the messy world of blockchain governance. Our question of interest is "Can we visualize and quantify the degree of contentiousness of Uniswap proposals?” If it is possible, we'd like to use the derived statistics and graphs to provide initial insights into how we might understand cohesion and dissent within the decentralized Uniswap community.
@@ -50,6 +61,87 @@ To initiate this analysis, we performed a data cleaning routine on this data to 
 Unlike traditional normal forms for data, multiple choices (and the scores for each choice) are encoded within individual rows. This meant that we had to separate out the individual components using string splitting routines. We used R and dplyr to accomplish this. In doing so, we encountered one additional issue. Since the data itself was encoded such that the choices and scores are separated with the ";" character, one proposal presented a special challenge because within its choices it to a ";" character. This meant that the automated routine saw an additional choice option that wasn't in the original data. 
 
 Once we special-cased this particular issue, we achieved a clean form for the data. This afforded us the chance to create our first visualization characterizing Uniswap voter consensus.
+
+---
+
+## Data Manipulation Code
+
+We used `R` and the associated `tidyverse` packages to perform the primary manipulation routine, which is reproduced below. In particular, we:
+
+1. Split the `choices` and `scores` fields by the semicolon operator
+2. Produce one unnested row per value
+3. Sum up the choices across all proposals
+4. Compute dissent as a ratio between the top score and the total sum of scores
+
+```{r, eval=FALSE}
+prop <- read_csv("prop_df.csv") %>%
+    mutate(
+        choices = strsplit(choices, ";"),
+        scores = strsplit(scores, ";")
+    ) %>%
+    select(id, title, votes, choices, scores) %>%
+    unnest(c(choices, scores)) %>%
+    group_by(id) %>%
+    mutate(choices = factor(choices, labels = paste0("Choice ", 1:length(unique(choices)), " Score"))) %>%
+    spread(key = choices, value = scores) %>%
+    mutate(across(starts_with("Choice "), readr::parse_number)) %>%
+    rowwise() %>%
+    mutate(
+        ScoreSum = sum(c(`Choice 1 Score`, `Choice 2 Score`, `Choice 3 Score`, `Choice 4 Score`,
+                             `Choice 5 Score`, `Choice 6 Score`, `Choice 7 Score`, `Choice 8 Score`,
+                             `Choice 9 Score`, `Choice 10 Score`, `Choice 11 Score`, `Choice 12 Score`), na.rm = TRUE)
+    ) %>%
+    mutate(
+        Dissent = 100 * (1 - (max(c(`Choice 1 Score`, `Choice 2 Score`, `Choice 3 Score`, `Choice 4 Score`,
+                         `Choice 5 Score`, `Choice 6 Score`, `Choice 7 Score`, `Choice 8 Score`,
+                         `Choice 9 Score`, `Choice 10 Score`, `Choice 11 Score`, `Choice 12 Score`), na.rm = TRUE) / ScoreSum))
+    ) %>%
+    select(-ScoreSum) %>%
+    mutate(Consensus = 100 - Dissent)
+```
+
+---
+
+## Dissent Visualization Code
+
+Next, we take the transformed data and use `ggplot` to produce our histograms of distributions of dissent for the 56 proposals. The code is shown below, where we use a pseudo log scale to help visualize the X axis.
+
+```{r, eval=FALSE}
+p1 <- ggplot(data = prop, aes(x = `Dissent`)) +
+    geom_histogram(colour = "black", fill = "red4") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_continuous(trans=scales::pseudo_log_trans(base = 10),
+                       breaks = c(0, .01, .02, .05, .1, .2, .5, 1) * 100,
+                       limits = c(NA, 100),
+                       labels = function(.) scales::percent(. / 100, accuracy = 1)) +
+    labs(
+        title = "Dissent Score Distribution",
+        subtitle = "For 56 Uniswap Proposals",
+        x = "Dissent Score",
+        y = "Count"
+    )
+```
+
+---
+
+## Consensus Score Code
+
+Finally, we produce a near identical plot, but this time on the Consensus dimension.
+
+```{r, eval=FALSE}
+p2 <- ggplot(data = prop, aes(x = `Consensus`)) +
+    geom_histogram(colour = "black", fill = "green4") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_x_log10(breaks = c(.01, .02, .05, .1, .2, .5, 1) * 100,
+                  limits = c(1, NA),
+                  labels = function(.) scales::percent(. / 100, accuracy = 1)) +
+    labs(
+        title = "Consensus Score Distribution",
+        subtitle = "For 56 Uniswap Proposals",
+        x = "Consensus Score",
+        y = "Count"
+    )
+```
 
 ---
 
