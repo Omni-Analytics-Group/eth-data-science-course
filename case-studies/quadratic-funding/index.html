@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Quadratic Funding in the Wild   A Post-Round Analysis of Gitcoin’s Fund Matching Mechanism     </title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Omni Analytics Group" />
+    <script src="libs/header-attrs-2.19/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="classroom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Quadratic Funding in the Wild <br><br>A Post-Round Analysis of Gitcoin’s<br>Fund Matching Mechanism<br> <br><br><br>
+]
+.author[
+### Omni Analytics Group
+]
+
+---
+
+
+
+
+## Introduction
+
+Quadratic Funding is defined by wtfisqf.com as “the mathematically optimal way to fund public goods in a democratic community.” The Gitcoin team further refers to it as the Wisdom of the Crowds. Gitcoin allocates donations from larger donators based on a Quadratic Funding formula, weighting grants which receive many small donations over those that receive a few large ones.
+
+Formulaically, Quadratic Funding can be described in such a manner that the amount received by a given is equal to the square of the sum of the square roots of contributions received, multiplied by some constant factor (Buterin, Hitzig, Weyl, 2018). This can be quantified in the formula below:
+
+&lt;img src="images/im1.png" width="1288" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Optimality
+
+While the core details of this mechanism are not the focus of this article, Quadratic Funding has been shown to be the optimal allocation method, despite the fact that very little research has been conducted on how matching allocations based on this method behave when implemented and applied in a true, real-world environment.
+
+In this case study, we will give a visual description of the capital allocation resulting from Gitcoin’s implementation of the Quadratic Funding mechanism, using data from Gitcoin Grants Round 14.
+
+---
+
+## Data
+
+We’ve pulled Round 14 Gitcoin Grants data. The data contains the following variables:
+
+- *grant_id* – Grant name
+- *sub_round_slug* – Eco-system Round Name
+- *clr_match* – Total Funds Available for that Round
+- *round_num* – Round ID
+- *grant_title* – Grant Title
+- *match_amount* – Total Match from that Round
+- *num_contributions* – Number of Contributors to the Grant
+- *num_unique_contributors* – Unique Contributors to the Grant
+- *crowdfund_amount_contributions_usd* – Funding Amount in USD
+- *total_usd* – Total Amount in USD
+
+---
+
+## Data Preview
+
+A previous of the first 15 rows of this data is given in the image below:
+
+&lt;img src="images/im2.png" width="2731" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Reading the Data in R
+
+The code for loading the data here is quite simple, and reproduced below:
+
+
+```r
+library(tidyverse)
+library(ggrepel)
+library(ggthemes)
+library(omnitheme)
+
+raw_gr14 &lt;- read_csv("data/GR14 Final Results - 6 29 2022.csv")
+
+raw_gr14 %&gt;% 
+    select(grant_id, sub_round_slug, clr_match, round_num, grant_title, match_amount,
+           num_contributions, num_unique_contributors, crowdfund_amount_contributions_usd, total_usd) %&gt;%
+  head(n = 20) %&gt;% 
+  kable
+```
+
+---
+
+&lt;table class="table" style="font-size: 8px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; grant_id &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sub_round_slug &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; clr_match &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; round_num &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; grant_title &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; match_amount &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; num_contributions &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; num_unique_contributors &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; crowdfund_amount_contributions_usd &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; total_usd &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5688 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; JediSwap: First AMM on StarkNet ebling instantaneous gasless swapping of assets &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36723 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27847 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 113862.40 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 138862.40 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-web3social &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lenster &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31821 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87377.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 123877.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-polygon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lenster &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31821 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87377.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 123877.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lenster &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31821 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87377.30 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 123877.30 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4268 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; zkRollups.xyz &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25100 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19687 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 87054.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 112054.20 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 37 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Connext Network &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21880 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17966 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58739.96 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 83739.96 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 3591 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DefiLlama &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18808 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14775 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53617.34 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78617.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5288 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Tally Ho! - Open Source and Community Owned Wallet &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 16537 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13471 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 41804.06 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 66804.06 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4665 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Via Protocol [Web3 Mastercard] - Best UX among any-to-any cross-chain swaps &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15347 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12312 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35032.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85032.35 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4665 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-aurora &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Via Protocol [Web3 Mastercard] - Best UX among any-to-any cross-chain swaps &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15347 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12312 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35032.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 85032.35 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 821 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Umbra: Privacy Preserving Stealth Payments &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14886 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12189 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29929.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 64929.44 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 821 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-polygon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Umbra: Privacy Preserving Stealth Payments &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14886 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12189 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 29929.44 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 64929.44 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 5051 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; DeFrag &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11775 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9578 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28274.18 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 53274.18 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4858 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-zktech &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Zk Block - Boilerplate &amp;amp; Tools to Bootstrap Zk Dapps &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10004 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8539 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22782.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 62282.21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4858 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Zk Block - Boilerplate &amp;amp; Tools to Bootstrap Zk Dapps &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10004 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8539 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22782.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 62282.21 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4830 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-polygon &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Punk Domains (Domains for DAOs) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9508 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8293 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15804.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50804.94 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4830 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Punk Domains (Domains for DAOs) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9508 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8293 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15804.94 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50804.94 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 4019 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; RainbowDAO Protocol &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9109 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7742 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17032.73 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 42032.73 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 25 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-gitcoin-main &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lighthouse: Ethereum Consensus Client &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8293 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6836 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22821.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97821.97 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 25 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; gr14-eth-infra &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Lighthouse: Ethereum Consensus Client &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 75000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8293 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6836 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22821.97 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 97821.97 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Variable Derivation
+
+The next step was to derive some important statistics based on the available data above. Specifically, we derive the following variables:
+
+- **Average Contribution Amount per Unique Contributor** – This value represents a ratio of the overall contributions, divided by the number of unique contributors, to roughly estimate the per-unique-contributor contribution value for each grant.
+
+- **Min-Max Scaled Number of Unique Contributors** – We apply a min-max scaling routine, subtracting the minimum value across all grants and dividing by the range, in order to scale the number of unique contributors to a range where 0 represents the grant with the fewest number, and 1 represents the grant with the largest number.
+
+- **Min-Max Scaled Average Contribution Amount per Unique Contributor** – The same procedure from above is applied, but to the first derived variable. In this instance, 0 represents the grant with the lowest average contribution amount per unique contributor, while 1 represents the grant with the highest.
+
+- **Equal Weight Score** – We derive this equal weight score by the two above derived variables, taking the Min-Max Scaled Number of Unique Contributors and adding the Min-Max Scaled Average Contribution Amount per Unique Contributor, which yields a variable that ranges from 0 (lowest on both of the derived metrics) to 2 (highest on both).
+
+---
+
+## Data Transformation
+
+The last step is to produce a tall or long version of this dataset, suitable for plotting using standard analysis tools such as R and ggplot2. 
+
+The tall version eschews the one-row-per-grant format of the previous data and instead produces one row per grant and variable combination, across the variables of interest. 
+
+In the following slides, we walk through the basic `dplyr` routines to perform these data transformations, and show a preview of the resulting dataset.
+
+---
+
+## Variable Derivation Code
+
+We use some simple dplyr transformations in order to produce these and rename some variables to help with analysis later on:
+
+
+```r
+processed_gr14 &lt;- raw_gr14 %&gt;%
+    rename(`Unique Contributors` = num_unique_contributors, `Crowdfunded Contributions ($)` = crowdfund_amount_contributions_usd,
+           `Avg $ Per Contributor` = avg_contramt_per_ucontr, `Equal Weight Score` = eql_weight_score,
+           `Round Matching Funds ($)` = clr_match) %&gt;%
+    gather(key = Variable, value = Value, `Unique Contributors`, `Crowdfunded Contributions ($)`,
+           `Avg $ Per Contributor`, `Equal Weight Score`) %&gt;%
+    mutate(Variable = factor(Variable, levels = c("Unique Contributors", "Crowdfunded Contributions ($)",
+                                        "Avg $ Per Contributor", "Equal Weight Score")),
+           sub_round_slug = gsub("gr14-", "", tools::toTitleCase(sub_round_slug))) %&gt;%
+    select(Variable, Value, `Round Matching Funds ($)`, grant_id, sub_round_slug)
+```
+
+---
+
+The key feature of this dataset is we now have one row per grant and variable combination, which matches a “third-normal form” in the SQL world, which is suitable for analyzing via plotting and visualization methods in ggplot2.
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Variable &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Value &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Round Matching Funds ($) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; grant_id &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sub_round_slug &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 27847 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5688 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Web3social &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Polygon &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24180 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5007 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19687 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4268 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17966 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 37 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14775 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3591 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13471 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5288 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12312 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4665 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Gitcoin-Main &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Unique Contributors &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12312 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4665 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Gr14-Aurora &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Visualization
+
+With this dataset, we are ready to write our `ggplot2` code to produce a matrix highlighting our derived variables across all the ecosystem rounds. Let's take a look:
+
+
+```r
+ggplot(processed_gr14, aes(x = Value, y = `Round Matching Funds ($)`)) +
+    geom_point(colour = "#0F0132", size = 1) + 
+    geom_smooth() +
+    geom_text_repel(aes(label = grant_id)) +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10), labels = scales::comma) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5), labels = scales::dollar,
+                       expand = expansion(mult = c(0, 0.25))) +
+    facet_wrap(sub_round_slug~Variable, scales = "free", ncol = 4) +
+    theme(
+        axis.text.x = element_text(angle = 20, hjust = 1),
+        axis.title = element_text(size = 45),
+        plot.title = element_text(size = 40, hjust = .5),
+        plot.subtitle = element_text(size = 16, hjust = .5)
+    ) +
+    labs(
+        title = 'Gitcoin Grants 14 Eco-System Round Quadratic Funding Analysis',
+        subtitle = 'A Scatterplot Matrix of per Grant Matching allocations as a Function of the Number of Unique Contributors and Average per Donor Contribution Amount',
+        x = "Value"
+    )
+```
+
+---
+
+This plot is far too large to display on a single slide. Please click the thumbnail below for a full size version:
+
+&lt;a target='_blank' href='https://crypto.omnianalytics.org/wp-content/uploads/2023/01/smoother_and_labels.png'&gt;
+&lt;img src="images/smoother_and_labels.png" width="125" height="500" style="display: block; margin: auto;" /&gt;
+&lt;/a&gt;
+
+---
+
+## Analysis
+
+Particular attention should be paid to the Equal Weight Score (the far right column). The idea of the equal weight score is to identify those grants which both have a high average contribution, but also a large number of unique contributors. In the chart, this is plotted along the x axis, with a theoretical maximum of 2 as mentioned (for a grant that was best on both metrics). The Y axis provides the Round Matching Funds. In an ideal world, our Equal Weighting Score would be correlated, in the sense that the grants that had the highest matching values were ones that both had a higher average contribution, but also and in particular a large number of unique donors.
+
+Indeed, that pattern presents itself strongly, though the pattern varies across ecosystem rounds. In sound rounds, such as GR14-Aurora, one grant overwhelms the others – in this case, Grant ID 4665, Via Protocol [Web3 Mastercard] - Best UX among any-to-any cross-chain swaps – This grant had over 12,000 unique contributors, with an average per-contributor contribution of nearly $3. It’s equal weight score reached 1.43771, while no other grant in this round achieved even 1.1. In some other rounds, there was not a clear “winner”, but a pattern emerged where generally higher equal weight scores were correlated with higher matching amounts. For instance, GR14-Protocollabs exhibits a distinct upward trend, though not linear – the highest equal weighting score actually had a slightly lower matching amount than the second highest.
+
+One thing to note as you analyze this matrix of charts is that the X axis varies as a function of the round, it is not fixed across rounds. This is to aid in the interpretation of the per-round trend. Note for example, GR14-Web3social has a Grant ID 5007 that gets quite close to the theoretical maximum of 2. This grant, Lenster, had over 24,000 unique contributors at $3.6136 per contributor, putting it towards the top of the list. In other rounds, the scale doesn’t reach nearly that high, as most grants have more modest figures in terms of contributors and the average contribution.
+
+---
+
+## Conclusion
+
+While the per-round pattern varies quite distinctively, the clear trend is that the equal weighting score (which provides 50% weight to the number of unique contributors and a 50% weight to the average contribution amount) was positively correlated with the matching amount. 
+
+This lends credence to the idea that we began this article with – Quadratic funding is an effective Wisdom of the Crowds approach, which doesn’t punish grants that happen to have smaller, but more frequent donations. 
+
+This type of approach helps the Gitcoin Grants Program provide meaningful matching contributions to projects that have a disproportionately positive impact on a large number of users, even if those users don’t have the financial means or wherewithal to donate large sums at once.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: 1em;
+  left: 1em;
+  width: 60px;
+  height: 60px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
