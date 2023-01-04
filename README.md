@@ -68,6 +68,7 @@ Module 4 - Case Studies
 * Filecoin Miner Index API Exploration ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/filecoin/filecoin.html))
 * Uniswap Airdrop Liquidity Provider Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap-bounty13/bounty.html#1))
 * Uniswap Governance Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap-bounty14/bounty.html#1))
+* Quadratic Funding in the Wild: A Post-Round Analysis of Gitcoin’s Fund Matching Mechanism ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/quadratic-funding/index.html#1))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
 
