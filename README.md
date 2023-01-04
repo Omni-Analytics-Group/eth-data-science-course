@@ -62,15 +62,19 @@ Module 4 - Case Studies
 * Forecasting the Trend in Bitcoin Dominance ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/bitcoin-dominance/dominance.html))
 * An Analysis of the Uniswap Platform ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap/report.html))
 * Forefront Social Token Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/forefront/forefront.html))
-* Gitcoin Grants Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/gitcoin-grant-analysis/grants.html))
 * Predicting Growth in L2 Chains ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/l2-growth/growth.html))
 * A Statistical Dive into the Unlock Protocol ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/unlock-protocol/unlock.html), [Video](https://youtu.be/RpEA7EWNE6k))
 * Filecoin Miner Index API Exploration ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/filecoin/filecoin.html))
 * Uniswap Airdrop Liquidity Provider Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap-bounty13/bounty.html#1))
 * Uniswap Governance Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/uniswap-bounty14/bounty.html#1))
-* Quadratic Funding in the Wild: A Post-Round Analysis of Gitcoin’s Fund Matching Mechanism ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/quadratic-funding/index.html#1))
 
 Data Sources: *Beaconscan, Numerai Tournament Data, Haskmasks, Crypto Punks, Crypto Jobs, Pool Together, BadgerDAO, Yearn Finance, ENS, Uniswap*
+
+Module 5 - Understanding and Defending Gitcoin
+* Quadratic Funding in the Wild: A Post-Round Analysis of Gitcoin’s Fund Matching Mechanism ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/quadratic-funding/index.html#1))
+* Gitcoin Grants Analysis ([Slides](https://crypto.omnianalytics.org/eth-data-science-course/case-studies/gitcoin-grant-analysis/grants.html))
+
+Data Sources: *Gitcoin*, *Omni Analytics Group*
 
 Lagniappe
 
