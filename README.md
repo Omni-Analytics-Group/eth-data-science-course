@@ -147,7 +147,7 @@ Change log
 * Various link fixes and copy edits
 * Minor updates to Module 3
 
-*Gitcoin Grant Round 15 and Beta Round*
+*Gitcoin Grants Round 15 and Beta Round*
 
 This round we've decided to experiment with a little bit of alternative styled content!  In the `lagniappe` folder you'll find a compilation "Tweet Book" of R programming related tweets from our Twitter.  As our first foray into children's content, we created a data collection worksheet that has young, budding data scientists describing crypto currency logos in spreadsheet form. It should be a short, fun exercise for anyone getting used to how data is structured. We've also included two new Uniswap-centric case studies, one of which won an award for most insightful analysis of the protocol's governance. With that, we hope you enjoy this update!
 
@@ -156,6 +156,11 @@ Change log
 * Added our first kids data collection worksheet
 * Added Vol. 1 of our quick stats "Tweet book"
 * Various link fixes
+
+*Gitcoin Grants Round 21*
+
+We are back and very excited to share some of the new stuff we've learned! Over the course of the Gitcoin Grants Round 21 (and the rest of the year) we'll be adding case studies based on some of the analysis we've completed for Arbitrum, JokeRace, and Aave. These newer case studies will tackle interesting topics in Web3 governance, grant analysis and even touch on how to leverage open source AI into your analytics workflow. Check back often with us and stay tuned for more updates!
+
 
 ## Vision
 
@@ -170,7 +175,8 @@ For a little over a year, this course has been inspiring new data scientists and
 * March 11th, 2022 -  59 Stars - 16 Forks
 * June   8th, 2022 -  76 Stars - 17 Forks
 * Sept   6th, 2022 -  90 Stars - 21 Forks
-* April 17th, 2023 - 101 Stars - 25 Forks 
+* Apr   17th, 2023 - 101 Stars - 25 Forks 
+* Aug    5th, 2024 - 119 Stars - 29 Forks
 
 ## FAQ
 
