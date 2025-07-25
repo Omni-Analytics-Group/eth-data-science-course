@@ -76,6 +76,12 @@ Module 5 - Understanding and Defending Gitcoin
 
 Data Sources: *Gitcoin*, *Omni Analytics Group*
 
+Module 6 - Data-driven Sense-Making with Arbitrum
+* [Analyzing Jokerace Submissions: Vision, Mission, and Strategic Priorities]()
+* [Analyzing Snapshot Rankings: Short-term and Long-term Priorities for Arbitrum DAO]()
+
+Data Sources: *JokeRace*, *Omniacs.DAO*
+
 Lagniappe
 
 * [The Omniacs’ Data Science Code Snippet
