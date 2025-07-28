@@ -77,13 +77,13 @@ Module 5 - Understanding and Defending Gitcoin
 Data Sources: *Gitcoin*, *Omni Analytics Group*
 
 Module 6 - Data-driven Sense-Making with Arbitrum
-* [Analyzing Jokerace Submissions: Vision, Mission, and Strategic Priorities]()
+* [Analyzing Jokerace Submissions: Vision, Mission, and Strategic Priorities](case-studies/jokerace-submissions)
   - [R markdown](case-studies/jokerace-submissions/html/jokerace_R.html)
   - [R code](case-studies/jokerace-submissions/code/jokerace.Rmd)
   - [Python markdown](case-studies/jokerace-submissions/html/jokerace_python.html)
   - [Python code](case-studies/jokerace-submissions/code/jokerace.ipynb)
 
-* [Analyzing Snapshot Rankings: Short-term and Long-term Priorities for Arbitrum DAO]()
+* [Analyzing Snapshot Rankings: Short-term and Long-term Priorities for Arbitrum DAO](case-studies/snapshot-rankings)
   - [R markdown](case-studies/snapshot-rankings/html/snapshot_R.html)
   - [R code](case-studies/snapshot-rankings/code/snapshot.Rmd)
   - [Python markdown](case-studies/snapshot-rankings/html/snapshot_python.html)
