@@ -92,6 +92,16 @@ Module 6 - Data-driven Sense-Making with Arbitrum
 
 Data Sources: *JokeRace*, *Omniacs.DAO*
 
+Module 7 - Analysis of Aave Grant DAO Activities
+* [Aave Grants DAO Activity: Trends in Proposals, Funding, and Categories](case-studies/aave/)
+  - [R markdown](case-studies/aave/output/aave_R.html)
+  - [R code](case-studies/aave/code/aave_R.Rmd)
+  - [Python markdown](case-studies/aave/output/aave_python.html)
+  - [Python code](case-studies/aave/code/aave_python.ipynb)
+    
+
+Data Sources: *Aave*
+
 Lagniappe
 
 * [The Omniacs’ Data Science Code Snippet
