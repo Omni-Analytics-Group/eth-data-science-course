@@ -1,12 +1,16 @@
 ---
-title: "Analyzing Snapshot Rankings: Short-term and Long-term Priorities for Arbitrum DAO"
+title: "Analyzing Snapshot Rankings: Short-term and Long-term Priorities for Arbitrum
+  DAO"
 author: "Omniacs.DAO"
 date: "`r Sys.Date()`"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
   html_document:
-    toc: true
-    toc_depth: 3      # Number of heading levels to include in TOC
-    number_sections: true
+    toc: yes
+    toc_depth: 3
+    number_sections: yes
 ---
 <!-- Custom Background and Output Styling -->
 <style>

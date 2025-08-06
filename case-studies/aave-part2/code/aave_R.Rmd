@@ -1,0 +1,521 @@
+---
+title: 'Reviewer Insights and Participation Trends in the Aave Grants DAO'
+author: "Omniacs.DAO"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    toc: yes
+    toc_depth: 3
+    number_sections: no
+    highlight: tango
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+<!-- Custom Background and Output Styling -->
+<style>
+body {
+  background-image: url('background/background_01.png');
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: 0;
+  padding: 0;
+}
+.main-container {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 900px;
+  margin: auto;
+  box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+}
+</style>
+
+
+<img src="Shot_Poses_IACS/OmniacPoses_11.png" width="120" style="float:right; margin: 8px 0 8px 20px;">
+
+## Introduction
+
+The Aave Grants DAO exists to provide grants to innovative ideas and projects which have a direct benefit to the broader Aave community. The DAO funds grants from a broad array of categories including developer tooling, events, and applications.
+
+In this analysis, we've collected data on the historical grants that have been submitted to the DAO. The information includes data on the grant proposal itself, as well as information on the reviews of that proposal. This analysis is produced in an effort to provide the utmost transparency about the Aave Grants DAO, and to derive insights into what types of projects have consistently done the best in terms of acceptance, and ultimate outcomes.
+
+This document focuses on a reviewer-based analysis, where we analyze metrics of the reviews and interviews conducted.
+
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(readr)
+library(readxl)
+library(lubridate)
+library(omnitheme)
+library(ngram)
+library(knitr)
+library(topicmodels)
+library(tidytext)
+library(ggrepel)
+
+grants <- read_csv("data/ApplicationsAnonymized.csv",show_col_types = FALSE) %>%
+            as_tibble() %>%
+            unnest() %>%
+            rename(`Interview Rationale` = `Interview Rational`)
+
+col_pal <- c("#2B2D42", "#F7E733", "#0A369D", "#294D4A", "#ED254E", "#BA2D0B",
+             "#003E1F", "#4F517D", "#6A0136", "#B81365", "#8E518D", "#395B50", "#A4036F")
+
+col_pal <- c("#7DC5EE", "#9D5C9E", "#69B4C1", "#99D17B", "#B4654A",
+             "#1E3231", "#F6C0D0", "#556F44", "#283F3B", "#1B2432",
+             "#121420", "#EE8434", "#FCF0CC")
+```
+
+![](./data/cover.png)
+
+
+
+## Reviewer-based Analysis
+
+<img src="Shot_Poses_IACS/OmniacPoses_03.png" width="120" style="float:left; margin: 8px 0 8px 20px;">
+
+Here, we are going to look at the reviewers of the grants themselves, their characteristics in terms of the number of reviews they've done, their acceptance rates, and the typical length of their reviews. Let's get started!
+
+First, a simple plot of the number of reviewers by quarter shows that for about the last year, the number of unique reviewers has been around a dozen.
+
+```{r, warning=FALSE}
+grants %>%
+    select(`Project Name`, Month, starts_with("Reviewer")) %>%
+    mutate(Date = ymd(paste(Month, "-", "01")),
+           Quarter = paste(year(Date), paste0("Q", quarter(Date))),
+           `Reviewer ID`) %>%
+    mutate(`Reviewer ID` = strsplit(`Reviewer ID`, ",")) %>%
+    unnest(`Reviewer ID`) %>%
+    group_by(Quarter) %>%
+    summarise(Reviewers = length(unique(`Reviewer ID`[!is.na(`Reviewer ID`)]))) %>%
+    ggplot(aes(x = Quarter, y = Reviewers, group = 1)) +
+    geom_line(colour = "#C0E2E7", size = 1.5) +
+    geom_point(colour = "#3FB5C3", size = 3) +
+    scale_y_continuous(breaks = seq(0, 15), limits = c(0, 15)) +
+    labs(
+        title = "Aave Grants Reviewers by Quarter"
+    ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+We can plot this and display the name of the reviewers inside the bar. We clearly see certain reviewers have been around since quite early on in the Grants DAO!
+
+```{r, warning=FALSE}
+grants %>%
+    select(`Project Name`, Month, starts_with("Reviewer")) %>%
+    mutate(Date = ymd(paste(Month, "-", "01")),
+           Quarter = paste(year(Date), paste0("Q", quarter(Date))),
+           `Reviewer ID`) %>%
+    mutate(`Reviewer ID` = strsplit(`Reviewer ID`, ",")) %>%
+    unnest(`Reviewer ID`) %>%
+    group_by(Quarter) %>%
+    summarise(Reviewers = unique(`Reviewer ID`[!is.na(`Reviewer ID`)])) %>%
+    unnest(Reviewers) %>%
+    arrange(Quarter, Reviewers) %>%
+    mutate(Ind = seq(0.5, length(Reviewers) - 0.5, by = 1),
+           Reviewers = sub("ReviewerID","ID", Reviewers)) %>%
+    ggplot(aes(x = Quarter)) +
+    geom_bar(stat = "count", alpha = .2, fill = "#C0E2E7", colour = "#3FB5C3") + # #3FB5C3
+    geom_text(aes(y = Ind, label = Reviewers), size = 2) +
+    scale_y_continuous(breaks = seq(0, 15)) +
+    labs(
+        title = "Aave Grants Reviewers by Quarter"
+    ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+<div style="display: flex; justify-content: space-between; align-items: flex-end;">
+  <img src="Shot_Poses_IACS/OmniacPoses_07.png" width="110"/>
+  <img src="Shot_Poses_IACS/OmniacPoses_09.png" width="110"/>
+</div>
+
+We can also look at acceptance rates by reviewer. Though the sample size for many reviewers is low, we can see at the high end, there is a reviewer with a 40% acceptance rate, while there are several that thus far have not accepted a single proposal.
+
+```{r}
+grants %>%
+    filter(!is.na(`Reviewer ID`)) %>%
+    mutate(Status2 = ifelse(`Status` %in%
+                              c("1st payment made ", "Approved", "Paid in full"),
+                            "Accepted", ifelse(`Status` %in%
+                                                 c("Denial confirmed",
+                                                   "Denial Confirmed",
+                                                   "Review failed",
+                                                   "Screening failed"
+                                                   ) |
+                                                 is.na(Status),
+                                               "Rejected",
+                                               "Pending Review"))) %>%
+    select(-Status) %>%
+    rename(Status = Status2) %>%
+    group_by(`Reviewer ID`) %>%
+    summarise(Count = n(),
+          `Num Accepted` = sum(Status == "Accepted"),
+          `Num Rejected` = sum(Status == "Rejected"),
+          `Num Pending` = sum(Status == "Pending Review"),
+          `Acceptance Rate` = scales::percent(sum(Status == "Accepted") / Count)) %>%
+    kable()
+```
+
+
+<div style="text-align: left;">
+  <img src="Shot_Poses_IACS/OmniacPoses_10.png" width="150"/>
+</div>
+
+### Average Number of Words per Review
+
+Next, let's do a word count analysis. We'll first look at the average number of words per review, using the text reviews, as encompassed in the `Review Rationale` column. We will then perform the same analysis using `Interviewer Rationale` to compare, and finally combine the two.
+
+```{r}
+wc <- round(mean(sapply(grants$`Review Rationale`[!is.na(grants$`Review Rationale`)],
+                        wordcount)),
+            digits = 1)
+```
+
+The overall average number of words per review is `r wc`. Let's break this down by reviewer. We see that there is pretty significant variability, with some reviewers averaging well over 50 words, and others under 20.
+
+```{r}
+grants %>%
+    select(`Reviewer ID`, `Review Rationale`) %>%
+    filter(!is.na(`Review Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Review Rationale`)) %>%
+    group_by(`Reviewer ID`) %>%
+    summarise(
+        `Average Words` = round(mean(Words), digits = 1),
+        `Median Words` = median(Words),
+        `Min Words` = min(Words),
+        `Max Words` = max(Words)
+    ) %>%
+    kable()
+```
+
+
+<div style="text-align: left;">
+  <img src="Shot_Poses_IACS/OmniacPoses_45.png" width="150"/>
+</div>
+
+The distribution overall is very right tailed, with most reviews tending to be shorter, but then a few outlier reviews with a significant number of words.
+
+```{r}
+grants %>%
+    filter(!is.na(`Review Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Review Rationale`)) %>%
+    ggplot(aes(x = Words)) +
+    geom_histogram(fill = "#C0E2E7", colour = "#3FB5C3") +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Distribution of Number of Words per Review",
+        subtitle = "For Aave Grant Reviews"
+    )
+```
+
+Breaking down each reviewer individually, we can plot the number of words over time to see the variability at the reviewer level. We also immediately see those that have consistently conducted reviews, vs. those that are newer or haven't done so recently.
+
+```{r}
+grants %>%
+    filter(!is.na(`Review Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    mutate(Date = ymd(paste(Month, "-", "01"))) %>%
+    arrange(Date) %>%
+    select(`Reviewer ID`, `Review Rationale`, Date) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Review Rationale`)) %>%
+    ungroup() %>%
+    mutate(`Review ID` = factor(1:nrow(.))) %>%
+    mutate(`Reviewer ID` = factor(`Reviewer ID`)) %>%
+    complete(`Review ID`, `Reviewer ID`) %>%
+    mutate(`Words` = ifelse(is.na(Words), 0, Words)) %>%
+    mutate(`Review ID` = as.numeric(`Review ID`)) %>%
+    ggplot(aes(x = `Review ID`, y = Words)) +
+    facet_wrap(~`Reviewer ID`) +
+    geom_line(colour = "#3FB5C3") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    labs(
+        title = "Number of Words per Review over Time",
+        subtitle = "For Aave Grants DAO Reviewers"
+    ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+<div style="text-align: left;">
+  <img src="Shot_Poses_IACS/OmniacPoses_35.png" width="150"/>
+</div>
+
+The same data above can be plotted cumulatively. At the upper end, some reviewers have written around 2000 words already!
+
+```{r}
+grants %>%
+    filter(!is.na(`Review Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    mutate(Date = ymd(paste(Month, "-", "01"))) %>%
+    arrange(Date) %>%
+    select(`Reviewer ID`, `Review Rationale`, Date) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Review Rationale`)) %>%
+    ungroup() %>%
+    mutate(`Review ID` = factor(1:nrow(.))) %>%
+    mutate(`Reviewer ID` = factor(`Reviewer ID`)) %>%
+    complete(`Review ID`, `Reviewer ID`) %>%
+    mutate(`Words` = ifelse(is.na(Words), 0, Words)) %>%
+    group_by(`Reviewer ID`) %>%
+    mutate(Words = cumsum(Words)) %>%
+    mutate(`Review ID` = as.numeric(`Review ID`)) %>%
+    ggplot(aes(x = `Review ID`, y = Words)) +
+    facet_wrap(~`Reviewer ID`) +
+    geom_line(colour = "#3FB5C3") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    labs(
+        title = "Cumulative Number of Words per Review over Time",
+        subtitle = "For Aave Grants DAO Reviewers"
+    ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+<div style="text-align: right;">
+  <img src="Shot_Poses_IACS/OmniacPoses_21.png" width="150"/>
+</div>
+
+### Average Number of Words per Interview
+
+Now, let's perform the same analysis by interview.
+
+```{r}
+wc <- round(mean(sapply(grants$`Review Rationale`[!is.na(grants$`Interview Rationale`)],
+                        wordcount)),
+            digits = 1)
+```
+
+The overall average number of words per interview is `r wc`. Let's break this down by reviewer. We again see variability, but it seems as if the rationale based on the interview tends to be a bit longer on average, for most reviewers.
+
+```{r}
+grants %>%
+    select(`Reviewer ID`, `Interview Rationale`) %>%
+    filter(!is.na(`Interview Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Interview Rationale`)) %>%
+    group_by(`Reviewer ID`) %>%
+    summarise(
+        `Average Words` = round(mean(Words), digits = 1),
+        `Median Words` = median(Words),
+        `Min Words` = min(Words),
+        `Max Words` = max(Words)
+    ) %>%
+    kable()
+```
+
+This finding is especially visible in the distribution, where it is much less right tailed and instead there is a noticeably larger mass on the higher end of the word count values.
+
+```{r}
+grants %>%
+    filter(!is.na(`Interview Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Interview Rationale`)) %>%
+    ggplot(aes(x = Words)) +
+    geom_histogram(fill = "#C0E2E7", colour = "#3FB5C3") +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Distribution of Number of Words per Interview",
+        subtitle = "For Aave Grant Interviews"
+    )
+```
+
+Once again we can look per reviewer. Because video interviews and the associated rationales are less common, we see a lot less noise in this plot than for the application-based reviews.
+
+```{r}
+grants %>%
+    filter(!is.na(`Interview Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    mutate(Date = ymd(paste(Month, "-", "01"))) %>%
+    arrange(Date) %>%
+    select(`Reviewer ID`, `Interview Rationale`, Date) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Interview Rationale`)) %>%
+    ungroup() %>%
+    mutate(`Interview ID` = factor(1:nrow(.))) %>%
+    mutate(`Reviewer ID` = factor(`Reviewer ID`)) %>%
+    complete(`Interview ID`, `Reviewer ID`) %>%
+    mutate(`Words` = ifelse(is.na(Words), 0, Words)) %>%
+    mutate(`Interview ID` = as.numeric(`Interview ID`)) %>%
+    ggplot(aes(x = `Interview ID`, y = Words)) +
+    facet_wrap(~`Reviewer ID`) +
+    geom_line(colour = "#3FB5C3") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    labs(
+        title = "Number of Words per Interview over Time",
+        subtitle = "For Aave Grants DAO Reviewers"
+    )
+```
+
+<div style="text-align: left;">
+  <img src="Shot_Poses_IACS/OmniacPoses_27.png" width="150"/>
+</div>
+
+
+The cumulative charts show that the most prolific reviewer in terms of interview rationale has written over 1000 words of justification.
+
+```{r}
+grants %>%
+    filter(!is.na(`Interview Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    mutate(Date = ymd(paste(Month, "-", "01"))) %>%
+    arrange(Date) %>%
+    select(`Reviewer ID`, `Interview Rationale`, Date) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Interview Rationale`)) %>%
+    ungroup() %>%
+    mutate(`Interview ID` = factor(1:nrow(.))) %>%
+    mutate(`Reviewer ID` = factor(`Reviewer ID`)) %>%
+    complete(`Interview ID`, `Reviewer ID`) %>%
+    mutate(`Words` = ifelse(is.na(Words), 0, Words)) %>%
+    group_by(`Reviewer ID`) %>%
+    mutate(Words = cumsum(Words)) %>%
+    mutate(`Interview ID` = as.numeric(`Interview ID`)) %>%
+    ggplot(aes(x = `Interview ID`, y = Words)) +
+    facet_wrap(~`Reviewer ID`) +
+    geom_line(colour = "#3FB5C3") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    labs(
+        title = "Cumulative Number of Words per Interview over Time",
+        subtitle = "For Aave Grants DAO Reviewers"
+    )
+```
+
+### Average Number of Words per Review+Interview Combined
+
+We will now combine the review and interview rationale into one text field, to look at an analysis of the two combined.
+
+```{r}
+grants$`Combined Rationale` <- paste(grants$`Review Rationale`,
+                                     grants$`Interview Rationale`)
+
+wc <- round(mean(sapply(grants$`Review Rationale`[!is.na(grants$`Interview Rationale`)],
+                        wordcount)),
+            digits = 1)
+```
+
+The overall average number of words per combined review/interview is `r wc`. Breaking down by reviewer shows a familiar amount of intra-reviewer variability.
+
+```{r}
+grants %>%
+    select(`Reviewer ID`, `Combined Rationale`) %>%
+    filter(!is.na(`Combined Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Combined Rationale`)) %>%
+    group_by(`Reviewer ID`) %>%
+    summarise(
+        `Average Words` = round(mean(Words), digits = 1),
+        `Median Words` = median(Words),
+        `Min Words` = min(Words),
+        `Max Words` = max(Words)
+    ) %>%
+    kable()
+```
+
+
+<div style="text-align: right;">
+  <img src="Shot_Poses_IACS/OmniacPoses_30.png" width="150"/>
+</div>
+
+
+The resulting distribution combines characteristics of each of the previous two we've seen, yielding a right-tailed distribution that is not as dramatic as for the reviewer-based distribution.
+
+```{r}
+grants %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Combined Rationale`)) %>%
+    ggplot(aes(x = Words)) +
+    geom_histogram(fill = "#C0E2E7", colour = "#3FB5C3") +
+    scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 10)) +
+    labs(
+        title = "Distribution of Number of Words per Combined Review+Interview",
+        subtitle = "For Aave Grant Reviews/Interviews"
+    )
+```
+
+The plot of the word counts for each reviewer now combines both the review and interview-based rationales, but tells a similar story.
+
+```{r}
+grants %>%
+    filter(!is.na(`Combined Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    mutate(Date = ymd(paste(Month, "-", "01"))) %>%
+    arrange(Date) %>%
+    select(`Reviewer ID`, `Combined Rationale`, Date) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Combined Rationale`)) %>%
+    ungroup() %>%
+    mutate(`Combined ID` = factor(1:nrow(.))) %>%
+    mutate(`Reviewer ID` = factor(`Reviewer ID`)) %>%
+    complete(`Combined ID`, `Reviewer ID`) %>%
+    mutate(`Words` = ifelse(is.na(Words), 0, Words)) %>%
+    mutate(`Combined ID` = as.numeric(`Combined ID`)) %>%
+    ggplot(aes(x = `Combined ID`, y = Words)) +
+    facet_wrap(~`Reviewer ID`) +
+    geom_line(colour = "#3FB5C3") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    labs(
+        title = "Number of Words per Combined Review/Interview over Time",
+        subtitle = "For Aave Grants DAO Reviewers/Interviewers"
+    )
+```
+
+When using the combined method, the most prolific combined reviewer/interviewer has written over 2500 words of rationale.
+
+```{r}
+grants %>%
+    filter(!is.na(`Combined Rationale`),
+           !is.na(`Reviewer ID`)) %>%
+    mutate(Date = ymd(paste(Month, "-", "01"))) %>%
+    arrange(Date) %>%
+    select(`Reviewer ID`, `Combined Rationale`, Date) %>%
+    rowwise() %>%
+    mutate(Words = wordcount(`Combined Rationale`)) %>%
+    ungroup() %>%
+    mutate(`Combined ID` = factor(1:nrow(.))) %>%
+    mutate(`Reviewer ID` = factor(`Reviewer ID`)) %>%
+    complete(`Combined ID`, `Reviewer ID`) %>%
+    mutate(`Words` = ifelse(is.na(Words), 0, Words)) %>%
+    group_by(`Reviewer ID`) %>%
+    mutate(Words = cumsum(Words)) %>%
+    mutate(`Combined ID` = as.numeric(`Combined ID`)) %>%
+    ggplot(aes(x = `Combined ID`, y = Words)) +
+    facet_wrap(~`Reviewer ID`) +
+    geom_line(colour = "#3FB5C3") +
+    scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+    labs(
+        title = "Cumulative Number of Words per Combined Review/Interview over Time",
+        subtitle = "For Aave Grants DAO Reviewers/Interviewers"
+    )
+```
+
+![](./data/end.png)
+
+
+## Conclusion
+
+<div style="text-align: left;">
+  <img src="Shot_Poses_IACS/OmniacPoses_10.png" width="150"/>
+</div>
+
+This analysis reveals important dynamics in the reviewer ecosystem of the Aave Grants DAO. Over the past several years, the DAO has successfully maintained a robust and stable pool of active reviewers, with approximately a dozen contributors per quarter, and a core group providing consistent participation over time.
+
+While the average review tends to be concise—under 100 words—the presence of significant outliers indicates deeper engagement from certain reviewers, especially in interviews, where rationales are often more detailed. The data also highlight marked differences in reviewer acceptance rates and productivity, with a few reviewers standing out for both their frequency and the length of their feedback.
+
+These findings point to the importance of reviewer diversity and sustained engagement for the health of the DAO’s grant-making process. Ensuring a mix of experienced and newer reviewers can help balance consistency with fresh perspectives, and tracking both qualitative (word count, rationale depth) and quantitative (number of reviews, acceptance rates) metrics will continue to improve transparency and the overall grant evaluation process.
+
+Continued monitoring of these trends can inform future improvements to the review process, potentially increasing fairness and efficiency in funding high-impact projects for the Aave community.
+
