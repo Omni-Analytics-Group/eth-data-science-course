@@ -98,10 +98,13 @@ Module 7 - Analysis of Aave Grant DAO Activities
   - [R code](case-studies/aave/code/aave_R.Rmd)
   - [Python markdown](case-studies/aave/output/aave_python.html)
   - [Python code](case-studies/aave/code/aave_python.ipynb)
-<<<<<<< HEAD
-=======
-    
->>>>>>> 6f223a8a6af2f41561c89c892f0124dc1d6afe19
+
+* [Reviewer Insights and Participation Trends in the Aave Grants DAO](case-studies/aave-part2/)
+  - [R markdown](case-studies/aave-part2/output/aave_R.html)
+  - [R code](case-studies/aave-part2/code/aave_R.Rmd)
+  - [Python markdown](case-studies/aave-part2/output/aave_python.html)
+  - [Python code](case-studies/aave-part2/code/aave_python.ipynb)
+
 
 Data Sources: *Aave*
 
